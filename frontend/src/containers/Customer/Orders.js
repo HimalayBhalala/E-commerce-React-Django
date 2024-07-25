@@ -1,10 +1,19 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import SideBar from './SideBar';
 import logo from '../../product.jpg';
 
 const Orders = () => {
+
+    const customer_id = JSON.parse(localStorage.getItem('customer_id'))
+
+    // useEffect (() => {
+    //     axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/`)
+    //         .then((response) => {console.log(response)})
+    // },[customer_id])
+
   return (
     <div className="container mt-5" style={{marginBottom:"12rem"}}>
+        {console.log("Customer_id:",customer_id)}
         <div className="row">
             <div className="col-md-3">
                 <SideBar />

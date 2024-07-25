@@ -30,7 +30,8 @@ from .serializers import (
     OrderDetailSerializer,
     OrderItemSerializer,
     CustomerAddressSerializer,
-    ProductRatingSerializer
+    ProductRatingSerializer,
+    CustomerOrderSerializer
 )
 import stripe
 from django.conf import settings
@@ -151,9 +152,10 @@ import json
 def create_payment_intent(request):
     if request.method == 'POST':
         try:
+            print(json.loads(request.body))
             data = json.loads(request.body)
-            amount = data['amount']  # Adjust as per your frontend data format
-            currency = data['currency']  # Adjust as per your frontend data format
+            amount = data['amount'] 
+            currency = data['currency'] 
 
             intent = stripe.PaymentIntent.create(
                 amount=amount,
@@ -171,3 +173,23 @@ def create_payment_intent(request):
             return JsonResponse({'error': 'Internal Server Error'}, status=500)
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+@csrf_exempt
+def update_order_status(request,order_id):
+    if request.method == "POST":
+        status_info = Order.objects.filter(id=order_id).update(order_status=True)
+        if status_info:
+            data = {
+                "order-status":True
+            }
+        else:
+            data = {
+                "order_status":False
+            }
+        return JsonResponse(data)
+    
+class ShowCustomerOrder(APIView):
+    def get(self, request,customer_id, *args, **kwargs):
+        customer = Customer.objects.get(id=customer_id)
+        serializer = CustomerOrderSerializer()
+        return Response({"customer":serializer.data}) 

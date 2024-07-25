@@ -93,8 +93,8 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
-        fields = ["id", "customer", "order_time"]
-        read_only_fields = ["id", "order_time"]
+        fields = ["id", "customer", "order_time","order_status"]
+        read_only_fields = ["id", "order_time","order_status"]
 
     def create(self, validated_data):
         customer = validated_data.pop('customer', None)
@@ -117,6 +117,11 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     def __init__(self,*args,**kwargs):
         super(OrderDetailSerializer,self).__init__(*args,**kwargs)
         self.Meta.depth=1
+
+class CustomerOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["id","customer"]
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())

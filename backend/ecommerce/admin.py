@@ -27,7 +27,7 @@ class CustomerAdmin(admin.ModelAdmin):
 admin.site.register(Customer,CustomerAdmin)
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ["id","customer","order_time"]
+    list_display = ["id","customer","order_time","order_status"]
 admin.site.register(Order,OrderAdmin)
 
 class OrderItemAdmin(admin.ModelAdmin):

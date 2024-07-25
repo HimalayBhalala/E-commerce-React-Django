@@ -18,7 +18,7 @@ const Checkout = ({isAuthenticated}) => {
             return navigate('/login')
         }
     },[])
-
+    
     const totalPrice = () => {
         var sum = 0;
         for(let i=0;i<cartData.length;i++){
@@ -26,6 +26,7 @@ const Checkout = ({isAuthenticated}) => {
         }
         return sum
     }
+
     
     const removeFromCart = (id) => {
         const filteredData = cart.filter((products) => products.product.product_id !== id)

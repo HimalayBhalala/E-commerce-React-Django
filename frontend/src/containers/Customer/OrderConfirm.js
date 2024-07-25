@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import axios from "axios";
 import { connect } from "react-redux";
 import { CartContext } from "../../context/CardContext";
@@ -14,6 +14,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState(0);
   const isInitialMount = useRef(true);
+  const [payment_confirm,setPaymentConfirm] = useState(false);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -23,9 +24,11 @@ const OrderConfirm = ({ isAuthenticated }) => {
     if (!isAuthenticated) {
       navigate("/login");
     } else if (!orderPlaced) {
-      addOrder();
+      if (payment_confirm){
+        addOrder();
+      }
     }
-  }, [isAuthenticated, orderPlaced, navigate]);
+  }, [isAuthenticated, orderPlaced, navigate,payment_confirm]);
 
   const addOrder = async () => {
     setIsLoading(true);
@@ -42,6 +45,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
 
       const order_id = response.data.id;
       await addOrderItem(order_id);
+      await updateOrderStatus(order_id)
       setOrderPlaced(true);
       setOrderId(order_id);
     } catch (error) {
@@ -49,6 +53,51 @@ const OrderConfirm = ({ isAuthenticated }) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const updateOrderStatus = (order_id) => {
+    axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/update-order-status/${order_id}/`)
+    .then((response) => {console.log(response)})
+  }
+  
+  const handlePayment = async () => {
+    setIsLoading(true);
+    setPaymentConfirm(true)
+    try {
+      const stripe = await stripePromise;
+      const response = await axios.post(
+        `${process.env.REACT_APP_API_URL}/ecommerce/create-payment-intent/`,
+        {
+          amount: calculateTotalAmount(),
+          currency: "inr",
+        }
+      );
+      
+      const { clientSecret } = response.data;
+      
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: stripe.elements.getElement("cardElement"),
+        },
+      });
+      
+      if (result.error) {
+        console.log(result.error.message);
+      } else {
+        if (result.paymentIntent.status === "succeeded") {
+          console.log("Payment successful!");
+        }
+      }
+    } catch (error) {
+      console.error("Error handling payment:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const calculateTotalAmount = () => {
+    const payment = localStorage.getItem('total_price')
+    return payment;
   };
 
   const addOrderItem = async (order_id) => {
@@ -76,48 +125,9 @@ const OrderConfirm = ({ isAuthenticated }) => {
         console.log("Error adding order item:", error);
       }
     }
-
-    setCartData([]);
+      setCartData([]);
   };
-
-  const handlePayment = async () => {
-    setIsLoading(true);
-
-    try {
-      const stripe = await stripePromise;
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/ecommerce/create-payment-intent/`,
-        {
-          amount: calculateTotalAmount(),
-          currency: "usd",
-        }
-      );
-
-      const { clientSecret } = response.data;
-
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: stripe.elements.getElement("cardElement"),
-        },
-      });
-
-      if (result.error) {
-        console.log(result.error.message);
-      } else {
-        if (result.paymentIntent.status === "succeeded") {
-          console.log("Payment successful!");
-        }
-      }
-    } catch (error) {
-      console.error("Error handling payment:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const calculateTotalAmount = () => {
-    return 1000; // Example amount calculation
-  };
+  
 
   return (
     <div>
@@ -127,61 +137,94 @@ const OrderConfirm = ({ isAuthenticated }) => {
         </p>
       ) : (
         <div className="container mt-5">
-          <div
-            className="form-control"
-            style={{
-              backgroundColor: "#82a382",
-              border: "2px solid black",
-            }}
-          >
-            <div
-              className="container mt-3"
-              style={{ color: "#rgb(15 28 4)" }}
+          {payment_confirm ? (
+              <div
+                className="form-control"
+                style={{
+                  backgroundColor: "#82a382",
+                  border: "2px solid black",
+                }}
+              >
+                <div
+                  className="container mt-3"
+                  style={{ color: "#rgb(15 28 4)" }}
+                >
+                  <h1 className="text-center">
+                    <span style={{ color: "darkgreen" }}>
+                      <i className=" fa fa-check-circle"></i>
+                    </span>{" "}
+                    Your order has been confirmed.
+                  </h1>
+                  <p className="text-center">
+                    <span className="text-center">
+                      <b>Your Order Id : </b>
+                      {orderId}
+                    </span>
+                  </p>
+                </div>
+              </div>
+          ) : (
+              <div
+              className="form-control"
+              style={{
+                backgroundColor: "lightyellow",
+                border: "2px solid black",
+              }}
             >
-              <h1 className="text-center">
-                <span style={{ color: "darkgreen" }}>
-                  <i className=" fa fa-check-circle"></i>
-                </span>{" "}
-                Your Order has been confirmed.
-              </h1>
-              <p className="text-center">
-                <span className="text-center">
-                  <b>Your Order Id : </b>
-                  {orderId}
-                </span>
-              </p>
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-6">
-              <div className="form-control mt-5 offset-6">
-                <h5 className="mt-2">Select Payment Option</h5>
-                <hr />
-                <form>
-                  <div className="form-group">
-                    <label>
-                      <input
-                        type="radio"
-                        name="selectPay"
-                        id="stripe"
-                      />{" "}
-                      Stripe
-                    </label>
-                  </div>
-
-                  <div className="text-center">
-                    <button
-                      className="btn mt-3 btn-outline-primary"
-                      onClick={handlePayment}
-                      style={{ width: "10rem" }}
-                    >
-                      Pay
-                    </button>
-                  </div>
-                </form>
+              <div
+                className="container mt-3"
+                style={{ color: "#rgb(15 28 4)" }}
+              >
+                <h1 className="text-center">
+                  <span style={{ color: "black" }}>
+                    <i className="fa-solid fa-spinner"></i>
+                    &nbsp;&nbsp;Your order has been not confirmed if you have not pay, payment of a selected product.
+                  </span>
+                </h1>
               </div>
             </div>
-          </div>
+          )
+          }
+          {
+            (!payment_confirm) ? (
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="form-control mt-5 offset-6">
+                    <h5 className="mt-2">Select Payment Option</h5>
+                    <hr />
+                    <form>
+                      <div className="form-group">
+                        <label>
+                          <input
+                            type="radio"
+                            name="selectPay"
+                            id="stripe"
+                          />
+                          &nbsp;Stripe
+                        </label>
+                      </div>
+
+                      <div className="text-center">
+                        <button
+                          className="btn mt-3 btn-outline-primary"
+                          onClick={handlePayment}
+                          style={{ width: "10rem" }}
+                        >
+                          Pay
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            ):
+            (
+              <div className="text-center">
+                <div className="btn btn-success mt-5 ms-1"><Link style={{textDecoration:'none',color:'black'}} to='/'>Go to home</Link></div>
+                <div className="btn btn-warning text-center mt-5 ms-1"><Link to='/orders' style={{textDecoration:'none',color:'black'}}>Click here for show Order detail</Link></div>
+              </div>
+            )
+          }
         </div>
       )}
     </div>
