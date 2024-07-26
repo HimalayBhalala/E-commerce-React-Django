@@ -188,8 +188,3 @@ def update_order_status(request,order_id):
             }
         return JsonResponse(data)
     
-class ShowCustomerOrder(APIView):
-    def get(self, request,customer_id, *args, **kwargs):
-        customer = Customer.objects.get(id=customer_id)
-        serializer = CustomerOrderSerializer()
-        return Response({"customer":serializer.data}) 

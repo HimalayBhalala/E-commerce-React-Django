@@ -118,19 +118,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         super(OrderDetailSerializer,self).__init__(*args,**kwargs)
         self.Meta.depth=1
 
-class CustomerOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ["id","customer"]
-
-class OrderItemSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    class Meta:
-        model = OrderItems
-        fields = ['order', 'product', 'quantity', 'price']
-        extra_kwargs = {
-            'order': {'required': True},
-        }
 
 class CustomerAddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -164,6 +151,15 @@ class CustomerSerializer(serializers.ModelSerializer):
         if len(str(value)) != 10:
             raise serializers.ValidationError("Mobile number must be exactly 10 digits.")
         return value
+    
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    class Meta:
+        model = OrderItems
+        fields = ['order', 'product', 'quantity', 'price']
+        extra_kwargs = {
+            'order': {'required': True},
+        }
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
     customer_orders = OrderSerializer(many=True,read_only=True)        
@@ -201,3 +197,10 @@ class ProductRatingSerializer(serializers.ModelSerializer):
         if ProductRating.objects.filter(customer=customer,product=product).exists():
             raise ValueError("You have aleady added rating")
         return data
+    
+
+class CustomerOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItems
+        fields = ['id','order','product','quantity','price']
+

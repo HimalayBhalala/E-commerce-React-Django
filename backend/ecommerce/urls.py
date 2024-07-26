@@ -21,5 +21,4 @@ urlpatterns = [
     path("hello/",views.hello,name="hello"),
     path('create-payment-intent/', views.create_payment_intent, name='create_payment_intent'),
     path('update-order-status/<int:order_id>/',views.update_order_status, name='update-order-status'),
-    path('<int:customer_id>/orderitems/',views.ShowCustomerOrder.as_view(),name="customer-order")
 ]
