@@ -3,114 +3,90 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import SingleProduct from './SingleProduct';
 import { CartContext } from '../context/CardContext';
 import { connect } from 'react-redux';
+import { CurrencyContext } from '../context/CurrencyContex';
 
-const ProductDetail = ({isAuthenticated}) => {
-
-    const get_customer_id = JSON.parse(localStorage.getItem('customer_id'))
-
-    const navigate = useNavigate()
-
-    const baseURL = 'http://127.0.0.1:8000/ecommerce';
+const ProductDetail = ({ isAuthenticated }) => {
+    const navigate = useNavigate();
     const { product_id } = useParams();
     const [productDetail, setProductDetail] = useState({});
     const [tagData, setTagData] = useState([]);
     const [relatedProduct, setRelatedProduct] = useState([]);
     const [addCart, setAddCart] = useState(false);
-    const {setCartData} = useContext(CartContext);
+    const { setCartData } = useContext(CartContext);
+    const {currency} = useContext(CurrencyContext);
 
-    const checkProductExists = () => {
-        var cartDataInfo = localStorage.getItem('cartDetail');
-        var jsonInfo = JSON.parse(cartDataInfo);
-        if (jsonInfo && jsonInfo.length > 0) {
-            for (let i = 0; i < jsonInfo.length; i++) {
-                if (jsonInfo[i].product.product_id === parseInt(product_id)) {
-                    setAddCart(true);
-                    return;
-                }
-            }
+    const get_customer_id = JSON.parse(localStorage.getItem('customer_id'));
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/login');
+            return;
         }
-        setAddCart(false);
-    };
-    
-    useEffect(() => {    
-        
-        if(!isAuthenticated){
-            navigate('/login')
-        }
-        
+
         const fetchData = async () => {
             try {
-                const response = await fetch(`${baseURL}/product/${product_id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                const response = await fetch(`http://127.0.0.1:8000/ecommerce/product/${product_id}`);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 setProductDetail(data);
                 setTagData(data.tags_data || []);
                 checkProductExists();
             } catch (error) {
-                console.error('Error during fetching the API:', error);
+                console.error('Error fetching product data:', error);
             }
         };
-        
+
         const fetchRelatedData = async () => {
             try {
-                const response = await fetch(`${baseURL}/product/related/${product_id}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+                const response = await fetch(`http://127.0.0.1:8000/ecommerce/product/related/${product_id}`);
+                if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 setRelatedProduct(data || []);
             } catch (error) {
-                console.error('Error during fetching related data:', error);
+                console.error('Error fetching related products:', error);
             }
         };
-        
+
         fetchData();
         fetchRelatedData();
-    }, [product_id, baseURL,isAuthenticated]);
+    }, [product_id, isAuthenticated, navigate]);
 
-
-
-    const renderTags = () => {
-        return tagData.map((tag, index) => (
-            <Link key={index} to={`/product/tag/${tag}`} className="badge bg-secondary ms-1">
-                {tag}
-            </Link>
-        ));
+    const checkProductExists = () => {
+        const cartDataInfo = JSON.parse(localStorage.getItem('cartDetail')) || [];
+        const exists = cartDataInfo.some(item => item.product.product_id === parseInt(product_id));
+        setAddCart(exists);
     };
-    
+
     const addToCart = () => {
-        var getCartDetail = localStorage.getItem('cartDetail');
-        var jsonData = JSON.parse(getCartDetail) || [];
-        var products = {
-            product: {
-                product_id: productDetail.id,
-                product_description: productDetail.description,
-                product_image: productDetail.image,
-                product_price: productDetail.price,
-            },
-            user: {
-                customer_id: get_customer_id,
-            },
+        const getCartDetail = JSON.parse(localStorage.getItem('cartDetail')) || [];
+        const product = {
+            product_id: productDetail.id,
+            product_description: productDetail.description,
+            product_image: productDetail.image,
+            product_price: productDetail.price,
+            product_usd_price: productDetail.usd_price
         };
-        jsonData.push(products);
-        var cartStringData = JSON.stringify(jsonData);
-        localStorage.setItem('cartDetail', cartStringData);
+        const cartData = [...getCartDetail, { product, user: { customer_id: get_customer_id } }];
+        localStorage.setItem('cartDetail', JSON.stringify(cartData));
         setAddCart(true);
-        setCartData(jsonData);
+        setCartData(cartData);
     };
 
     const removeFromCart = () => {
-        var cartData = localStorage.getItem('cartDetail');
-        var jsonData = JSON.parse(cartData) || [];
-        var filteredData = jsonData.filter(item => item.product.product_id !== productDetail.id);
-        var getAllData = JSON.stringify(filteredData);    
-        localStorage.setItem('cartDetail', getAllData);
+        const cartData = JSON.parse(localStorage.getItem('cartDetail')) || [];
+        const updatedCart = cartData.filter(item => item.product.product_id !== productDetail.id);
+        localStorage.setItem('cartDetail', JSON.stringify(updatedCart));
         setAddCart(false);
-        setCartData(filteredData);
+        setCartData(updatedCart);
     };
-    
+
+    const renderTags = () => (
+        tagData.map((tag, index) => (
+            <Link key={index} to={`/product/tag/${tag}`} className="badge bg-secondary ms-1">
+                {tag}
+            </Link>
+        ))
+    );
 
     return (
         <div className='container mt-5' style={{ marginBottom: '3.8rem' }}>
@@ -118,26 +94,39 @@ const ProductDetail = ({isAuthenticated}) => {
             <hr />
             <div className="row mt-5 card-img-container">
                 <div className="col-4">
-                    <div>
-                        <img src={productDetail.image} className='img-thumbnail mb-5' style={{ height: '30rem', width: '25rem' }} alt={productDetail.title} />
-                    </div>
+                    <img 
+                        src={productDetail.image} 
+                        className='img-thumbnail mb-5' 
+                        style={{ height: '30rem', width: '25rem' }} 
+                        alt={productDetail.title || 'Product Image'} 
+                    />
                 </div>
                 <div className="col-8 mt-5">
                     <p><span className="fs-4"><b>Product Title: </b></span><span className='fs-5'>{productDetail.title}</span></p>
                     <p><span className="fs-4"><b>Product Description: </b></span><span className='fs-5'>{productDetail.description}</span></p>
-                    <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{productDetail.price}</span></p>
-                    <hr className='mt-5'/>
+                    <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{currency === 'inr' ? '₹' : '$'} {currency === 'inr' ? productDetail.price : productDetail.usd_price}</span></p>
+                    <hr className='mt-5' />
                     <div className="mt-1 mt-5">
-                        <Link href="#" className='btn btn-dark btn-sm' target="_blank" rel="noopener noreferrer" title='Demo'><i className='fa-solid fa-cart-plus'></i> Demo</Link>
+                        <a href="#" className='btn btn-dark btn-sm' target="_blank" rel="noopener noreferrer" title='Demo'>
+                            <i className='fa-solid fa-cart-plus'></i> Demo
+                        </a>
                         {
-                            (!addCart) ? (
-                                <button className='btn btn-success btn-sm ms-1' type='button' onClick={addToCart} title='Add to Cart'><i className='fa-solid fa-cart-plus'></i> Add To Cart</button>
+                            !addCart ? (
+                                <button className='btn btn-success btn-sm ms-1' type='button' onClick={addToCart} title='Add to Cart'>
+                                    <i className='fa-solid fa-cart-plus'></i> Add To Cart
+                                </button>
                             ) : (
-                                <button className='btn btn-warning btn-sm ms-1' type='button' onClick={removeFromCart} title='Remove from Cart'><i className='fa-solid fa-cart-plus'></i> Remove From Cart</button>
+                                <button className='btn btn-warning btn-sm ms-1' type='button' onClick={removeFromCart} title='Remove from Cart'>
+                                    <i className='fa-solid fa-cart-plus'></i> Remove From Cart
+                                </button>
                             )
                         }
-                        <button className='btn btn-primary btn-sm ms-1' title='Buy Now'><i className='fa-solid fa-bag-shopping'></i> Buy Now</button>
-                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist'><i className='fa-solid fa-heart'></i> Wishlist</button>
+                        <button className='btn btn-primary btn-sm ms-1' title='Buy Now'>
+                            <i className='fa-solid fa-bag-shopping'></i> Buy Now
+                        </button>
+                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist'>
+                            <i className='fa-solid fa-heart'></i> Wishlist
+                        </button>
                     </div>
                     <div className="producttags mt-5">
                         <h5 className='mt-3'><b>Tags</b></h5>
@@ -176,8 +165,7 @@ const ProductDetail = ({isAuthenticated}) => {
 };
 
 const mapStateToProps = (state) => ({
-    isAuthenticated:state.auth.isAuthenticated
-})
-
+    isAuthenticated: state.auth.isAuthenticated
+});
 
 export default connect(mapStateToProps)(ProductDetail);

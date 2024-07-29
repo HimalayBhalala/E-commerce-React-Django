@@ -32,11 +32,13 @@ class Product(models.Model):
     description = models.TextField(null=True,blank=True)
     image = models.ImageField(upload_to='product/image',default='no-image.png')
     tags = models.TextField(null=True,blank=True,default='')
-    price = models.FloatField()  
+    price = models.FloatField(default=0,max_length=10)
+    usd_price = models.FloatField(default=83,max_length=10)
+    downloads = models.IntegerField(default=0,null=True,blank=True)
 
     def __str__(self):
         return f"{self.title}"
-    
+     
     def tags_data(self):
         if self.tags:
             tag_list = self.tags.split(",")

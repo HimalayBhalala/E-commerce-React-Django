@@ -152,7 +152,6 @@ import json
 def create_payment_intent(request):
     if request.method == 'POST':
         try:
-            print(json.loads(request.body))
             data = json.loads(request.body)
             amount = data['amount'] 
             currency = data['currency'] 
@@ -187,4 +186,33 @@ def update_order_status(request,order_id):
                 "order_status":False
             }
         return JsonResponse(data)
+
+class GetCustomerOrder(APIView):
+    def get(self,request,*args,**kwargs):
+        customer_id = self.kwargs['customer_id']
+        order = Order.objects.filter(customer__id=customer_id)
+        order_items = OrderItems.objects.filter(order__in=order)
+        serializer = CustomerOrderSerializer(order_items,many=True)
+        return Response({"data":serializer.data})
+
+@csrf_exempt
+def count_product_download(request, product_id):
+    if request.method == "POST":
+        product = Product.objects.get(id=product_id)
+        totalDownloads = product.downloads
+        totalDownloads += 1
+        if totalDownloads == 0:
+            totalDownloads=1
+        update_result = Product.objects.filter(id=product_id).update(downloads=totalDownloads)
+        data = {
+            'bool':False
+        }
+        if update_result:
+            data = {
+                'bool':True
+            }
+    return JsonResponse(data) 
+
+
+
     

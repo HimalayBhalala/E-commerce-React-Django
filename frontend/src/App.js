@@ -10,8 +10,6 @@ import Footer from './componenets/Footer';
 import CategoryProducts from './containers/CategoryProducts';
 import AllProduct from './containers/AllProduct';
 import ProductDetail from './containers/ProductDetail';
-import OrderSuccess from './containers/OrderSuccess';
-import OrderFailure from './containers/OrderFailure';
 import AboutUs from './containers/AboutUs';
 import Help from './containers/Help';
 import ContactUs from './containers/ContactUs';
@@ -40,11 +38,13 @@ import Report from './containers/Seller/Reports';
 import TagProduct from './containers/TagProduct';
 import { CartProvider } from './context/CardContext';
 import OrderConfirm from './containers/Customer/OrderConfirm';
+import { CurrencyProvider } from './context/CurrencyContex';
 
 function App() {
   return (
     <div>
       <Provider store={store}>
+      <CurrencyProvider>
       <CartProvider>
         <Router>
         <Layout>
@@ -58,8 +58,6 @@ function App() {
             <Route exact path="/product/tag/:tag" element={<TagProduct />} />
             <Route exact path="/product/:product_slug/:product_id" element={<ProductDetail />} />
             <Route exact path="/category/:category_slug/" element={<CategoryProducts />} />
-            <Route exact path="/order/success" element={<OrderSuccess />} />
-            <Route exact path="/order/failure" element={<OrderFailure />} />
             {/* Customer Panel */}
             <Route exact path="/register" element={<SignUp />} />
             <Route exact path="/login" element={<Login />} />
@@ -90,6 +88,7 @@ function App() {
           <Footer />
         </Router>
         </CartProvider>
+        </CurrencyProvider>
       </Provider>
     </div>
   );

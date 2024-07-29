@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { CurrencyContext } from '../context/CurrencyContex';
 
 const SingleProduct = (props) => {
+    
+    const {currency} = useContext(CurrencyContext);
+
     return (
         <div className="col-12 col-md-3 mb-4">
                 <div className="card card-img-container">
@@ -13,7 +17,13 @@ const SingleProduct = (props) => {
                                 {props.product?.title}
                             </Link>
                         </h4>
-                        <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: {props.product.price}</h5>
+                        {
+                            currency == 'inr' ? (
+                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: ₹ {props.product.price}</h5>
+                            ) : (
+                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: $ {props.product.usd_price}</h5>
+                            )
+                        }
                     </div>
                 </Link>
                     <div className="card-footer">

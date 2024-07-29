@@ -35,7 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id","category","image","vendor","customer","title","description","tags_data","price","product_ratings","order_products"]
+        fields = ["id","category","image","vendor","customer","title","description","downloads","tags_data","price","usd_price","product_ratings","order_products"]
 
     def get_image(self, obj):
         image = str(obj.image)
@@ -66,6 +66,10 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         super(ProductCategorySerializer,self).__init__(*args, **kwargs)
         self.Meta.depth=1
 
+class ProductInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id","title","description","image","price","usd_price"]
 
 class ProductTitleDetailSerializer(serializers.ModelSerializer):
     category_product = ProductSerializer(many=True,read_only=True)
@@ -83,7 +87,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id","category","vendor","customer","title","description","customer","price","image","tags_data","product_ratings","order_products"]
+        fields = ["id","category","vendor","customer","title","description","customer","price","usd_price","image","downloads","tags_data","product_ratings","order_products"]
 
     def __init__(self,*args,**kwargs):
         super(ProductDetailSerializer,self).__init__(*args,**kwargs)
@@ -131,7 +135,7 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
 class CustomerProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id","title","price"]
+        fields = ["id","title","price","usd_price"]
 
 class CustomerSerializer(serializers.ModelSerializer):
     customer_orders = OrderSerializer(many=True,read_only=True)
@@ -152,11 +156,22 @@ class CustomerSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Mobile number must be exactly 10 digits.")
         return value
     
+class CustomerOrderSerializer(serializers.ModelSerializer):
+    product = ProductInfoSerializer()
+    class Meta:
+        model = OrderItems
+        fields = ["id","order","product"]
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super(CustomerOrderSerializer,self).__init__(instance, data, **kwargs)
+        self.Meta.depth=1
+
+    
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     class Meta:
         model = OrderItems
-        fields = ['order', 'product', 'quantity', 'price']
+        fields = ['order', 'product', 'quantity', 'price',"usd_price"]
         extra_kwargs = {
             'order': {'required': True},
         }
@@ -198,9 +213,4 @@ class ProductRatingSerializer(serializers.ModelSerializer):
             raise ValueError("You have aleady added rating")
         return data
     
-
-class CustomerOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderItems
-        fields = ['id','order','product','quantity','price']
 

@@ -19,7 +19,8 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 admin.site.register(ProductCategory,ProductCategoryAdmin)
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["id","title","tags","customer","category","vendor","price"]
+    list_display = ["id","title","tags","customer","category","vendor","price","usd_price"]
+    list_editable = ["usd_price","price"]
 admin.site.register(Product,ProductAdmin)
 
 class CustomerAdmin(admin.ModelAdmin):

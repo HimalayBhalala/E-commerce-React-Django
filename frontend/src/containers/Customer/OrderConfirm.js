@@ -4,6 +4,7 @@ import axios from "axios";
 import { connect } from "react-redux";
 import { CartContext } from "../../context/CardContext";
 import { loadStripe } from "@stripe/stripe-js";
+import { CurrencyContext } from "../../context/CurrencyContex";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
@@ -15,6 +16,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const [orderId, setOrderId] = useState(0);
   const isInitialMount = useRef(true);
   const [payment_confirm,setPaymentConfirm] = useState(false);
+  const {currency} = useContext(CurrencyContext);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -69,7 +71,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
         `${process.env.REACT_APP_API_URL}/ecommerce/create-payment-intent/`,
         {
           amount: calculateTotalAmount(),
-          currency: "inr",
+          currency: currency,
         }
       );
       
@@ -110,7 +112,11 @@ const OrderConfirm = ({ isAuthenticated }) => {
         formData.append("order", order_id);
         formData.append("product", cart.product.product_id);
         formData.append("quantity", 1);
-        formData.append("price", cart.product.product_price);
+        if(currency === 'inr'){
+          formData.append("price", cart.product.product_price);
+        }else{
+          formData.append("usd_price", cart.product.product_usd_price);
+        }
 
         return axios.post(
           `${process.env.REACT_APP_API_URL}/ecommerce/orderitems/`,
@@ -177,7 +183,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
               >
                 <h1 className="text-center">
                   <span style={{ color: "black" }}>
-                    <i className="fa-solid fa-spinner"></i>
+                  <i className="fa-solid fa-spinner spinner"></i>
                     &nbsp;&nbsp;Your order has been not confirmed if you have not pay, payment of a selected product.
                   </span>
                 </h1>

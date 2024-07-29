@@ -10,3 +10,30 @@ body{
 .card-background{
   background-color:#e2d4d475;
 }
+
+
+.spinner {
+  font-size: 35px; 
+  color: gray;  
+  animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.order-status-spinner{
+  font-size: 1rem;
+  color: yellowgreen;
+  animation: rotation 3s linear infinite;
+}
+
+@keyframes rotation {
+  0%{
+    transform: rotate(0deg);
+  }  
+  100%{
+    transform: rotate(360deg);
+  }
+}
