@@ -80,9 +80,12 @@ class ProductTagAPIView(APIView):
         return Response(serializer.data)
     
 class ProductHomeView(ListAPIView):
-    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = HomeProductPagination
+
+    def get_queryset(self):
+        return Product.objects.all().order_by('-downloads')
+
 
 class ProductCategoryHomeView(ListAPIView):
     queryset = ProductCategory.objects.all()
