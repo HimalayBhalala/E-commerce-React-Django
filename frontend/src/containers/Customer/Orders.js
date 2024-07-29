@@ -30,7 +30,6 @@ const Orders = () => {
 
   return (
     <>
-    {console.log(currency,order_currency)}
     {
       (orderItem.length <= 0) ? (
         <div className="container mt-5" style={{ marginBottom: "12rem" }}>
