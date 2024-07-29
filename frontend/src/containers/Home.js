@@ -7,6 +7,7 @@ const Home = () => {
     const baseURL = 'http://127.0.0.1:8000/ecommerce'
     const [productData,setProductsData] = useState([])
     const [categoryData,setCategoryData] = useState([])
+    const [popularProductData,setPopularProductData] = useState([]);
 
     useEffect(() => {
         function fetchProductData() {
@@ -41,6 +42,23 @@ const Home = () => {
                 });
         }
 
+        function fetchPopularProductData() {
+            fetch(baseURL + '/home/popular/products/')
+            .then((response) => {
+                if(!response.ok){
+                    throw new Error("Network issue during fetching an api");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                setPopularProductData(data.results);
+            })
+            .catch((error) => {
+                console.log("Error During fetching an api", error);
+            });
+        }
+
+        fetchPopularProductData();
         fetchProductData();
         fetchCategoryData();
     }, []);
@@ -79,12 +97,14 @@ const Home = () => {
             </div>
             <h3 className='mb-4'>Popular Products <Link to="/" className='float-end btn btn-sm' style={{backgroundColor:"darkslategrey",color:"white"}}>View All Popular Products <i className='fa-solid fa-arrow-right-long'></i></Link></h3>
             <div className="row">
+            {
+                popularProductData.map((product) => (
                 <div className="col-12 col-md-3 mb-4">
                     <div className="card">
-                        <img src={logo} className='card-img-top' alt="image9" />
+                        <img src={product.image} className='card-img-top' alt="image9" />
                         <div className="card-body">
-                            <h4 className="card-title">Product title</h4>
-                            <h5 className='card-title text-muted'>Price: Rs.500</h5>
+                            <h4 className="card-title">{product.title}</h4>
+                            <h5 className='card-title text-muted'>Price: $ {product.price}</h5>
                         </div> 
                         <div className="card-footer">
                             <button title='Add to Card' className='btn btn-success btn-sm'>
@@ -96,57 +116,8 @@ const Home = () => {
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-md-3 mb-4">
-                    <div className="card">
-                        <img src={logo} className='card-img-top' alt="image10" />
-                        <div className="card-body">
-                            <h4 className="card-title">Product title</h4>
-                            <h5 className='card-title text-muted'>Price: Rs.500</h5>
-                        </div> 
-                        <div className="card-footer">
-                            <button title='Add to Card' className='btn btn-success btn-sm'>
-                                <i className='fa-solid fa-cart-plus'></i>
-                            </button>
-                            <button className="btn btn-danger btn-sm ms-1" title="Add to Wishlist">
-                                <i className='fa fa-heart'></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-md-3 mb-4">
-                    <div className="card">
-                        <img src={logo} className='card-img-top' alt="image11" />
-                        <div className="card-body">
-                            <h4 className="card-title">Product title</h4>
-                            <h5 className='card-title text-muted'>Price: Rs.500</h5>
-                        </div> 
-                        <div className="card-footer">
-                            <button title='Add to Card' className='btn btn-success btn-sm'>
-                                <i className='fa-solid fa-cart-plus'></i>
-                            </button>
-                            <button className="btn btn-danger btn-sm ms-1" title="Add to Wishlist">
-                                <i className='fa fa-heart'></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div className="col-12 col-md-3 mb-4">
-                    <div className="card">
-                        <img src={logo} className='card-img-top' alt="image12" />
-                        <div className="card-body">
-                            <h4 className="card-title">Product title</h4>
-                            <h5 className='card-title text-muted'>Price: Rs.500</h5>
-                        </div> 
-                        <div className="card-footer">
-                            <button title='Add to Card' className='btn btn-success btn-sm'>
-                                <i className='fa-solid fa-cart-plus'></i>
-                            </button>
-                            <button className="btn btn-danger btn-sm ms-1" title="Add to Wishlist">
-                                <i className='fa fa-heart'></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                ))
+            }
             </div>
             <h3 className='mb-4'>Popular Sellers <Link to="/" className='float-end btn btn-sm' style={{backgroundColor:"darkslategrey",color:"white"}}>View All Sellers <i className='fa-solid fa-arrow-right-long'></i></Link></h3>
             <div className="row">

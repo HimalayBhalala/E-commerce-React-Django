@@ -65,7 +65,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const handlePayment = async () => {
     setIsLoading(true);
     setPaymentConfirm(true)
-    localStorage.setItem('order-currency')
+    localStorage.setItem('order-currency',currency)
     try {
       const stripe = await stripePromise;
       const response = await axios.post(

@@ -17,3 +17,6 @@ class HomeProductPagination(pagination.PageNumberPagination):
 
 class HomeCategoryProductPagination(pagination.PageNumberPagination):
     page_size = 4
+
+class PopularProductPagination(pagination.PageNumberPagination):
+    page_size = 4

@@ -162,7 +162,7 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'ecommerce.pagination.CustomPagination',
-    'PAGE_SIZE': 1
+    'PAGE_SIZE': 3
 }
 
 # settings.py

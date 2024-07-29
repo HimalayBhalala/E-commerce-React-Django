@@ -4,7 +4,8 @@ from rest_framework.views import APIView
 from rest_framework import viewsets
 from .pagination import (
     HomeProductPagination,
-    HomeCategoryProductPagination
+    HomeCategoryProductPagination,
+    PopularProductPagination
 )
 from rest_framework.decorators import api_view
 from .models import (
@@ -80,12 +81,16 @@ class ProductTagAPIView(APIView):
         return Response(serializer.data)
     
 class ProductHomeView(ListAPIView):
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = HomeProductPagination
 
+class PopularProductView(ListAPIView):
+    serializer_class = ProductSerializer
+    pagination_class = PopularProductPagination
+
     def get_queryset(self):
         return Product.objects.all().order_by('-downloads')
-
 
 class ProductCategoryHomeView(ListAPIView):
     queryset = ProductCategory.objects.all()
@@ -144,12 +149,6 @@ class OrderDetailAPIView(ListCreateAPIView):
 class ProductRatingView(viewsets.ModelViewSet):
     queryset = ProductRating.objects.all()
     serializer_class = ProductRatingSerializer
-
-@api_view(["GET"])
-def hello(request):
-    return Response({"Message":"Hello"})
-
-
 
 @csrf_exempt
 def create_payment_intent(request):
