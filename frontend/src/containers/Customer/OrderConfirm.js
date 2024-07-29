@@ -65,6 +65,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const handlePayment = async () => {
     setIsLoading(true);
     setPaymentConfirm(true)
+    localStorage.setItem('order-currency')
     try {
       const stripe = await stripePromise;
       const response = await axios.post(
@@ -99,7 +100,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   
   const calculateTotalAmount = () => {
     console.log("Total:",localStorage.getItem('total_price'))
-    const payment = parseInt(Math.floor(localStorage.getItem('total_price')))
+    const payment = parseInt(Math.floo(localStorage.getItem('total_price')))
     return payment;
   };
 

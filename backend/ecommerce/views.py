@@ -35,6 +35,11 @@ from .serializers import (
 )
 import stripe
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+import json
 
 class VendorAPIView(ListCreateAPIView):
     queryset = Vendor.objects.all()
@@ -141,12 +146,7 @@ class ProductRatingView(viewsets.ModelViewSet):
 def hello(request):
     return Response({"Message":"Hello"})
 
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
 
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-import json
 
 @csrf_exempt
 def create_payment_intent(request):
@@ -200,17 +200,17 @@ def count_product_download(request, product_id):
         product = Product.objects.get(id=product_id)
         totalDownloads = product.downloads
         totalDownloads += 1
-        if totalDownloads == 0:
-            totalDownloads=1
         update_result = Product.objects.filter(id=product_id).update(downloads=totalDownloads)
         data = {
-            'bool':False
+            'bool':False,
+            'downloads':product.downloads
         }
         if update_result:
             data = {
-                'bool':True
+                'bool':True,
+                'downloads':product.downloads
             }
-    return JsonResponse(data) 
+        return JsonResponse(data) 
 
 
 

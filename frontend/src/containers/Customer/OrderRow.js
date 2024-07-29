@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { CurrencyContext } from "../../context/CurrencyContex";
 
@@ -21,7 +21,7 @@ function OrderRow(props) {
         formData
       );
       if (response.data.bool === true) {
-        setTotalDownloads((prevDownloads) => prevDownloads + 1);
+        setTotalDownloads(response.data.downloads);
         const imageUrl = `${process.env.REACT_APP_API_URL}/${products.product?.image}`;
         downloadImage(imageUrl, products.product?.image || "download");
       } else {
