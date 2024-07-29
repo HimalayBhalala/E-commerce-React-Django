@@ -65,6 +65,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const handlePayment = async () => {
     setIsLoading(true);
     setPaymentConfirm(true)
+    localStorage.setItem('order-currency',currency);
     try {
       const stripe = await stripePromise;
       const response = await axios.post(
@@ -98,7 +99,8 @@ const OrderConfirm = ({ isAuthenticated }) => {
   };
   
   const calculateTotalAmount = () => {
-    const payment = localStorage.getItem('total_price')
+    console.log("Total:",localStorage.getItem('total_price'))
+    const payment = parseInt(Math.floor(localStorage.getItem('total_price')))
     return payment;
   };
 
@@ -115,7 +117,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
         if(currency === 'inr'){
           formData.append("price", cart.product.product_price);
         }else{
-          formData.append("usd_price", cart.product.product_usd_price);
+          formData.append("price", cart.product.product_usd_price);
         }
 
         return axios.post(
@@ -137,6 +139,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
 
   return (
     <div>
+      {localStorage.getItem('total_price')}
       {isLoading ? (
         <p className="text-center">
           <h1>Processing your order...</h1>
@@ -158,7 +161,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
                   <h1 className="text-center">
                     <span style={{ color: "darkgreen" }}>
                       <i className=" fa fa-check-circle"></i>
-                    </span>{" "}
+                    </span>
                     Your order has been confirmed.
                   </h1>
                   <p className="text-center">

@@ -171,7 +171,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     class Meta:
         model = OrderItems
-        fields = ['order', 'product', 'quantity', 'price',"usd_price"]
+        fields = ['order', 'product', 'quantity', 'price']
         extra_kwargs = {
             'order': {'required': True},
         }

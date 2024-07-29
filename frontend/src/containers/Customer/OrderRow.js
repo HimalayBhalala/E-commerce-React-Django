@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
+import { CurrencyContext } from "../../context/CurrencyContex";
 
 function OrderRow(props) {
   const index = props.index;
+  const {currency} = useContext(CurrencyContext);
   const products = props.products;
+
   const [totalDownloads, setTotalDownloads] = useState(
     products.product?.downloads || 0
   );
@@ -62,7 +65,13 @@ function OrderRow(props) {
         </span>
       </td>
       <td>
-        <p>Rs.{products.product?.price}</p>
+        {
+          currency === 'inr' ? (
+            <p>₹ {products.product?.price}</p>
+          ) : (
+            <p>$ {products.product?.usd_price}</p>
+          )
+        }
       </td>
       <td>
         {products.order.order_status ? (

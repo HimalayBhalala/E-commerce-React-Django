@@ -13,7 +13,7 @@ const Checkout = ({ isAuthenticated }) => {
 
   
     const totalPrice = () => {
-        let sum = 0;
+        var sum = parseFloat(0);
         if (currency === 'inr'){
             cartData.forEach(item => {
             sum += item.product.product_price
@@ -23,7 +23,7 @@ const Checkout = ({ isAuthenticated }) => {
                 sum += item.product.product_usd_price
             });
         }
-        return sum.toFixed(2);
+        return sum.toFixed(2)
     };
 
 

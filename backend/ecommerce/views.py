@@ -155,7 +155,6 @@ def create_payment_intent(request):
             data = json.loads(request.body)
             amount = data['amount'] 
             currency = data['currency'] 
-
             intent = stripe.PaymentIntent.create(
                 amount=amount,
                 currency=currency,
