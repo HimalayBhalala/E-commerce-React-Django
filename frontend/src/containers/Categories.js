@@ -27,8 +27,11 @@ const Categories = () => {
         fetchData(baseurl)
     }
 
-    var links = [];
-    for(let i=1;i<=totalResult;i++){
+    const resultsPerPage = 3;
+    const totalPages = Math.ceil(totalResult / resultsPerPage);
+    const links = [];
+    for(let i=1;i<=totalPages;i++){
+        console.log(i)
         links.push(
             <li className="page-item"><Link className="page-link" key={i} onClick={() => changeUrl(baseURL + `/categories/?page=${i}`)} to={`/categories/?page=${i}`}>{i}</Link></li>
         )
@@ -42,10 +45,10 @@ const Categories = () => {
             <div className="row">
                 {
                     categories.map((category) => {
-                        return <div className="col-12 col-md-3 mb-4" key={category.id}>
+                        return <div className="col-12 col-md-3 mb-4 offset-1" key={category.id}>
                                 <Link className='link' style={{color:"initial"}} to={`/category/${category.title}`}>
-                                    <div className="card">
-                                            <img src={category.category_image} className='card-img-top' alt={category.title} />
+                                    <div className="card fixed-size-card">
+                                            <img src={category.category_image} className='card-img-top large-image' alt={category.title} />
                                         <div className="card-body card-background">
                                             <h4 className="card-title">Title : {category.title}</h4>
                                             <p className="card-title">Description : {category.description}</p>
@@ -59,11 +62,31 @@ const Categories = () => {
                         })
                 }
             </div>
-            <nav aria-label="Page navigation example">
-                <ul className="pagination">
-                    {links}
-                </ul>
-            </nav>
+            <nav aria-label="Page navigation example" style={{ marginTop: "2rem" }}>
+                    <ul className="pagination justify-content-center">
+                        <li className="page-item">
+                            <Link 
+                                className="page-link" 
+                                onClick={() => changeUrl(baseURL + `/categories/?page=${totalPages}`)}
+                                to={`/categories/?page=${1}`}
+                                aria-label="Previous"
+                            >
+                                <span aria-hidden="true">&laquo;</span>
+                            </Link>
+                        </li>
+                        {links}
+                        <li className="page-item">
+                            <Link 
+                                className="page-link" 
+                                onClick={() => changeUrl(baseURL + `/categories/?page=${totalPages}`)}
+                                to={`/categories/?page=${totalPages}`}
+                                aria-label="Next"
+                            >
+                                <span aria-hidden="true">&raquo;</span>
+                            </Link>
+                        </li>
+                    </ul>
+                </nav>
         </section>
     </div>
   )

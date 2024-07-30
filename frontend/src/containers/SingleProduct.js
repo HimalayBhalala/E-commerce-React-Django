@@ -8,9 +8,9 @@ const SingleProduct = (props) => {
 
     return (
         <div className="col-12 col-md-3 mb-4">
-                <div className="card card-img-container">
+                <div className="card card-img-container fixed-size-card">
                 <Link to={`/product/${props.product?.title}/${props.product?.id}`} style={{ textDecoration: 'none' }}>
-                    <img src={props.product?.image} className="card-img-top" alt={props.product?.title} style={{ maxHeight: '100%', maxWidth: '100%' }} />
+                    <img src={props.product?.image} className="card-img-top large-image" alt={props.product?.title} style={{ maxHeight: '100%', maxWidth: '100%' }} />
                     <div className="card-body card-background">
                         <h4 className="card-title">
                             <Link className='link' style={{ color: "initial" }} to={`/product/${props.product?.title}/${props.product?.id}`}>

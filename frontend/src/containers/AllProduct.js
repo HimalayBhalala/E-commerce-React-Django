@@ -51,28 +51,27 @@ const AllProduct = () => {
                 <div className="row mt-3">
                     {
                         products.map((product) => (
-                            <div key={product.id} className="col-12 col-md-3 mb-4 offset-md-1">
-                                <div className="card card-img-container">
+                            <div key={product.id} className="col-12 col-md-3 mb-4 offset-1">
+                                <div className="card fixed-size-card" style={{width:"90%"}}>
                                     <Link to={`/product/${product?.title}/${product?.id}`} style={{ textDecoration: 'none' }}>
                                         <img 
                                             src={product?.image} 
-                                            className="card-img-top" 
+                                            className="card-img-top large-image" 
                                             alt={product?.title} 
-                                            style={{ maxHeight: '100%', maxWidth: '100%' }} 
                                         />
-                                        <div className="card-body card-background">
-                                            <h4 className="card-title">
+                                        <div className="card-body">
+                                            <h4 className="card-title small-title">
                                                 <Link className='link' style={{ color: "initial" }} to={`/product/${product?.title}/${product?.id}`}>
                                                     {product?.title}
                                                 </Link>
                                             </h4>
                                             {
                                                 currency === 'inr' ? (
-                                                    <h5 className='card-title' style={{ color: 'darkslategrey' }}>
+                                                    <h5 className='card-price small-price' style={{ color: 'darkslategrey' }}>
                                                         Price: ₹ {product.price}
                                                     </h5>
                                                 ) : (
-                                                    <h5 className='card-title' style={{ color: 'darkslategrey' }}>
+                                                    <h5 className='card-price small-price' style={{ color: 'darkslategrey' }}>
                                                         Price: $ {product.usd_price}
                                                     </h5>
                                                 )

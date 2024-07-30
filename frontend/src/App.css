@@ -37,3 +37,41 @@ body{
     transform: rotate(360deg);
   }
 }
+
+
+.fixed-size-card {
+  width: 80%; 
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 4px 4px brown;
+}
+
+.large-image {
+  height: 18rem; 
+  object-fit: fill;
+  border-bottom: 2px solid black;
+}
+
+.card-body {
+  text-align: center; 
+  background-color: aliceblue;
+}
+
+.small-title {
+  font-size: 1.2rem; 
+  margin: 0;
+}
+
+.small-price {
+  font-size: 1rem; 
+  margin-top: 0.5rem;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  background-color: lightyellow;
+  padding: 0.5rem 1rem; 
+}
