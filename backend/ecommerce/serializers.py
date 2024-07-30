@@ -8,6 +8,7 @@ from .models import (
     OrderItems,
     CustomerAddress,
     ProductRating,
+    WishList
 )
 
 class VendorSerializer(serializers.ModelSerializer):
@@ -213,4 +214,13 @@ class ProductRatingSerializer(serializers.ModelSerializer):
             raise ValueError("You have aleady added rating")
         return data
     
+
+class WishListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WishList
+        fields = ["id","product","customer"]
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super(WishListSerializer,self).__init__(instance, data, **kwargs)
+        self.Meta.depth=1
 

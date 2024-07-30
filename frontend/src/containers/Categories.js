@@ -31,7 +31,6 @@ const Categories = () => {
     const totalPages = Math.ceil(totalResult / resultsPerPage);
     const links = [];
     for(let i=1;i<=totalPages;i++){
-        console.log(i)
         links.push(
             <li className="page-item"><Link className="page-link" key={i} onClick={() => changeUrl(baseURL + `/categories/?page=${i}`)} to={`/categories/?page=${i}`}>{i}</Link></li>
         )

@@ -16,7 +16,8 @@ from .models import (
     Order,
     OrderItems,
     CustomerAddress,
-    ProductRating
+    ProductRating,
+    WishList
 )
 from .serializers import (
     VendorSerializer,
@@ -32,7 +33,8 @@ from .serializers import (
     OrderItemSerializer,
     CustomerAddressSerializer,
     ProductRatingSerializer,
-    CustomerOrderSerializer
+    CustomerOrderSerializer,
+    WishListSerializer
 )
 import stripe
 from django.conf import settings
@@ -215,5 +217,10 @@ def count_product_download(request, product_id):
         return JsonResponse(data) 
 
 
-
+class GetProductWishList(APIView):
+    def get(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        wishlist_data = WishList.objects.filter(customer__id=customer_id)
+        serializer = WishListSerializer(wishlist_data,many=True)
+        return Response({"data":serializer.data})
     

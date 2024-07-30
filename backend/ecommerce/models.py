@@ -51,6 +51,11 @@ class CustomerAddress(models.Model):
     address = models.TextField()
     default_address = models.BooleanField(default=False)
 
+
+    class Meta:
+        verbose_name="customer address"
+        verbose_name_plural="customer addresses"
+
     def __str__(self):
         return f"{self.address}"
 
@@ -67,6 +72,10 @@ class OrderItems(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="order_products")
     quantity = models.IntegerField(default=1)
     price  = models.DecimalField(max_digits=10,decimal_places=2,default=0)
+
+
+    class Meta:
+        verbose_name_plural="order items"
     
     def __str__(self):
         return f"{self.product.title}"
@@ -78,5 +87,18 @@ class ProductRating(models.Model):
     review = models.TextField()
     add_time = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name_plural="product ratings"
+
     def __str__(self):
         return f"{self.rating}-{self.review}"
+
+class WishList(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,related_name="product_wishlist")
+    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,related_name="customer_wishlist")
+
+    class Meta:
+        verbose_name_plural="wishlists"
+
+    def __str__(self) -> str:
+        return f"{self.product.title} - {self.customer.user.email}"

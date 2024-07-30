@@ -88,6 +88,10 @@ const ProductDetail = ({ isAuthenticated }) => {
         ))
     );
 
+    const addProductWishList = (product_id,customer_id) => {
+        console.log("Product:",product_id,"Customer:",get_customer_id)
+    }
+
     return (
         <div className='container mt-5' style={{ marginBottom: '3.8rem' }}>
             <h1 className='text-center mb-5'>Product Information</h1>
@@ -124,7 +128,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                         <button className='btn btn-primary btn-sm ms-1' title='Buy Now'>
                             <i className='fa-solid fa-bag-shopping'></i> Buy Now
                         </button>
-                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist'>
+                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist' onClick={addProductWishList(productDetail.id)}>
                             <i className='fa-solid fa-heart'></i> Wishlist
                         </button>
                     </div>

@@ -22,5 +22,6 @@ urlpatterns = [
     path("<int:customer_id>/orderitems/",views.GetCustomerOrder.as_view(),name='customer-order'),
     path('create-payment-intent/', views.create_payment_intent, name='create-payment-intent'),
     path('update-order-status/<int:order_id>/',views.update_order_status, name='update-order-status'),
-    path('count_product_download/<int:product_id>/',views.count_product_download,name='count-product-download')
+    path('count_product_download/<int:product_id>/',views.count_product_download,name='count-product-download'),
+    path('wish-list/<int:customer_id>/',views.GetProductWishList.as_view(),name="product-wishlist")
 ]

@@ -7,7 +7,8 @@ from .models import (
     Order,
     OrderItems,
     CustomerAddress,
-    ProductRating
+    ProductRating,
+    WishList
 )
 
 class VendorAdmin(admin.ModelAdmin):
@@ -42,3 +43,7 @@ admin.site.register(CustomerAddress,CustomerAddressAdmin)
 class ProductRatingAdmin(admin.ModelAdmin):
     list_display = ["id","customer","product","rating","review","add_time"]
 admin.site.register(ProductRating,ProductRatingAdmin)
+
+class WishListAdmin(admin.ModelAdmin):
+    list_display = ["id","product","customer"]
+admin.site.register(WishList,WishListAdmin)
