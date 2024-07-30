@@ -1,8 +1,24 @@
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import SideBar from './SideBar';
-import logo from '../../product.jpg';
+import axios from 'axios';
+import { WishListContext } from '../../context/WishListContext';
+import { CurrencyContext } from '../../context/CurrencyContex';
 
 const WishList = () => {
+
+    const get_customer_id = localStorage.getItem('customer_id')
+    const {wish_list,setWishList} = useContext(WishListContext);
+    const {currency} = useContext(CurrencyContext)
+
+    useEffect(() => {
+        const getWishListData = () => {
+            axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/wish-list/${parseInt(get_customer_id)}/`)
+            .then((response) => {setWishList(response.data.data)})
+            .catch((error) => console.log("Error during fetching api",String(error)))
+        }
+        getWishListData();
+    },[get_customer_id])
+
   return (
     <div className="container mt-5" style={{marginBottom:"12rem"}}>
         <div className="row">
@@ -21,57 +37,33 @@ const WishList = () => {
                             </tr>
                         </thead>  
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>
-                                    <td>
-                                        <img src={logo} className='img-thumbnail' style={{width:"60px"}} alt="product1" />
-                                    </td>
-                                    <td>
-                                        <p className='mt-2' style={{marginLeft:"20px"}}>Python</p>
-                                    </td>
-                                </td>
-                                <td>
-                                    <p>Rs.500</p>
-                                </td>
-                                <td>
-                                    <button className='btn btn-danger btn-sm'>Remove</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>
-                                    <td>
-                                        <img src={logo} className='img-thumbnail' style={{width:"60px"}} alt="product1" />
-                                    </td>
-                                    <td>
-                                        <p className='mt-2' style={{marginLeft:"20px"}}>Java</p>
-                                    </td>
-                                </td>
-                                <td>
-                                    <p>Rs.500</p>
-                                </td>
-                                <td>
-                                    <button className='btn btn-danger btn-sm'>Remove</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>
-                                    <td>
-                                        <img src={logo} className='img-thumbnail' style={{width:"60px"}} alt="product1" />
-                                    </td>
-                                    <td>
-                                        <p className='mt-2' style={{marginLeft:"20px"}}>C#</p>
-                                    </td>
-                                </td>
-                                <td>
-                                    <p>Rs.500</p>
-                                </td>
-                                <td>
-                                    <button className='btn btn-danger btn-sm'>Remove</button>
-                                </td>
-                            </tr>
+                            {
+                                wish_list.map((products,index) => (
+                                    <tr>
+                                        <td>{index+1}</td>
+                                        <td>
+                                            <td>
+                                                <img src={`${process.env.REACT_APP_API_URL}/${products?.product.image}`} className='img-thumbnail' style={{width:"60px"}} alt={products?.product.title} />
+                                            </td>
+                                            <td>
+                                                <p className='mt-2' style={{marginLeft:"20px"}}>{}</p>
+                                            </td>
+                                        </td>
+                                             <td>
+                                                {
+                                                currency === 'inr' ? (
+                                                    <p>₹ {products?.product.price}</p>
+                                                ):(
+                                                    <p>$ {products?.product.usd_price}</p>
+                                                )
+                                                }
+                                            </td>
+                                        <td>
+                                            <button className='btn btn-danger btn-sm'>Remove</button>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>

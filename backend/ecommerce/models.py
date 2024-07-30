@@ -94,11 +94,9 @@ class ProductRating(models.Model):
         return f"{self.rating}-{self.review}"
 
 class WishList(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,related_name="product_wishlist")
-    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,related_name="customer_wishlist")
+    product = models.ForeignKey(Product,on_delete=models.SET_NULL,null=True,blank=True,related_name="product_wishlist")
+    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True,related_name="customer_wishlist")
 
     class Meta:
         verbose_name_plural="wishlists"
 
-    def __str__(self) -> str:
-        return f"{self.product.title} - {self.customer.user.email}"

@@ -39,6 +39,7 @@ import TagProduct from './containers/TagProduct';
 import { CartProvider } from './context/CardContext';
 import OrderConfirm from './containers/Customer/OrderConfirm';
 import { CurrencyProvider } from './context/CurrencyContex';
+import { WishListProvider } from './context/WishListContext';
 
 function App() {
   return (
@@ -46,6 +47,7 @@ function App() {
       <Provider store={store}>
       <CurrencyProvider>
       <CartProvider>
+      <WishListProvider>
         <Router>
         <Layout>
           <Routes>
@@ -87,6 +89,7 @@ function App() {
           </Layout>
           <Footer />
         </Router>
+        </WishListProvider>
         </CartProvider>
         </CurrencyProvider>
       </Provider>

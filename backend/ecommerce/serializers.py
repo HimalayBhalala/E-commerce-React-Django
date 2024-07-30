@@ -224,3 +224,4 @@ class WishListSerializer(serializers.ModelSerializer):
         super(WishListSerializer,self).__init__(instance, data, **kwargs)
         self.Meta.depth=1
 
+    

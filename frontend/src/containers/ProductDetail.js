@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import SingleProduct from './SingleProduct';
 import { CartContext } from '../context/CardContext';
-import { connect } from 'react-redux';
 import { CurrencyContext } from '../context/CurrencyContex';
+import { connect } from 'react-redux';
+import axios from 'axios';
 
 const ProductDetail = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -89,7 +90,13 @@ const ProductDetail = ({ isAuthenticated }) => {
     );
 
     const addProductWishList = (product_id,customer_id) => {
-        console.log("Product:",product_id,"Customer:",get_customer_id)
+        axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/add-product-wishlist/${customer_id}/${product_id}/`)       
+        .then((response) => {
+            console.log(response)
+        })
+        .catch((error) => {
+            console.log("Error during fetching a api",String(error))
+        })
     }
 
     return (
@@ -128,7 +135,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                         <button className='btn btn-primary btn-sm ms-1' title='Buy Now'>
                             <i className='fa-solid fa-bag-shopping'></i> Buy Now
                         </button>
-                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist' onClick={addProductWishList(productDetail.id)}>
+                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist' onClick={() => {addProductWishList(productDetail.id,get_customer_id)}}>
                             <i className='fa-solid fa-heart'></i> Wishlist
                         </button>
                     </div>
