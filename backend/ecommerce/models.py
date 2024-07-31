@@ -22,11 +22,10 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.user.email}"
-
     
 class Product(models.Model):
-    category = models.ForeignKey(ProductCategory,on_delete=models.SET_NULL,null=True,related_name="category_product")
-    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,related_name='product_customer')
+    category = models.ForeignKey(ProductCategory,on_delete=models.SET_NULL,null=True,blank=True,related_name="category_product")
+    customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True,related_name='product_customer')
     vendor = models.ForeignKey(Vendor,on_delete=models.SET_NULL,null=True,related_name="product_vendor")
     title = models.CharField(max_length=200)
     description = models.TextField(null=True,blank=True)
@@ -50,7 +49,6 @@ class CustomerAddress(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="customer_address")
     address = models.TextField()
     default_address = models.BooleanField(default=False)
-
 
     class Meta:
         verbose_name="customer address"

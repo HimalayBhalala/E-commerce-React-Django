@@ -34,7 +34,9 @@ from .serializers import (
     CustomerAddressSerializer,
     ProductRatingSerializer,
     CustomerOrderSerializer,
-    WishListSerializer
+    WishListSerializer,
+    CustomerProductCountSerializer,
+    GetTotalOrderSerializer
 )
 import stripe
 from django.conf import settings
@@ -264,3 +266,19 @@ class AddProductInWishList(APIView):
             return Response({"message":"Product deleted Successfully"},status=status.HTTP_204_NO_CONTENT)
         return Response({"message":"product is not exist so deletion is not possible"},status=status.HTTP_400_BAD_REQUEST)
     
+
+class GetCustomerProductCount(APIView):
+    def get(self,request,*args,**kwargs):
+        customer_id = self.kwargs.get('customer_id')
+        customer = Customer.objects.get(id=customer_id)
+        serializer = CustomerProductCountSerializer(customer)
+        return Response({"data":serializer.data})
+    
+
+class GetTotalOrder(APIView):
+    def get(self,request,*args,**kwargs):
+        customer_id = self.kwargs.get('customer_id')
+        customer = Customer.objects.get(id=customer_id)
+        order = Order.objects.filter(customer=customer)
+        serializer = GetTotalOrderSerializer(order,many=True)
+        return Response({"orders":serializer.data})

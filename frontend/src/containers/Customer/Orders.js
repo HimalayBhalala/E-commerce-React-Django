@@ -10,6 +10,7 @@ const Orders = () => {
   const {currency} = useContext(CurrencyContext);
   const order_currency = localStorage.getItem('order-currency');
 
+
   useEffect(() => {
     if (customer_id) {
       const fetchData = async () => {
@@ -17,8 +18,8 @@ const Orders = () => {
           const response = await fetch(
             `${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/`
           );
-          const data = await response.json();
-          setOrderItem(data.data);
+          const res = await response.json();
+          setOrderItem(res.data);
         } catch (error) {
           console.error("Error fetching order items:", error);
         }
