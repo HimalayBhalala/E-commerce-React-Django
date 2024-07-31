@@ -8,7 +8,6 @@ export const CartProvider = ({ children }) => {
     const CartData = JSON.parse(localStorage.getItem('cartDetail')) || [];
     const [cartData, setCartData] = useState(CartData);
 
-
     const totalProductPrice = () => {
       var sum = 0
       if(currency === 'inr'){

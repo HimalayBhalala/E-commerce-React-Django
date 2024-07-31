@@ -1,8 +1,10 @@
 import React from 'react'
 import SideBar from './SideBar';
-import { Link } from 'react-router-dom';
 
 const DashBoard = () => {
+
+  const totalOrder = localStorage.getItem('order-count')
+
   return (
     <div>
       <div className="container mt-5" style={{marginBottom:"12rem"}}>
@@ -18,7 +20,7 @@ const DashBoard = () => {
                           <div className="card-title">
                             <h3>Total Orders</h3>
                           </div>
-                            <Link style={{fontSize:"25px"}}>123</Link>
+                            <div style={{fontSize:"25px",color:'maroon'}}>{totalOrder}</div>
                       </div>
                   </div>
                 </div>
@@ -28,8 +30,8 @@ const DashBoard = () => {
                       <div className="card-title">
                         <h3>Total WishList</h3>
                       </div>
-                        <Link style={{fontSize:"25px"}}>44</Link>
-                    </div>
+                        <div style={{fontSize:"25px",color:'maroon'}}>{4}</div>
+                      </div>
                   </div>
                 </div>
                 <div className="col-md-4">
@@ -38,8 +40,8 @@ const DashBoard = () => {
                       <div className="card-title">
                           <h3>Total Addresses</h3>
                       </div>
-                        <Link style={{fontSize:"25px"}}>3</Link>
-                    </div>
+                        <div style={{fontSize:"25px",color:'maroon'}}>{1}</div>
+                      </div>
                   </div>
                 </div>
               </div>

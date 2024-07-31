@@ -18,7 +18,7 @@ class ProductCategory(models.Model):
 
 class Customer(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
-    mobile = models.PositiveBigIntegerField()
+    mobile = models.PositiveBigIntegerField(null=True,blank=True)
 
     def __str__(self):
         return f"{self.user.email}"

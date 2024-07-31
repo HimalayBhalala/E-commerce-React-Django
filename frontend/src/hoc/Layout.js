@@ -1,14 +1,13 @@
 import React,{useEffect} from 'react';
 import Navbar from '../componenets/Navbar';
+import { checkAuthenticated } from '../actions/auth';
 import { connect } from 'react-redux';
-import {CheckAuthenticated} from '../actions/auth';
 
 const Layout = (props) => {
-  const {CheckAuthenticated} = props;
 
-  useEffect(() => {
-    CheckAuthenticated();
-  },[CheckAuthenticated]);
+  useEffect (() => {
+    checkAuthenticated();
+  },[checkAuthenticated])
 
   return (
     <div>
@@ -18,6 +17,6 @@ const Layout = (props) => {
   )
 };
 
-export default connect(null,{CheckAuthenticated})(Layout);
+export default connect(null,checkAuthenticated())(Layout);
 
  

@@ -24,5 +24,5 @@ urlpatterns = [
     path('update-order-status/<int:order_id>/',views.update_order_status, name='update-order-status'),
     path('count_product_download/<int:product_id>/',views.count_product_download,name='count-product-download'),
     path('wish-list/<int:customer_id>/',views.GetProductWishList.as_view(),name="product-wishlist"),
-    path('add-product-wishlist/<int:customer_id>/<int:product_id>/',views.AddProductInWishList.as_view(),name="add-product-wishlist")
+    path('product-wishlist/<int:customer_id>/<int:product_id>/',views.AddProductInWishList.as_view(),name="add-product-wishlist")
 ]

@@ -18,7 +18,9 @@ const ChangePassword = () => {
 
   const handleSubmit = (e) => {
       e.preventDefault();
+      console.log("Chnage Passwor is working")
   };
+
 
   return (
     <div className="container mt-5" style={{marginBottom:"10.3rem"}}>

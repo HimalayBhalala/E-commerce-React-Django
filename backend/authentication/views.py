@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from ecommerce.models import Customer
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import CreateUserSerializer, CustomerSerializer, LoginSerializer
 
 class CustomerRegisterAPIView(APIView):
@@ -56,6 +57,7 @@ class CustomerLoginAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
 class GetCustomerAPIView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):

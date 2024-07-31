@@ -42,8 +42,9 @@ class CreateUserSerializer(serializers.ModelSerializer):
         last_name = validated_data.get("last_name")
         password = validated_data.get("password")
 
-        user = Customer.objects.create(email=email, first_name=first_name, last_name=last_name, password=password)
-        return user
+        user = User.objects.create(email=email, first_name=first_name, last_name=last_name, password=password)
+        customer = Customer.objects.create(user=user)
+        return customer
 
 
 class LoginSerializer(serializers.Serializer):

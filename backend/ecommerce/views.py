@@ -244,3 +244,23 @@ class AddProductInWishList(APIView):
         if wishlist_added:
             return Response({"message":"Product added in wishlist"},status=status.HTTP_200_OK)
         return Response({"message":"product is not added in wishlist try again"},status=status.HTTP_400_BAD_REQUEST)
+    
+
+    def delete(self,request,*args,**kwargs):
+        customer_id = self.kwargs['customer_id']
+        product_id = self.kwargs['product_id']
+
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            product = Product.objects.get(id=product_id)
+        except Customer.DoesNotExist:
+            return Response({"message":"Customer Does not exist with a given key"},status=status.HTTP_400_BAD_REQUEST)
+        except Product.DoesNotExist:
+            return Response({"message":"Product does not exist with a given key"},status=status.HTTP_400_BAD_REQUEST)
+        
+        wish_list =  WishList.objects.filter(customer=customer,product=product)
+        if wish_list.exists():
+            wish_list.delete()
+            return Response({"message":"Product deleted Successfully"},status=status.HTTP_204_NO_CONTENT)
+        return Response({"message":"product is not exist so deletion is not possible"},status=status.HTTP_400_BAD_REQUEST)
+    

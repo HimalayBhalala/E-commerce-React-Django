@@ -2,9 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import SingleProduct from './SingleProduct';
 import { CartContext } from '../context/CardContext';
-import { CurrencyContext } from '../context/CurrencyContex';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import { WishListContext } from '../context/WishListContext';
+import { CurrencyContext } from '../context/CurrencyContex';
 
 const ProductDetail = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -13,10 +14,12 @@ const ProductDetail = ({ isAuthenticated }) => {
     const [tagData, setTagData] = useState([]);
     const [relatedProduct, setRelatedProduct] = useState([]);
     const [addCart, setAddCart] = useState(false);
+    const [isInWishlist, setIsInWishlist] = useState(false);
     const { setCartData } = useContext(CartContext);
-    const {currency} = useContext(CurrencyContext);
+    const { currency } = useContext(CurrencyContext);
+    const { wish_list } = useContext(WishListContext);
 
-    const get_customer_id = JSON.parse(localStorage.getItem('customer_id'));
+    const getCustomerId = parseInt(localStorage.getItem('customer_id'));
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -32,6 +35,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                 setProductDetail(data);
                 setTagData(data.tags_data || []);
                 checkProductExists();
+                checkIfInWishlist();
             } catch (error) {
                 console.error('Error fetching product data:', error);
             }
@@ -50,12 +54,17 @@ const ProductDetail = ({ isAuthenticated }) => {
 
         fetchData();
         fetchRelatedData();
-    }, [product_id, isAuthenticated, navigate]);
+    }, [product_id, isAuthenticated, navigate, wish_list]);
 
     const checkProductExists = () => {
         const cartDataInfo = JSON.parse(localStorage.getItem('cartDetail')) || [];
         const exists = cartDataInfo.some(item => item.product.product_id === parseInt(product_id));
         setAddCart(exists);
+    };
+
+    const checkIfInWishlist = () => {
+        const exists = wish_list.some(item => item.product.id === parseInt(product_id));
+        setIsInWishlist(exists);
     };
 
     const addToCart = () => {
@@ -67,7 +76,7 @@ const ProductDetail = ({ isAuthenticated }) => {
             product_price: productDetail.price,
             product_usd_price: productDetail.usd_price
         };
-        const cartData = [...getCartDetail, { product, user: { customer_id: get_customer_id } }];
+        const cartData = [...getCartDetail, { product, user: { customer_id: getCustomerId } }];
         localStorage.setItem('cartDetail', JSON.stringify(cartData));
         setAddCart(true);
         setCartData(cartData);
@@ -81,6 +90,19 @@ const ProductDetail = ({ isAuthenticated }) => {
         setCartData(updatedCart);
     };
 
+    const addProductToWishlist = async (product_id, customer_id) => {
+        try {
+            await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/product-wishlist/${customer_id}/${product_id}/`);
+            setIsInWishlist(true);
+        } catch (error) {
+            console.log("Error adding product to wishlist:", String(error));
+        }
+    };
+
+    const removeProductFromWishlist = () => {
+            setIsInWishlist(false);
+    };
+
     const renderTags = () => (
         tagData.map((tag, index) => (
             <Link key={index} to={`/product/tag/${tag}`} className="badge bg-secondary ms-1">
@@ -88,16 +110,6 @@ const ProductDetail = ({ isAuthenticated }) => {
             </Link>
         ))
     );
-
-    const addProductWishList = (product_id,customer_id) => {
-        axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/add-product-wishlist/${customer_id}/${product_id}/`)       
-        .then((response) => {
-            console.log(response)
-        })
-        .catch((error) => {
-            console.log("Error during fetching a api",String(error))
-        })
-    }
 
     return (
         <div className='container mt-5' style={{ marginBottom: '3.8rem' }}>
@@ -135,8 +147,19 @@ const ProductDetail = ({ isAuthenticated }) => {
                         <button className='btn btn-primary btn-sm ms-1' title='Buy Now'>
                             <i className='fa-solid fa-bag-shopping'></i> Buy Now
                         </button>
-                        <button className='btn btn-danger btn-sm ms-1' title='Wishlist' onClick={() => {addProductWishList(productDetail.id,get_customer_id)}}>
-                            <i className='fa-solid fa-heart'></i> Wishlist
+                        <button 
+                            className='btn btn-danger btn-sm ms-1' 
+                            title='Wishlist' 
+                            onClick={() => {
+                                if (isInWishlist) {
+                                    removeProductFromWishlist();
+                                } else {
+                                    addProductToWishlist(productDetail.id, getCustomerId);
+                                }
+                            }}
+                            disabled={isInWishlist}
+                        >
+                            <i className='fa-solid fa-heart'></i> {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                         </button>
                     </div>
                     <div className="producttags mt-5">
