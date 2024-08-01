@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import {register} from '../../actions/auth';
+import {customer_register} from '../../actions/auth';
 import { connect } from 'react-redux';
 import { Button,TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const SellerSignUp = ({register}) => {
+const SellerSignUp = ({customer_register}) => {
   const [created,setCreated] = useState(false)
   const [formData,setFormData] = useState({
     email : '',
@@ -27,7 +27,7 @@ const SellerSignUp = ({register}) => {
     e.preventDefault();
 
     try{  
-      await register(email,first_name,last_name,password,confirm_password);
+      await customer_register(email,first_name,last_name,password,confirm_password);
       setCreated(true)
     }catch(error){
       console.log("SignUp Error:"+error)
@@ -105,4 +105,4 @@ const SellerSignUp = ({register}) => {
   )
 };
 
-export default connect(null,{register})(SellerSignUp);
+export default connect(null,{customer_register})(SellerSignUp);

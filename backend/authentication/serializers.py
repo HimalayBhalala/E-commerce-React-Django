@@ -43,8 +43,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
         password = validated_data.get("password")
 
         user = User.objects.create(email=email, first_name=first_name, last_name=last_name, password=password)
-        customer = Customer.objects.create(user=user)
-        return customer
+        return user
+
 
 
 class LoginSerializer(serializers.Serializer):
@@ -82,3 +82,18 @@ class CustomerSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         return representation
 
+
+class CustomerRegistrationSerializer(serializers.ModelSerializer):
+    user = CreateUserSerializer(read_only=True)
+
+    class Meta:
+        model = Customer
+        fields = ["id", "user","mobile"]
+        extra_kwargs = {
+            "id": {"read_only": True},
+        }
+
+    def to_representation(self, instance):
+        representation =  super().to_representation(instance)
+        representation['user'] = instance.user
+        return representation

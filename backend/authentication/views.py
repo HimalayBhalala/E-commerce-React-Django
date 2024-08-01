@@ -5,28 +5,43 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from ecommerce.models import Customer
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import CreateUserSerializer, CustomerSerializer, LoginSerializer
+from .serializers import (
+    CreateUserSerializer,
+    CustomerSerializer,
+    LoginSerializer,
+    CustomerRegistrationSerializer
+)
 
-class CustomerRegisterAPIView(APIView):
-    permission_classes = [AllowAny]
-
+class CustomerRegistrationView(APIView):
     def post(self, request):
         serializer = CreateUserSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+            mobile = request.data.get('mobile')
+            if not mobile:
+                return Response({"message":"Mobile number field is required"},status=status.HTTP_400_BAD_REQUEST)
+            customer = Customer.objects.create(user=user,mobile=mobile)
+            customer_serializer = CustomerRegistrationSerializer(customer)
+            
+            token = RefreshToken.for_user(user)
+
             response_data = {
                 'user': {
                     'id': user.id,
                     'email': user.email,
                     'first_name': user.first_name,
                     'last_name': user.last_name,
+                    'mobile' : customer_serializer.data.get('mobile')
+                },
+                'token':{
+                    'access_token': str(token.access_token),
+                    'refresh_token':str(token),
                 }
             }
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomerLoginAPIView(APIView):
-    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={'request': request})

@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from 'react'
-import {register} from '../../actions/auth';
+import {customer_register} from '../../actions/auth';
 import { connect } from 'react-redux';
 import { Button,TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const SignUp = ({register}) => {
+const SignUp = ({customer_register}) => {
   const [created,setCreated] = useState(false)
   const [formData,setFormData] = useState({
     email : '',
     first_name : '',
     last_name : '',
+    mobile : '',
     password : '',
     confirm_password : ''
   })
 
   const navigate = useNavigate();
 
-  const {email,first_name,last_name,password,confirm_password} = formData;
+  const {email,first_name,last_name,mobile,password,confirm_password} = formData;
 
   const onChange = (e) => setFormData({
     ...formData,
@@ -27,7 +28,7 @@ const SignUp = ({register}) => {
     e.preventDefault();
 
     try{  
-      await register(email,first_name,last_name,password,confirm_password);
+      await customer_register(email,first_name,last_name,mobile,password,confirm_password);
       setCreated(true)
     }catch(error){
       console.log("SignUp Error:"+error)
@@ -73,6 +74,15 @@ const SignUp = ({register}) => {
           onChange={onChange}
         />
         <TextField
+          label="Mobile Number"
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          value={mobile}
+          name='mobile'
+          onChange={onChange}
+        />
+        <TextField
           label="Password"
           type="password"
           variant="outlined"
@@ -105,4 +115,4 @@ const SignUp = ({register}) => {
   )
 };
 
-export default connect(null,{register})(SignUp);
+export default connect(null,{customer_register})(SignUp);

@@ -18,7 +18,8 @@ class ProductCategory(models.Model):
 
 class Customer(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
-    mobile = models.PositiveBigIntegerField(null=True,blank=True)
+    mobile = models.CharField(max_length=10,null=True)
+    image = models.ImageField(default='no-image.png',upload_to='customer/image')
 
     def __str__(self):
         return f"{self.user.email}"

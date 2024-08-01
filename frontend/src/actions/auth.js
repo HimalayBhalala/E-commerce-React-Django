@@ -45,20 +45,21 @@ export const checkAuthenticated = () => async dispatch => {
 };
 
 
-export const register = (email, first_name, last_name, password, confirm_password) => async dispatch => {
+export const customer_register = (email, first_name, last_name, mobile, password, confirm_password) => async dispatch => {
     const config = {
         headers: {
             "Content-Type": "application/json"
         }
     };
 
-    const body = JSON.stringify({ email, first_name, last_name, password, confirm_password });
+    const body = JSON.stringify({ email, first_name, last_name, mobile, password, confirm_password});
 
     try {
-        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/register/`, body, config);
-        if (res.status === 200) {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/customer/register/`, body, config);
+        if (res.status === 201) {
             dispatch({
-                type: SIGNUP_SUCCESS
+                type: SIGNUP_SUCCESS,
+                payload:res.data
             });
         } else {
             dispatch({

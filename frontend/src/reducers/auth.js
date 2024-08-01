@@ -21,10 +21,15 @@ const auth = (state = initialState, action) => {
 
     switch (type) {
         case SIGNUP_SUCCESS:
+            localStorage.setItem('access_token', payload.token.access_token);
+            localStorage.setItem('refresh_token', payload.token.refresh_token);
             return {
-                ...state,
-                user: payload
-            };
+                    ...state,
+                    access_token: payload.token.access_token,
+                    refresh_token: payload.token.refresh_token,
+                    isAuthenticated: true,
+                    user: payload.user,
+                };
         case AUTHENTICATED_SUCCESS:
             return {
                 isAuthenticated: true,
@@ -43,8 +48,15 @@ const auth = (state = initialState, action) => {
                 customer: payload.customer
             };
         case SIGUP_FAIL:
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
             return {
-                ...state
+                ...state,
+                access_token: null,
+                refresh_token: null,
+                isAuthenticated: false,
+                user: null,
+                customer: null
             };
 
         case AUTHENTICATED_FAILED:

@@ -64,7 +64,7 @@ const DashBoard = () => {
               label: 'Orders',
               data: data,
               fill: false,
-              borderColor: 'rgba(75,192,192,1)',
+              borderColor: 'rgba(15,150,255,10)',
               tension: 0.1
             }
           ]
