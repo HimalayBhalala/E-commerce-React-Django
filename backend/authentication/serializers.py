@@ -82,6 +82,11 @@ class CustomerSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         return representation
 
+class UserInformationSerilaizer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id","email","first_name","last_name"]
+
 
 class CustomerRegistrationSerializer(serializers.ModelSerializer):
     user = CreateUserSerializer(read_only=True)
@@ -90,10 +95,26 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
         model = Customer
         fields = ["id", "user","mobile"]
         extra_kwargs = {
-            "id": {"read_only": True},
+            "id": {"read_only": True}
         }
 
     def to_representation(self, instance):
         representation =  super().to_representation(instance)
         representation['user'] = instance.user
         return representation
+    
+class GetCustomerProfileSerilaizer(serializers.ModelSerializer):
+    user = UserInformationSerilaizer(read_only=True)
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Customer
+        fields = ["id","user","mobile","image"]
+        extra_kwargs = {
+            "id":{"read_only": True}
+        }
+
+    def get_image(self,obj):
+        if str(obj.image).startswith('http'):
+            return obj.image
+        else:
+            return f"http://127.0.0.1:8000/media/{obj.image}"

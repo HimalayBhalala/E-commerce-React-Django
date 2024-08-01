@@ -9,7 +9,8 @@ from .serializers import (
     CreateUserSerializer,
     CustomerSerializer,
     LoginSerializer,
-    CustomerRegistrationSerializer
+    CustomerRegistrationSerializer,
+    GetCustomerProfileSerilaizer
 )
 
 class CustomerRegistrationView(APIView):
@@ -82,3 +83,14 @@ class GetCustomerAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Customer.DoesNotExist:
             return Response({"message": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class CustomerProfileView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        customer = Customer.objects.get(id=customer_id)
+        serializer = GetCustomerProfileSerilaizer(customer)
+        return Response({"data":serializer.data})
