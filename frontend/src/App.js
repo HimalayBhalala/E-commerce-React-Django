@@ -45,9 +45,9 @@ function App() {
   return (
     <div>
       <Provider store={store}>
-      <WishListProvider>
       <CurrencyProvider>
       <CartProvider>
+      <WishListProvider>
         <Router>
         <Layout>
           <Routes>
@@ -89,9 +89,9 @@ function App() {
           </Layout>
           <Footer />
         </Router>
+        </WishListProvider>
         </CartProvider>
         </CurrencyProvider>
-        </WishListProvider>
       </Provider>
     </div>
   );

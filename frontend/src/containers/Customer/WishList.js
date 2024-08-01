@@ -5,14 +5,14 @@ import { CurrencyContext } from '../../context/CurrencyContex';
 import { WishListContext } from '../../context/WishListContext';
 
 const WishList = () => {
-    const getCustomerId = parseInt(localStorage.getItem('customer_id'));
+    const get_customer_id = parseInt(localStorage.getItem('customer_id'));
     const { wish_list, setWishList } = useContext(WishListContext);
     const { currency } = useContext(CurrencyContext);
 
     useEffect(() => {
         const fetchWishListData = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/wish-list/${getCustomerId}/`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/wish-list/${get_customer_id}/`);
                 setWishList(response.data.data);
             } catch (error) {
                 console.error("Error fetching wishlist data:", error);
@@ -20,7 +20,7 @@ const WishList = () => {
         };
 
         fetchWishListData();
-    }, [getCustomerId, setWishList]);
+    }, [get_customer_id, setWishList]);
 
     const removeFromWishList = async (product_id, customer_id) => {
         try {
@@ -50,7 +50,7 @@ const WishList = () => {
                             </thead>
                             <tbody>
                                 {
-                                    wish_list.length > 0 ? (
+                                    wish_list.length >= 0 ? (
                                         wish_list.map((item, index) => (
                                             <tr key={item.product.id}>
                                                 <td>{index + 1}</td>
@@ -73,7 +73,7 @@ const WishList = () => {
                                                 <td>
                                                     <button
                                                         className='btn btn-danger btn-sm'
-                                                        onClick={() => removeFromWishList(item.product.id, getCustomerId)}
+                                                        onClick={() => removeFromWishList(item.product.id, get_customer_id)}
                                                     >
                                                         Remove
                                                     </button>
