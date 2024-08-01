@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { Fragment, useContext} from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../actions/auth';
 import { CartContext } from '../context/CardContext';
 import { CurrencyContext } from '../context/CurrencyContex';
 
-const Navbar = ({ logout }) => {
+const Navbar = ({ logout,isAuthenticated}) => {
   const cartData = useContext(CartContext);
   const {currency,setCurrency} = useContext(CurrencyContext);
 
@@ -31,12 +31,20 @@ const Navbar = ({ logout }) => {
                   My Account
                 </button>
                 <ul className="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                  <li><Link className="dropdown-item" to="/register">Register</Link></li>
-                  <li><Link className="dropdown-item" to="/login">Login</Link></li>
-                  <li><Link className="dropdown-item" to="/forget/password">Forget Password</Link></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><Link className="dropdown-item" to="/dashboard">DashBoard</Link></li>
-                  <li><Link className="dropdown-item" to="/checkout">CheckOut</Link></li>
+                  {
+                    isAuthenticated ? (
+                      <Fragment>
+                        <li><Link className="dropdown-item" to="/dashboard">DashBoard</Link></li>
+                        <li><Link className="dropdown-item" to="/checkout">CheckOut</Link></li>
+                      </Fragment>
+                    ) : (
+                      <Fragment>
+                        <li><Link className="dropdown-item" to="/register">Register</Link></li>
+                        <li><Link className="dropdown-item" to="/login">Login</Link></li>
+                        <li><Link className="dropdown-item" to="/forget/password">Forget Password</Link></li>
+                      </Fragment>
+                    )
+                  }
                 </ul>
               </div>
               <li className='nav-link'>
@@ -70,4 +78,8 @@ const mapDispatchToProps = (dispatch) => ({
   logout: () => dispatch(logout())
 });
 
-export default connect(null, mapDispatchToProps)(Navbar);
+const mapStateToProps = (state) => ({
+  isAuthenticated : state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps,mapDispatchToProps)(Navbar);

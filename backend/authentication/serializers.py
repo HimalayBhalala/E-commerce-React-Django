@@ -42,9 +42,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
         last_name = validated_data.get("last_name")
         password = validated_data.get("password")
 
-        user = User.objects.create(email=email, first_name=first_name, last_name=last_name, password=password)
+        user = User.objects.create_user(email=email, first_name=first_name, last_name=last_name, password=password)
         return user
-
 
 
 class LoginSerializer(serializers.Serializer):
@@ -82,11 +81,20 @@ class CustomerSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user.email
         return representation
 
-class UserInformationSerilaizer(serializers.ModelSerializer):
+class UserInformationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id","email","first_name","last_name"]
 
+    def update(self, instance, validated_data):
+        email = validated_data.get('email')
+        first_name = validated_data.get('first_name')
+        last_name = validated_data.get('last_name')
+        instance.email = email
+        instance.first_name = first_name
+        instance.last_name = last_name
+        instance.save()
+        return instance
 
 class CustomerRegistrationSerializer(serializers.ModelSerializer):
     user = CreateUserSerializer(read_only=True)
@@ -103,18 +111,23 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
         representation['user'] = instance.user
         return representation
     
-class GetCustomerProfileSerilaizer(serializers.ModelSerializer):
-    user = UserInformationSerilaizer(read_only=True)
-    image = serializers.SerializerMethodField()
+class GetCustomerProfileSerializer(serializers.ModelSerializer):
+    user = UserInformationSerializer(read_only=True)
     class Meta:
         model = Customer
         fields = ["id","user","mobile","image"]
         extra_kwargs = {
             "id":{"read_only": True}
-        }
+        }         
 
-    def get_image(self,obj):
-        if str(obj.image).startswith('http'):
-            return obj.image
-        else:
-            return f"http://127.0.0.1:8000/media/{obj.image}"
+    def update(self, instance, validated_data):
+        mobile = validated_data.get('mobile')
+        image = validated_data.get('image')
+
+        instance.mobile = mobile
+        instance.image = image
+
+        instance.save()
+
+        return instance
+    

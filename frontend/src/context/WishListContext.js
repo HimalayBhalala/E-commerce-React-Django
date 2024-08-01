@@ -8,7 +8,7 @@ export const WishListProvider = ({ children }) => {
     const [wish_list, setWishList] = useState(() => {
        try{
             const wishlist_data = JSON.parse(localStorage.getItem('wishlist'))
-            return wishlist_data
+            return wishlist_data || []
         }catch(error){
             console.log("Error During getting a array")
             return []

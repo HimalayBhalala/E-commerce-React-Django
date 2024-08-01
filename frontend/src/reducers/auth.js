@@ -23,12 +23,14 @@ const auth = (state = initialState, action) => {
         case SIGNUP_SUCCESS:
             localStorage.setItem('access_token', payload.token.access_token);
             localStorage.setItem('refresh_token', payload.token.refresh_token);
+            localStorage.setItem('customer_id', payload.customer.id);
             return {
                     ...state,
                     access_token: payload.token.access_token,
                     refresh_token: payload.token.refresh_token,
                     isAuthenticated: true,
                     user: payload.user,
+                    customer:payload.customer
                 };
         case AUTHENTICATED_SUCCESS:
             return {
@@ -50,6 +52,7 @@ const auth = (state = initialState, action) => {
         case SIGUP_FAIL:
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
+            localStorage.removeItem('customer_id');
             return {
                 ...state,
                 access_token: null,

@@ -4,13 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from ecommerce.models import Customer
+from .models import User
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import (
     CreateUserSerializer,
     CustomerSerializer,
     LoginSerializer,
     CustomerRegistrationSerializer,
-    GetCustomerProfileSerilaizer
+    GetCustomerProfileSerializer,
+    UserInformationSerializer
 )
 
 class CustomerRegistrationView(APIView):
@@ -22,11 +24,14 @@ class CustomerRegistrationView(APIView):
             if not mobile:
                 return Response({"message":"Mobile number field is required"},status=status.HTTP_400_BAD_REQUEST)
             customer = Customer.objects.create(user=user,mobile=mobile)
-            customer_serializer = CustomerRegistrationSerializer(customer)
-            
+            customer_serializer = CustomerRegistrationSerializer(customer)            
             token = RefreshToken.for_user(user)
 
             response_data = {
+                'token':{
+                    'access_token': str(token.access_token),
+                    'refresh_token':str(token),
+                },
                 'user': {
                     'id': user.id,
                     'email': user.email,
@@ -34,15 +39,16 @@ class CustomerRegistrationView(APIView):
                     'last_name': user.last_name,
                     'mobile' : customer_serializer.data.get('mobile')
                 },
-                'token':{
-                    'access_token': str(token.access_token),
-                    'refresh_token':str(token),
+                'customer' : {
+                    'id': customer_serializer.data.get('id'),
+                    'mobile':customer_serializer.data.get('mobile')
                 }
             }
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CustomerLoginAPIView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = LoginSerializer(data=request.data, context={'request': request})
@@ -79,7 +85,7 @@ class GetCustomerAPIView(APIView):
     def get(self, request):
         try:
             customer = Customer.objects.get(user=request.user)
-            serializer = CustomerSerializer(customer)
+            serializer = GetCustomerProfileSerializer(customer, context={'request':request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Customer.DoesNotExist:
             return Response({"message": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
@@ -92,5 +98,23 @@ class CustomerProfileView(APIView):
     def get(self,request,*args, **kwargs):
         customer_id = self.kwargs['customer_id']
         customer = Customer.objects.get(id=customer_id)
-        serializer = GetCustomerProfileSerilaizer(customer)
+        serializer = GetCustomerProfileSerializer(customer,context={'request':request})
         return Response({"data":serializer.data})
+    
+    def put(self, request, *args, **kwargs):
+        customer_id = self.kwargs.get('customer_id')
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            user = customer.user
+
+            user_serializer = UserInformationSerializer(user, data=request.data, partial=True)
+            if user_serializer.is_valid(raise_exception=True):
+                user_serializer.save() 
+
+            customer_serializer = GetCustomerProfileSerializer(customer, data=request.data, partial=True,context={'request':request})
+            if customer_serializer.is_valid(raise_exception=True):
+                customer_serializer.save()
+
+            return Response({"data":customer_serializer.data}, status=status.HTTP_200_OK)
+        except Customer.DoesNotExist:
+            return Response({"message": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)

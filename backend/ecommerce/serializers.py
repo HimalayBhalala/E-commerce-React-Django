@@ -158,8 +158,6 @@ class OrderItemSerializer(serializers.ModelSerializer):
             'order': {'required': True},
         }
 
-
-
 class ProductRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRating
