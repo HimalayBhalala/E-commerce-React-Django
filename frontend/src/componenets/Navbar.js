@@ -24,8 +24,16 @@ const Navbar = ({ logout,isAuthenticated}) => {
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav ms-auto">
               <Link className="nav-link active" aria-current="page" to="/">Home</Link>
-              <Link className='nav-link' to="/categories">Category</Link>
-              <Link className='nav-link' to="/checkout">My Cart (<span className='text-white'>{cartData.cartData.length}</span>)</Link>
+              {
+                isAuthenticated ? (
+                  <Fragment>
+                    <Link className='nav-link' to="/categories">Category</Link>
+                    <Link className='nav-link' to="/checkout">My Cart (<span className='text-white'>{cartData.cartData.length}</span>)</Link>
+                  </Fragment>
+                ) : (
+                  null
+                )
+              }
               <div className="dropdown">
                 <button className="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown">
                   My Account
@@ -41,7 +49,7 @@ const Navbar = ({ logout,isAuthenticated}) => {
                       <Fragment>
                         <li><Link className="dropdown-item" to="/register">Register</Link></li>
                         <li><Link className="dropdown-item" to="/login">Login</Link></li>
-                        <li><Link className="dropdown-item" to="/forget/password">Forget Password</Link></li>
+                        <li><Link className="dropdown-item" to="/change/password">Forget Password</Link></li>
                       </Fragment>
                     )
                   }
@@ -53,19 +61,33 @@ const Navbar = ({ logout,isAuthenticated}) => {
                   <option value="usd">USD</option>
                 </select>
               </li>
-              <div className="dropdown">
-                <button className="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown">
-                  Seller Panel
-                </button>
-                <ul className="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                  <li><Link className="dropdown-item" to="/seller/register">Register</Link></li>
-                  <li><Link className="dropdown-item" to="/seller/login">Login</Link></li>
-                  <li><Link className="dropdown-item" to="/seller/forget/password">Forget Password</Link></li>
-                  <li><hr className="dropdown-divider" /></li>
-                  <li><Link className="dropdown-item" to="/seller/dashboard">DashBoard</Link></li>
-                </ul>
-              </div>
-              <Link to='/login' className='nav-link' onClick={(e) => { e.preventDefault(); logout() }}>Logout</Link>
+              {
+                isAuthenticated ? (
+                  <Fragment>
+                  <div className="dropdown">
+                  <button className="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown">
+                    Seller Panel
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                    <li><Link className="dropdown-item" to="/seller/register">Register</Link></li>
+                    <li><Link className="dropdown-item" to="/seller/login">Login</Link></li>
+                    <li><Link className="dropdown-item" to="/seller/forget/password">Forget Password</Link></li>
+                    <li><hr className="dropdown-divider" /></li>
+                    <li><Link className="dropdown-item" to="/seller/dashboard">DashBoard</Link></li>
+                  </ul>
+                  </div>
+                  </Fragment>
+                ):(
+                  null
+                )
+              }
+              {
+                isAuthenticated ? (
+                  <Link to='/login' className='nav-link' onClick={(e) => { e.preventDefault(); logout() }}>Logout</Link>
+                ) : (
+                  null
+                )
+              }
             </div>
           </div>
         </div>

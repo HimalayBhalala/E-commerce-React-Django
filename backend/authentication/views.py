@@ -12,7 +12,8 @@ from .serializers import (
     LoginSerializer,
     CustomerRegistrationSerializer,
     GetCustomerProfileSerializer,
-    UserInformationSerializer
+    UserInformationSerializer,
+    ChangedPasswordSerializer
 )
 
 class CustomerRegistrationView(APIView):
@@ -118,3 +119,17 @@ class CustomerProfileView(APIView):
             return Response({"data":customer_serializer.data}, status=status.HTTP_200_OK)
         except Customer.DoesNotExist:
             return Response({"message": "Customer not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class ChangePasswordView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self,request,*args, **kwargs):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        serializer = ChangedPasswordSerializer(user,data=request.data,partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"message":"Password Updated Successfully...."},status=status.HTTP_202_ACCEPTED)
+        return Response({"error":str(serializer.error_messages)},status=status.HTTP_400_BAD_REQUEST)

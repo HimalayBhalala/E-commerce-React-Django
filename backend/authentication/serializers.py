@@ -131,3 +131,34 @@ class GetCustomerProfileSerializer(serializers.ModelSerializer):
 
         return instance
     
+class ChangedPasswordSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["id","new_password","confirm_new_password"]
+        extra_kwargs = {"new_password":{"read_only":True},'confirm_new_password':{'read_only':True}}
+
+    def validate(self, data):
+        new_password = data.get('new_password')
+        confirm_new_password = data.get('confirm_new_password')
+        if new_password is None:
+            raise serializers.ValidationError({"message":"New Password is required"})
+        
+        if confirm_new_password is None:
+            raise serializers.ValidationError({"message":"Confirm New Password is required"})
+
+        if new_password != confirm_new_password:
+            raise serializers.ValidationError({"message":"New Password and Confirm New Password is not matched"})
+        return data
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.get('new_password')
+
+        instance.set_password(new_password)
+        print("Instance of User",instance)
+        instance.save()
+        return instance
+
+    

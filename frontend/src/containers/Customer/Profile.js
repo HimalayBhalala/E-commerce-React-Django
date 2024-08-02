@@ -64,7 +64,6 @@ const Profile = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-    
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",

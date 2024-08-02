@@ -30,7 +30,6 @@ import SellerProfile from './containers/Seller/SellerProfile';
 import SellerProducts from './containers/Seller/SellerProducts';
 import SellerOrders from './containers/Seller/SellerOrders';
 import SellerCustomers from './containers/Seller/SellerCustomers';
-import ForgetPassword from './containers/Customer/ForgetPassword';
 import SellerForgetPassword from './containers/Seller/SellerForgetPassword';
 import SellerAddProduct from './containers/Seller/SellerAddProduct';
 import SellerChangePassword from './containers/Seller/SellerChangePassword';
@@ -40,6 +39,7 @@ import { CartProvider } from './context/CardContext';
 import OrderConfirm from './containers/Customer/OrderConfirm';
 import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
+import AddEmail from './containers/Customer/AddEmail';
 
 function App() {
   return (
@@ -65,6 +65,7 @@ function App() {
             <Route exact path="/login" element={<Login />} />
             <Route exact path="/dashboard" element={<DashBoard />} />
             <Route exact path="/profile" element={<Profile />} />
+            <Route exact path="/add/email" element={<AddEmail />} />
             <Route exact path="/change/password" element={<ChangePassword />} />
             <Route exact path="/checkout" element={<Checkout />} />
             <Route exact path="/orders" element={<Orders />} />
@@ -72,7 +73,6 @@ function App() {
             <Route exact path="/wishlist" element={<WishList />} />
             <Route exact path="/addresses" element={<Addresses />} />
             <Route exact path="/add/address" element={<AddAddress />} />
-            <Route exact path="/forget/password" element={<ForgetPassword />} />
             {/* Seller Panel */}
             <Route exact path="/seller/register" element={<SellerSignUp />} />
             <Route exact path="/seller/login" element={<SellerLogin />} />

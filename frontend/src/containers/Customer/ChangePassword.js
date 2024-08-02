@@ -1,8 +1,22 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SideBar from './SideBar';
 import { TextField,Button } from '@mui/material';
+import { change_password } from '../../actions/auth';
+import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-const ChangePassword = () => {
+const ChangePassword = ({change_password,isAuthenticated}) => {
+
+  const username = localStorage.getItem('username');
+  const user_id = localStorage.getItem('user_id');
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(!isAuthenticated){
+      navigate('/add/email')
+    }
+  },[isAuthenticated])
 
   const [formData,setFormData] = useState({
     new_password : '',
@@ -16,9 +30,14 @@ const ChangePassword = () => {
     [e.target.name] : e.target.value
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
       e.preventDefault();
-      console.log("Chnage Passwor is working")
+      
+      try{
+        await change_password(new_password,confirm_new_password,user_id);
+      }catch(error){
+        console.log("Error During fetching an api",String(error))
+      }
   };
 
 
@@ -29,10 +48,10 @@ const ChangePassword = () => {
                 <SideBar />
             </div>
             <div className="col-md-9">
-                <h1>Welcome, xyz</h1>
+                <h1>Welcome, {username}</h1>
                 <hr />
                 <div style={{border:"2px solid black",background:"white"}}>
-                    <form style={{margin:"2rem"}} onClick={handleSubmit}>
+                    <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
                         <TextField
                             label="New Password"
                             variant="outlined"
@@ -64,4 +83,8 @@ const ChangePassword = () => {
   )
 };
 
-export default ChangePassword;
+const mapStateToProps = (state) => ({
+  isAuthenticated : state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps,{change_password})(ChangePassword);
