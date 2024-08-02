@@ -13,7 +13,8 @@ from .serializers import (
     CustomerRegistrationSerializer,
     GetCustomerProfileSerializer,
     UserInformationSerializer,
-    ChangedPasswordSerializer
+    ChangedPasswordSerializer,
+    CustomerEmailVerificationSerializer
 )
 
 class CustomerRegistrationView(APIView):
@@ -133,3 +134,28 @@ class ChangePasswordView(APIView):
             serializer.save()
             return Response({"message":"Password Updated Successfully...."},status=status.HTTP_202_ACCEPTED)
         return Response({"error":str(serializer.error_messages)},status=status.HTTP_400_BAD_REQUEST)
+    
+
+class ForgetPasswordView(APIView):
+    def put(self,request,*args, **kwargs):
+        user_id = self.kwargs['user_id']
+        user = User.objects.get(id=user_id)
+        serializer = ChangedPasswordSerializer(user,data=request.data,partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"message":"Password Updated Successfully...."},status=status.HTTP_202_ACCEPTED)
+        return Response({"error":str(serializer.error_messages)},status=status.HTTP_400_BAD_REQUEST)
+
+class EmailVerificationView(APIView):
+    def post(self,request,*args,**kwargs):
+        email = request.data.get('email')
+
+        if email is None:
+            return Response({"message":"Email is required or not found"},status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = User.objects.get(email=email)
+            serializer = CustomerEmailVerificationSerializer(user)
+            return Response({"user":serializer.data},status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"data":"User does not exists with a given url"},status=status.HTTP_400_BAD_REQUEST)

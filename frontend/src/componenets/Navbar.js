@@ -49,7 +49,7 @@ const Navbar = ({ logout,isAuthenticated}) => {
                       <Fragment>
                         <li><Link className="dropdown-item" to="/register">Register</Link></li>
                         <li><Link className="dropdown-item" to="/login">Login</Link></li>
-                        <li><Link className="dropdown-item" to="/change/password">Forget Password</Link></li>
+                        <li><Link className="dropdown-item" to="/forget/password">Forget Password</Link></li>
                       </Fragment>
                     )
                   }

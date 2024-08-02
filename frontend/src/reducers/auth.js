@@ -7,7 +7,9 @@ import {
     LOGIN_FAIL,
     LOGOUT,
     CHANGE_PASSWORD_SUCCESS,
-    CHANGE_PASSWORD_FAILED
+    CHANGE_PASSWORD_FAILED,
+    EMAIL_VERIFY_SUCCESS,
+    EMAIL_VERIFY_FAILED
 } from '../actions/types';
 
 const initialState = {
@@ -16,7 +18,7 @@ const initialState = {
     isAuthenticated: false,
     user: null,
     customer: null,
-    message: null
+    message: null,
 };
 
 const authReducer = (state = initialState, action) => {
@@ -60,6 +62,13 @@ const authReducer = (state = initialState, action) => {
                 message: "Failed to change password"
             };
 
+        case EMAIL_VERIFY_SUCCESS:
+            localStorage.setItem('user_id', payload.user.id);
+            return {
+                user : payload.user,
+                message : "User has been exists."
+            }
+
         case LOGIN_SUCCESS:
             localStorage.setItem('access_token', payload.access_token);
             localStorage.setItem('refresh_token', payload.refresh_token);
@@ -98,6 +107,13 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 message: "Authentication failed"
             };
+        
+        case EMAIL_VERIFY_FAILED:
+            localStorage.removeItem('user_id')
+            return {
+                    user : null,
+                    message : "User has not found"
+                }
 
         case LOGIN_FAIL:
             localStorage.removeItem("access_token");

@@ -1,9 +1,70 @@
-import React from 'react'
+import { TextField,Button } from '@mui/material'
+import React, { useEffect, useState } from 'react'
+import { email_confirmation } from '../../actions/auth';
+import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-export default function AddEmail() {
-  return (
-    <div className='container mt-5'>
-        <h1>Welcome</h1>
+function AddEmail({user,email_confirmation}) {
+
+    const [formData,setFormData] = useState({
+        email:''
+    })
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(user){
+            navigate('/forget/password')
+        }
+    },[user])
+
+
+    const {email} = formData;
+
+    const onChange = (e) => setFormData({
+        ...formData,
+        [e.target.name] : e.target.value  
+    })
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try{
+            await email_confirmation(email)
+        }catch(error){
+            console.log("Error Ocuure during fetching an api",String(error))
+        }
+    }
+    return (
+    <div className='container mt-2'>
+        <header>
+            <h1 className='text-center mt-5'>
+                Confirm Email 
+            </h1>
+        </header>
+        <form onSubmit={handleSubmit}>
+            <TextField
+                label="Add Email"
+                variant='outlined'
+                margin='normal'
+                value={email}
+                fullWidth
+                name="email"
+                onChange={onChange}
+            />
+            <div className='text-center'>
+                <Button type='submit' color='primary' variant='contained' style={{marginTop:"1rem",textAlign:"center"}}>
+                    Next
+                </Button>
+            </div>
+        </form>
     </div>
   )
 }
+
+const mapStateToProps = (state) => ({
+    user : state.auth.user
+  })
+  
+export default connect(mapStateToProps,{email_confirmation})(AddEmail);
+  
+

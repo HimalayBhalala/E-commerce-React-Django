@@ -1,30 +1,33 @@
-import React, {useEffect, useState } from 'react'
-import SideBar from './SideBar';
+import React, { useEffect, useState } from 'react'
 import { TextField,Button } from '@mui/material';
-import { change_password } from '../../actions/auth';
-import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { forget_password } from '../../actions/auth';
+import { connect } from 'react-redux';
 
-const ChangePassword = ({change_password}) => {
+const ForgetPassword = ({user,forget_password}) => {
 
-  const username = localStorage.getItem('username');
   const user_id = localStorage.getItem('user_id');
-  const [passwordStatus,setPasswordStatus] = useState(false);
 
-  const navigate = useNavigate();
-  
   const [formData,setFormData] = useState({
     new_password : '',
     confirm_new_password : ''
   });
 
-  useEffect(() => {
-    if(passwordStatus){
-      navigate('/dashboard')
-    }
-  },[passwordStatus,navigate])
+  const [passwordStatus,setPasswordStatus] = useState(false);
+
+
+  const navigate = useNavigate();
 
   const {new_password,confirm_new_password} = formData;
+
+  useEffect(() => {
+    if(!user){
+      navigate('/add/email')
+    }
+    if(passwordStatus){
+        navigate('/login')
+    }
+  },[user,passwordStatus,navigate])
 
   const onChange = (e) => setFormData({
     ...formData,
@@ -32,29 +35,19 @@ const ChangePassword = ({change_password}) => {
   });
 
   const handleSubmit = async (e) => {
-      e.preventDefault();
-      try{
-        if(!passwordStatus){
-          setPasswordStatus(true)
-          await change_password(new_password,confirm_new_password,user_id);
-        }else{
-          navigate('/dashboard')
-        }
-      }catch(error){
-        console.log("Error During fetching an api",String(error))
-      }
-  };
-
+    e.preventDefault();
+      
+    try{
+        setPasswordStatus(true)
+        await forget_password(new_password,confirm_new_password,user_id);
+    }catch(error){
+      console.log("Error During fetching an api",String(error))
+    }
+};
 
   return (
-    <div className="container mt-5" style={{marginBottom:"10.3rem"}}>
-        <div className="row">
-            <div className="col-md-3">
-                <SideBar />
-            </div>
-            <div className="col-md-9">
-                <h1>Welcome, {username}</h1>
-                <hr />
+    <div className="container mt-5" style={{marginBottom:"15.66rem"}}>
+            <div>
                 <div style={{border:"2px solid black",background:"white"}}>
                     <form style={{margin:"2rem"}} onSubmit={handleSubmit}>
                         <TextField
@@ -69,8 +62,8 @@ const ChangePassword = ({change_password}) => {
                         />
                         <TextField
                           label="Confirm New Password"
-                          type='password'
                           variant='outlined'
+                          type='password'
                           fullWidth
                           name='confirm_new_password'
                           margin='normal'
@@ -86,12 +79,12 @@ const ChangePassword = ({change_password}) => {
                 </div>
             </div>
         </div>
-    </div>
   )
 };
 
 const mapStateToProps = (state) => ({
-  user : state.auth.user
-})
-
-export default connect(mapStateToProps,{change_password})(ChangePassword);
+    user : state.auth.user
+  })
+  
+export default connect(mapStateToProps,{forget_password})(ForgetPassword);
+  

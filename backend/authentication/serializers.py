@@ -157,8 +157,10 @@ class ChangedPasswordSerializer(serializers.ModelSerializer):
         new_password = validated_data.get('new_password')
 
         instance.set_password(new_password)
-        print("Instance of User",instance)
         instance.save()
         return instance
 
-    
+class CustomerEmailVerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id","email","first_name","last_name"]

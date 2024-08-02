@@ -8,7 +8,9 @@ import {
     AUTHENTICATED_SUCCESS,
     AUTHENTICATED_FAILED,
     CHANGE_PASSWORD_SUCCESS,
-    CHANGE_PASSWORD_FAILED
+    CHANGE_PASSWORD_FAILED,
+    EMAIL_VERIFY_SUCCESS,
+    EMAIL_VERIFY_FAILED
 } from './types';
 
 export const checkAuthenticated = () => async dispatch => {
@@ -136,6 +138,63 @@ export const change_password = (new_password,confirm_new_password,user_id) => as
             type : CHANGE_PASSWORD_FAILED
         })
     }
+}
+
+export const forget_password = (new_password,confirm_new_password,user_id) => async dispatch => {
+    
+    const config = {
+        headers : {
+            "Content-Type":"application/json",
+        }
+    }
+
+    const body = JSON.stringify({new_password,confirm_new_password})
+
+    try{
+        const res = await axios.put(`${process.env.REACT_APP_API_URL}/auth/forget/password/${user_id}/`,body,config)
+        if(res.status === 202){
+            dispatch({
+                type:CHANGE_PASSWORD_SUCCESS
+            })
+        }else{
+            dispatch({
+                type:CHANGE_PASSWORD_FAILED
+            })
+        }
+    }catch(error){
+        console.log("Api is not fetching successfully",String(error));
+        dispatch({
+            type : CHANGE_PASSWORD_FAILED
+        })
+    }
+}
+
+export const email_confirmation = (email) => async dispatch => {
+    const config = {
+        headers : {
+            "Content-Type":"application/json",
+        }
+    }
+    const body = JSON.stringify({email})
+    try{
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/add/email/`,body,config)
+        console.log(res)
+        if (res.status === 200){
+            dispatch({
+                type:EMAIL_VERIFY_SUCCESS,
+                payload:res.data
+            })
+        }else{
+            dispatch({
+                type : EMAIL_VERIFY_FAILED
+            })            
+        }
+    }catch(error){
+        console.log("Error occure during fetching an api",String(error));
+        dispatch({
+            type : EMAIL_VERIFY_FAILED
+        })
+    }   
 }
 
 
