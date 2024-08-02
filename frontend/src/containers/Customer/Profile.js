@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
 import { TextField, Button } from '@mui/material';
 import axios from 'axios';
+import { change_profile } from '../../actions/auth';
+import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
-const Profile = () => {
+const Profile = ({change_profile,isAuthenticated}) => {
     const customer_id = localStorage.getItem('customer_id');
     const token = localStorage.getItem('access_token');
     const [customerInfo, setCustomerInfo] = useState({});
@@ -15,8 +18,15 @@ const Profile = () => {
         image: '',
     });
     const [imageUrl, setImageUrl] = useState('');
+    const navigate = useNavigate();
+    const {email,first_name,last_name,mobile,image} = formData;
 
     useEffect(() => {
+
+        if(!isAuthenticated){
+            navigate('/login')
+        }
+
         const config = {
             headers: {
                 "Content-Type": "application/json",
@@ -62,29 +72,14 @@ const Profile = () => {
     };
     
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const config = {
-            headers: {
-                "Content-Type": "multipart/form-data",
-                "Authorization": `Bearer ${token}`
-            }
-        };
-    
-        const formDataToSubmit = new FormData();
-        formDataToSubmit.append('email', formData.email);
-        formDataToSubmit.append('first_name', formData.first_name);
-        formDataToSubmit.append('last_name', formData.last_name);
-        formDataToSubmit.append('mobile', formData.mobile);
-        formDataToSubmit.append('image', formData.image);
-    
-        axios.put(`${process.env.REACT_APP_API_URL}/auth/customer/profile/${customer_id}/`, formDataToSubmit, config)
-            .then((response) => {
-                console.log("Profile updated successfully", response.data);
-            })
-            .catch((error) => {
-                console.log("Error updating profile", error);
-            });
+
+        try{
+            await change_profile(email,first_name,last_name,mobile,image,customer_id)
+        }catch(error){
+            console.log("Error occure during fetching an api",String(error))
+        }
     };
     
 
@@ -105,7 +100,7 @@ const Profile = () => {
                                 variant="outlined"
                                 fullWidth
                                 name="email"
-                                value={formData.email}
+                                value={email}
                                 margin="normal"
                                 onChange={onChange}
                             />
@@ -115,7 +110,7 @@ const Profile = () => {
                                 fullWidth
                                 name="first_name"
                                 margin="normal"
-                                value={formData.first_name}
+                                value={first_name}
                                 onChange={onChange}
                             />
                             Last Name:
@@ -124,7 +119,7 @@ const Profile = () => {
                                 fullWidth
                                 margin="normal"
                                 name="last_name"
-                                value={formData.last_name}
+                                value={last_name}
                                 onChange={onChange}
                             />
                             Mobile:
@@ -133,7 +128,7 @@ const Profile = () => {
                                 fullWidth
                                 margin="normal"
                                 name="mobile"
-                                value={formData.mobile}
+                                value={mobile}
                                 onChange={onChange}
                             />
                             <div>
@@ -164,4 +159,8 @@ const Profile = () => {
     );
 };
 
-export default Profile;
+const mapStateToProps = (state) => ({
+    isAuthenticated:state.auth.isAuthenticated
+})
+
+export default connect(mapStateToProps,{change_profile})(Profile);

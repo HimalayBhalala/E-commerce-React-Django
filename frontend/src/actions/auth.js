@@ -10,7 +10,9 @@ import {
     CHANGE_PASSWORD_SUCCESS,
     CHANGE_PASSWORD_FAILED,
     EMAIL_VERIFY_SUCCESS,
-    EMAIL_VERIFY_FAILED
+    EMAIL_VERIFY_FAILED,
+    PROFILE_UPDATE_SUCCESS,
+    PROFILE_UPDATE_FAILED
 } from './types';
 
 export const checkAuthenticated = () => async dispatch => {
@@ -178,7 +180,6 @@ export const email_confirmation = (email) => async dispatch => {
     const body = JSON.stringify({email})
     try{
         const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/add/email/`,body,config)
-        console.log(res.status)
         if (res.status === 200){
             dispatch({
                 type:EMAIL_VERIFY_SUCCESS,
@@ -199,6 +200,46 @@ export const email_confirmation = (email) => async dispatch => {
         return {success:false}
     }   
 }
+
+export const change_profile = (email, first_name, last_name, mobile, image, customer_id) => async dispatch => {
+    const token = localStorage.getItem('access_token');
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('first_name', first_name);
+    formData.append('last_name', last_name);
+    formData.append('mobile', mobile);
+    
+    if (image) {
+        formData.append('image', image);
+    }
+
+    const config = {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
+        }
+    };
+
+    try {
+        const res = await axios.put(`${process.env.REACT_APP_API_URL}/auth/customer/profile/${customer_id}/`,formData,config);
+        
+        if (res.status === 200) {
+            console.log("Profile Data----------",res.data)
+            dispatch({
+                type: PROFILE_UPDATE_SUCCESS,
+                payload: res.data
+            });
+        } else {
+            dispatch({
+                type: PROFILE_UPDATE_FAILED,
+            });
+        }
+    } catch (error) {
+        console.log("Error occurred during fetching the backend API:", String(error));
+    }
+};
+
 
 
 export const logout = () => async dispatch =>{

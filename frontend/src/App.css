@@ -75,3 +75,11 @@ body{
   background-color: lightyellow;
   padding: 0.5rem 1rem; 
 }
+
+.profile-image{
+  width: 2rem;
+  height: 2rem; 
+  border: 0.5px solid blanchedalmond;
+  border-radius: 50%;
+  object-fit: cover;
+}

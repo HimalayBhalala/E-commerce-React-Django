@@ -64,12 +64,11 @@ const OrderConfirm = ({ isAuthenticated }) => {
   
   const handlePayment = async () => {
     setIsLoading(true);
-    setPaymentConfirm(true)
     localStorage.setItem('order-currency',currency)
     try {
       const stripe = await stripePromise;
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/ecommerce/create-payment-intent/`,
+        `${process.env.REACT_APP_API_URL}/ecommerce/add-payment/`,
         {
           amount: calculateTotalAmount(),
           currency: currency,
@@ -77,6 +76,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
       );
       
       const { clientSecret } = response.data;
+      console.log(response)
       
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
@@ -95,6 +95,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
       console.error("Error handling payment:", error);
     } finally {
       setIsLoading(false);
+      setPaymentConfirm(true)
     }
   };
   

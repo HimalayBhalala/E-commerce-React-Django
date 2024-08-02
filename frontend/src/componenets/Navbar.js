@@ -90,9 +90,9 @@ const Navbar = ({ logout,isAuthenticated}) => {
               }
               {
                 isAuthenticated ? (
-                  <Link to='/profile' className='nav-link'>
-                    <img src="sdd.png" alt="no-image"/>
-                  </Link>
+                    <Link to='/profile' className='nav-link'>
+                      <img className='profile-image' src='' alt="no-image"/>
+                    </Link>
                 ) : (
                   null
                 )

@@ -8,6 +8,8 @@ import {
     LOGOUT,
     CHANGE_PASSWORD_SUCCESS,
     CHANGE_PASSWORD_FAILED,
+    PROFILE_UPDATE_SUCCESS,
+    PROFILE_UPDATE_FAILED,
     EMAIL_VERIFY_SUCCESS,
     EMAIL_VERIFY_FAILED
 } from '../actions/types';
@@ -42,7 +44,7 @@ const authReducer = (state = initialState, action) => {
             };
 
         case AUTHENTICATED_SUCCESS:
-            return {
+                return {
                 access_token:localStorage.getItem('access_token'),
                 refresh_token:localStorage.getItem('refresh_token'),
                 isAuthenticated: true,
@@ -67,6 +69,12 @@ const authReducer = (state = initialState, action) => {
             return {
                 user : payload.user,
                 message : "User has been exists."
+            }
+        
+        case PROFILE_UPDATE_SUCCESS:
+            localStorage.setItem('profile-image',payload.customer.image)
+            return{
+                customer:payload
             }
 
         case LOGIN_SUCCESS:
@@ -114,6 +122,12 @@ const authReducer = (state = initialState, action) => {
                     user : null,
                     message : "User has not found"
                 }
+
+        case PROFILE_UPDATE_FAILED:
+            localStorage.removeItem('profile-item');
+            return{
+                customer:null
+            }
 
         case LOGIN_FAIL:
             localStorage.removeItem("access_token");
