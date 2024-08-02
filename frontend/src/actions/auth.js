@@ -178,22 +178,25 @@ export const email_confirmation = (email) => async dispatch => {
     const body = JSON.stringify({email})
     try{
         const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/add/email/`,body,config)
-        console.log(res)
+        console.log(res.status)
         if (res.status === 200){
             dispatch({
                 type:EMAIL_VERIFY_SUCCESS,
                 payload:res.data
             })
+            return {success:true,status:res.status}
         }else{
             dispatch({
                 type : EMAIL_VERIFY_FAILED
-            })            
+            })
+            return {success:false,status:res.status}            
         }
     }catch(error){
-        console.log("Error occure during fetching an api",String(error));
+        console.log("Error occure during fetching an backend api",String(error));
         dispatch({
             type : EMAIL_VERIFY_FAILED
         })
+        return {success:false}
     }   
 }
 

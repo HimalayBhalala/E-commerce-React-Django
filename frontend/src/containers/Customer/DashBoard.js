@@ -153,6 +153,7 @@ const DashBoard = () => {
                       }}
                     />
                   </div>
+                    <p className='text-center mt-3'>Chart of total order based on date</p>
                 </div>
               </div>
             </div>

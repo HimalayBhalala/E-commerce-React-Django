@@ -158,4 +158,4 @@ class EmailVerificationView(APIView):
             serializer = CustomerEmailVerificationSerializer(user)
             return Response({"user":serializer.data},status=status.HTTP_200_OK)
         except User.DoesNotExist:
-            return Response({"data":"User does not exists with a given url"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"data":"User does not exists with a given url"},status=status.HTTP_404_NOT_FOUND)

@@ -88,6 +88,15 @@ const Navbar = ({ logout,isAuthenticated}) => {
                   null
                 )
               }
+              {
+                isAuthenticated ? (
+                  <Link to='/profile' className='nav-link'>
+                    <img src="sdd.png" alt="no-image"/>
+                  </Link>
+                ) : (
+                  null
+                )
+              }
             </div>
           </div>
         </div>

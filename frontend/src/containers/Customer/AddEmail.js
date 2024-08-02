@@ -29,7 +29,10 @@ function AddEmail({user,email_confirmation}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            await email_confirmation(email)
+            const res = await email_confirmation(email)
+            if (!(res.success)){
+                navigate('/register')
+            }
         }catch(error){
             console.log("Error Ocuure during fetching an api",String(error))
         }
