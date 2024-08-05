@@ -162,7 +162,10 @@ SIMPLE_JWT = {
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'ecommerce.pagination.CustomPagination',
-    'PAGE_SIZE': 3
+    'PAGE_SIZE': 3,
+    'DATE_INPUT_FORMATS': "%d-%m-%Y",
+    'DATE_FORMAT': "%d-%m-%Y",
+    'DATETIME_FORMAT': "%d-%m-%Y %H:%M:%S",
 }
 
 # settings.py

@@ -28,4 +28,5 @@ urlpatterns = [
     path('customer-product-count/<int:customer_id>/',views.GetCustomerProductCount.as_view(),name='customer-product-count'),
     path('total-order/<int:customer_id>/',views.GetTotalOrder.as_view(),name='get-total-order'),
     path('customer/search/',views.GetSearchingProduct.as_view(),name='get-search-product'),
+    path('<int:customer_id>/orderitems/<str:date>/',views.getOrderProductDetail.as_view(),name='order-detail')
 ]

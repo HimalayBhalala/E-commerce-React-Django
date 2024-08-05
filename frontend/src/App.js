@@ -42,6 +42,7 @@ import { WishListProvider } from './context/WishListContext';
 import AddEmail from './containers/Customer/AddEmail';
 import ForgetPassword from './containers/Customer/ForgetPassword';
 import SearchProduct from './containers/Customer/SearchProduct';
+import SortedOrderDate from './containers/Customer/SortedOrderDate';
 
 function App() {
   return (
@@ -77,6 +78,7 @@ function App() {
             <Route exact path="/wishlist" element={<WishList />} />
             <Route exact path="/addresses" element={<Addresses />} />
             <Route exact path="/add/address" element={<AddAddress />} />
+            <Route exact path="/date/:date" element={<SortedOrderDate />} />
             {/* Seller Panel */}
             <Route exact path="/seller/register" element={<SellerSignUp />} />
             <Route exact path="/seller/login" element={<SellerLogin />} />

@@ -2,6 +2,9 @@ from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIVi
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets,status
+from datetime import datetime
+import pytz
+from django.utils import timezone
 from .pagination import (
     HomeProductPagination,
     HomeCategoryProductPagination,
@@ -37,7 +40,8 @@ from .serializers import (
     WishListSerializer,
     CustomerProductCountSerializer,
     GetTotalOrderSerializer,
-    ProductInfoSerializer
+    ProductInfoSerializer,
+    OrderProductItemSerializer
 )
 import stripe
 from django.conf import settings
@@ -292,3 +296,26 @@ class GetSearchingProduct(APIView):
         product = Product.objects.filter(title__icontains=data)
         serializer = ProductInfoSerializer(product,many=True)
         return Response({"data":serializer.data},status=status.HTTP_200_OK)
+    
+
+class getOrderProductDetail(APIView):
+    def get(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        date = self.kwargs['date']
+
+        try:
+            customer = Customer.objects.get(id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({"info":"customer Does not exists"},status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            order = Order.objects.filter(customer=customer,order_time__date=date)
+        except Order.DoesNotExist:
+            return Response({"info":"order Does not exists"},status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            orderitems = OrderItems.objects.filter(order__in=order)
+            serializer = OrderProductItemSerializer(orderitems,many=True)
+            return Response({"data":serializer.data},status=status.HTTP_200_OK)
+        except OrderItems.DoesNotExist:
+            return Response({"info":"orderitem Does not exists"},status=status.HTTP_404_NOT_FOUND)

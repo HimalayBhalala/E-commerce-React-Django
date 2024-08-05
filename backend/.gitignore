@@ -28,10 +28,6 @@ MANIFEST
 
 git rm -r --cached media/**
 git rm -r --cached backend/media/**
-# .backend/media/**
-# .backend/media/
-# backend/media
-
 media
 
 # PyInstaller

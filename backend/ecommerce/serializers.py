@@ -136,8 +136,8 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
         model = CustomerAddress
         fields = ["id","customer","address","default_address"]
 
-    def __init__(self,*args, **kwargs):
-        super(CustomerAddressSerializer,self).__init__(*args,**kwargs)
+    def __init__(self, instance=None, data=..., **kwargs):
+        super(CustomerAddressSerializer,self).__init__(instance, data, **kwargs)
         self.Meta.depth=1
 
 class CustomerProductSerializer(serializers.ModelSerializer):
@@ -164,6 +164,18 @@ class OrderItemSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'order': {'required': True},
         }
+
+class OrderProductItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItems
+        fields = ['order', 'product', 'quantity', 'price']
+        extra_kwargs = {
+            'order': {'required': True},
+        }
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super(OrderProductItemSerializer,self).__init__(instance, data, **kwargs)
+        self.Meta.depth=1
 
 class ProductRatingSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,22 +1,23 @@
 import React, { useContext, useEffect, useState } from "react";
 import SideBar from "./SideBar";
 import OrderRow from "./OrderRow";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { CurrencyContext } from "../../context/CurrencyContex";
 
-const Orders = () => {
+const OrderDate = () => {
   const customer_id = JSON.parse(localStorage.getItem("customer_id"));
   const [orderItem, setOrderItem] = useState([]);
   const {currency} = useContext(CurrencyContext);
   const order_currency = localStorage.getItem('order-currency');
-  const [formData,setFormData] = useState([]);
+
+  const {date} = useParams();
 
   useEffect(() => {
     if (customer_id) {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/`
+            `${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/${date}`
           );
           const res = await response.json();
           setOrderItem(res.data);
@@ -29,19 +30,10 @@ const Orders = () => {
     }
   }, [customer_id]);
 
-  const onChange = (e) => setFormData({
-    ...formData,
-    [e.target.name] : e.target.value
-  })
-
-  const {date} = formData;
   
   return (
     <>
-    <div className="container mt-1" style={{float:"right",textAlign:"end"}}>
-      <input type="date" name="date" value={date} onChange={onChange}/>
-      <Link to={`/date/${date}`} className="btn btn-primary">Get Order</Link>
-    </div>
+    {console.log("Date of order,",date)}
     {
       (orderItem.length <= 0) ? (
         <div className="container mt-5" style={{ marginBottom: "12rem" }}>
@@ -108,4 +100,4 @@ const Orders = () => {
   );
 };
 
-export default Orders;
+export default OrderDate;
