@@ -26,11 +26,13 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-git rm -r --cached .media/**
-git rm -r --cached .backend/media/**
-.backend/media/**
-.backend/media/
-backend/media
+git rm -r --cached media/**
+git rm -r --cached backend/media/**
+# .backend/media/**
+# .backend/media/
+# backend/media
+
+media
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
