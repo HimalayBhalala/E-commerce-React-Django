@@ -22,7 +22,7 @@ function OrderRow(props) {
       );
       if (response.data.bool === true) {
         setTotalDownloads(response.data.downloads);
-        const imageUrl = `${process.env.REACT_APP_API_URL}/${products.product?.image}`;
+        const imageUrl = products.product?.image;
         downloadImage(imageUrl, products.product?.image || "download");
       } else {
         console.log("API response indicates failure:", response.data);
@@ -48,7 +48,7 @@ function OrderRow(props) {
     });
   }
 
-  const imageUrl = `${process.env.REACT_APP_API_URL}/${products.product?.image}`;
+  const imageUrl = products.product?.image;
 
   return (
     <tr key={index}>

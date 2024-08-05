@@ -4,10 +4,8 @@ import { Link } from 'react-router-dom';
 import { logout } from '../actions/auth';
 import { CartContext } from '../context/CardContext';
 import { CurrencyContext } from '../context/CurrencyContex';
-import { ProfileContext } from '../context/ProfileContext';
 
-const Navbar = ({ logout,isAuthenticated}) => {
-  const {getProfile} = useContext(ProfileContext);
+const Navbar = ({ logout,isAuthenticated,profile_image}) => {
   const cartData = useContext(CartContext);
   const {currency,setCurrency} = useContext(CurrencyContext);
   const [formData,setFormData] = useState([])
@@ -71,16 +69,12 @@ const Navbar = ({ logout,isAuthenticated}) => {
                   <option value="usd">USD</option>
                 </select>
               </li>
-              {
-                isAuthenticated ? (
+              <div>
                   <form>
                     <input type="search" className='mt-1' onChange={onChange} name='search' value={search} id='search'/>
                     <Link to={`/search?search=${search}`} className='btn btn-success'>Search</Link>
                   </form>
-                ) : (
-                  null
-                )
-              }
+              </div>
               {
                 isAuthenticated ? (
                   <Fragment>
@@ -111,7 +105,7 @@ const Navbar = ({ logout,isAuthenticated}) => {
               {
                 isAuthenticated ? (
                     <Link to='/profile' className='nav-link'>
-                      <img className='profile-image' src={getProfile.image} alt="no-image"/>
+                      <img className='profile-image' src={profile_image} alt="no-image"/>
                     </Link>
                 ) : (
                   null
@@ -130,7 +124,8 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const mapStateToProps = (state) => ({
-  isAuthenticated : state.auth.isAuthenticated
+  isAuthenticated : state.auth.isAuthenticated,
+  profile_image : state.auth.profile_image
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Navbar);

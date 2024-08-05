@@ -21,6 +21,7 @@ const initialState = {
     user: null,
     customer: null,
     message: null,
+    profile_image:null
 };
 
 const authReducer = (state = initialState, action) => {
@@ -33,6 +34,7 @@ const authReducer = (state = initialState, action) => {
             localStorage.setItem('customer_id', payload.customer.id);
             localStorage.setItem('user_id', payload.user.id);
             localStorage.setItem('username', payload.user.first_name);
+            localStorage.setItem('profile_image',payload.customer.image)
             return {
                 ...state,
                 access_token: payload.token.access_token,
@@ -40,13 +42,16 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: true,
                 user: payload.user,
                 customer: payload.customer,
+                profile_image:payload.customer.image,
                 message: "Register Successfully"
             };
 
         case AUTHENTICATED_SUCCESS:
                 return {
+                ...state,
                 access_token:localStorage.getItem('access_token'),
                 refresh_token:localStorage.getItem('refresh_token'),
+                profile_image:localStorage.getItem('profile_image'),
                 isAuthenticated: true,
                 user: payload,
                 message: "Authentication success"
@@ -72,10 +77,11 @@ const authReducer = (state = initialState, action) => {
             }
         
         case PROFILE_UPDATE_SUCCESS:
-            localStorage.setItem('profile-image',payload.customer.image)
+            localStorage.setItem('profile_image',payload.data.image)
             return{
                 ...state,
-                customer:payload
+                customer:payload,
+                profile_image:payload.data.image
             }
 
         case LOGIN_SUCCESS:
@@ -84,6 +90,7 @@ const authReducer = (state = initialState, action) => {
             localStorage.setItem('customer_id', payload.customer.id);
             localStorage.setItem('user_id', payload.user.id);
             localStorage.setItem('username', payload.user.first_name);
+            localStorage.setItem('profile_image',payload.customer.image);
             return {
                 ...state,
                 access_token: payload.access_token,
@@ -91,6 +98,7 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: true,
                 user: payload.user,
                 customer: payload.customer,
+                profile_image:payload.customer.image,
                 message: "Login Successfully"
             };
 
@@ -100,6 +108,7 @@ const authReducer = (state = initialState, action) => {
             localStorage.removeItem('customer_id');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
+            localStorage.removeItem('profile_image');
             return {
                 ...state,
                 access_token: null,
@@ -107,6 +116,7 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: null,
                 customer: null,
+                profile_image:null,
                 message: "Signup failed"
             };
 
@@ -125,9 +135,11 @@ const authReducer = (state = initialState, action) => {
                 }
 
         case PROFILE_UPDATE_FAILED:
-            localStorage.removeItem('profile-item');
+            localStorage.removeItem('profile_image')
             return{
-                customer:null
+                ...state,
+                customer:null,
+                profile_image:null
             }
 
         case LOGIN_FAIL:
@@ -136,6 +148,7 @@ const authReducer = (state = initialState, action) => {
             localStorage.removeItem('customer_id');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
+            localStorage.removeItem('profile_image');
             return {
                 ...state,
                 access_token: null,
@@ -143,6 +156,7 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: null,
                 customer: null,
+                profile_image:null,
                 message: "Login failed"
             }
         case LOGOUT:
@@ -151,6 +165,7 @@ const authReducer = (state = initialState, action) => {
             localStorage.removeItem('customer_id');
             localStorage.removeItem('user_id');
             localStorage.removeItem('username');
+            localStorage.removeItem('profile_image');
             return {
                 ...state,
                 access_token: null,
@@ -158,6 +173,7 @@ const authReducer = (state = initialState, action) => {
                 isAuthenticated: false,
                 user: null,
                 customer: null,
+                profile_image:null,
                 message: "Logout successful"
             };
 

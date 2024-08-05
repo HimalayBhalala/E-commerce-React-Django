@@ -69,9 +69,19 @@ class LoginSerializer(serializers.Serializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = Customer
-        fields = ['id', 'user', 'mobile']
+        fields = ['id', 'user', 'mobile',"image"]
+
+    def get_image(self, obj):
+        image = str(obj.image)
+        if image.startswith('http'):
+            return image
+        else:
+            return f"http://127.0.0.1:8000/media/{image}"
+
 
     def to_representation(self, instance):
         """
@@ -98,13 +108,22 @@ class UserInformationSerializer(serializers.ModelSerializer):
 
 class CustomerRegistrationSerializer(serializers.ModelSerializer):
     user = CreateUserSerializer(read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Customer
-        fields = ["id", "user","mobile"]
+        fields = ["id", "user","mobile","image"]
         extra_kwargs = {
             "id": {"read_only": True}
         }
+    
+    def get_image(self, obj):
+        image = str(obj.image)
+        if image.startswith('http'):
+            return image
+        else:
+            return f"http://127.0.0.1:8000/media/{image}"
+
 
     def to_representation(self, instance):
         representation =  super().to_representation(instance)
@@ -113,12 +132,14 @@ class CustomerRegistrationSerializer(serializers.ModelSerializer):
     
 class GetCustomerProfileSerializer(serializers.ModelSerializer):
     user = UserInformationSerializer(read_only=True)
+
     class Meta:
         model = Customer
         fields = ["id","user","mobile","image"]
         extra_kwargs = {
             "id":{"read_only": True}
         }         
+
 
     def update(self, instance, validated_data):
         mobile = validated_data.get('mobile')

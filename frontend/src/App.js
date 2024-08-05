@@ -41,14 +41,12 @@ import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
 import AddEmail from './containers/Customer/AddEmail';
 import ForgetPassword from './containers/Customer/ForgetPassword';
-import ProfileProvide from './context/ProfileContext';
 import SearchProduct from './containers/Customer/SearchProduct';
 
 function App() {
   return (
     <div>
       <Provider store={store}>
-      <ProfileProvide>
       <CurrencyProvider>
       <CartProvider>
       <WishListProvider>
@@ -98,7 +96,6 @@ function App() {
         </WishListProvider>
         </CartProvider>
         </CurrencyProvider>
-        </ProfileProvide>
       </Provider>
     </div>
   );

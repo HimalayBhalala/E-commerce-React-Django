@@ -75,7 +75,7 @@ class ProductInfoSerializer(serializers.ModelSerializer):
 
     def get_image(self,obj):
         if str(obj.image).startswith('http'):
-            return obj.image
+            return obj
         else:
             return f"http://127.0.0.1:8000/media/{obj.image}"
 
@@ -202,7 +202,7 @@ class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ["id","user","mobile","customer_orders","customer_address","product_customer","ratings_customer","customer_wishlist"]
+        fields = ["id","user","mobile","image","customer_orders","customer_address","product_customer","ratings_customer","customer_wishlist"]
 
     def __init__(self,*args,**kwargs):
         super(CustomerSerializer,self).__init__(*args,**kwargs)
@@ -223,7 +223,7 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        fields = ["id","user","mobile","customer_orders","product_customer","customer_address","ratings_customer","customer_wishlist"]
+        fields = ["id","user","mobile","customer_orders","image","product_customer","customer_address","ratings_customer","customer_wishlist"]
 
     def __init__(self,*args,**kwargs):
         super(CustomerDetailSerializer,self).__init__(*args,**kwargs)
@@ -245,7 +245,7 @@ class CustomerProductCountSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Customer
-        fields = ['id',"user","customer_wishlist","order_lists"]
+        fields = ['id',"user","customer_wishlist","order_lists","image"]
 
     def get_order_lists(self,obj):
         order = Order.objects.filter(customer=obj)

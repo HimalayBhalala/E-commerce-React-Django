@@ -5,11 +5,9 @@ import axios from 'axios';
 import { change_profile } from '../../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { ProfileContext } from '../../context/ProfileContext';
 
 const Profile = ({change_profile,isAuthenticated}) => {
 
-    const {getProfile} = useContext(ProfileContext);
     const customer_id = localStorage.getItem('customer_id');
     const token = localStorage.getItem('access_token');
     const [customerInfo, setCustomerInfo] = useState({});
