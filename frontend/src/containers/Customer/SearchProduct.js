@@ -34,7 +34,7 @@ export default function SearchProduct() {
   return (
     <div className='container text-center'>
         {console.log("Product",getProductData)}
-      <h1 style={{ textAlign: "center" }}>Products</h1>
+      <h1 style={{ textAlign: "center" }} className='mt-3'>Search Results</h1>
                 <hr />
                 <div className="row mt-3">
                     {

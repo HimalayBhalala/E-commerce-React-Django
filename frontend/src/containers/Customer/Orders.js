@@ -9,7 +9,7 @@ const Orders = () => {
   const [orderItem, setOrderItem] = useState([]);
   const {currency} = useContext(CurrencyContext);
   const order_currency = localStorage.getItem('order-currency');
-  const [formData,setFormData] = useState([]);
+
 
   useEffect(() => {
     if (customer_id) {
@@ -29,19 +29,8 @@ const Orders = () => {
     }
   }, [customer_id]);
 
-  const onChange = (e) => setFormData({
-    ...formData,
-    [e.target.name] : e.target.value
-  })
-
-  const {date} = formData;
-  
   return (
     <>
-    <div className="container mt-1" style={{float:"right",textAlign:"end"}}>
-      <input type="date" name="date" value={date} onChange={onChange}/>
-      <Link to={`/date/${date}`} className="btn btn-primary">Get Order</Link>
-    </div>
     {
       (orderItem.length <= 0) ? (
         <div className="container mt-5" style={{ marginBottom: "12rem" }}>
@@ -86,7 +75,7 @@ const Orders = () => {
                       <th>Sr.No</th>
                       <th>Product</th>
                       <th>Price</th>
-                      <th>Date</th>
+                      <th>Data</th>
                       <th>Status</th>
                       <th>Action</th>
                     </tr>

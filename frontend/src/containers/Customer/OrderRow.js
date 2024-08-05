@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 import axios from "axios";
 import { CurrencyContext } from "../../context/CurrencyContex";
-import { toZonedTime, format as formatZonedTime } from 'date-fns-tz';
 
 function OrderRow(props) {
   const index = props.index;
@@ -11,11 +10,6 @@ function OrderRow(props) {
   const [totalDownloads, setTotalDownloads] = useState(
     products.product?.downloads || 0
   );
-
-  const get_date = products.order?.order_time
-  const timeZone = 'Asia/Kolkata';
-  const zonedDate = toZonedTime(get_date, timeZone);
-  const formated_date = formatZonedTime(zonedDate, 'dd-MMMM-yyyy', { timeZone });
 
   async function countDownloads(product_id) {
     const formData = new FormData();
@@ -80,7 +74,7 @@ function OrderRow(props) {
         }
       </td>
       <td>
-        {formated_date}
+        {products.order?.order_time}
       </td>
       <td>
         {products.order.order_status ? (
