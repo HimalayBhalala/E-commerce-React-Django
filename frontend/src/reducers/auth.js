@@ -74,6 +74,7 @@ const authReducer = (state = initialState, action) => {
         case PROFILE_UPDATE_SUCCESS:
             localStorage.setItem('profile-image',payload.customer.image)
             return{
+                ...state,
                 customer:payload
             }
 

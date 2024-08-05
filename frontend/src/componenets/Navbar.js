@@ -1,17 +1,27 @@
-import React, { Fragment, useContext} from 'react';
+import React, { Fragment, useContext, useState} from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from '../actions/auth';
 import { CartContext } from '../context/CardContext';
 import { CurrencyContext } from '../context/CurrencyContex';
+import { ProfileContext } from '../context/ProfileContext';
 
 const Navbar = ({ logout,isAuthenticated}) => {
+  const {getProfile} = useContext(ProfileContext);
   const cartData = useContext(CartContext);
   const {currency,setCurrency} = useContext(CurrencyContext);
+  const [formData,setFormData] = useState([])
 
   const handleCurrencyChange = (e) => {
     setCurrency(e.target.value);
   };
+
+  const {search} = formData;
+
+  const onChange = (e) => setFormData({
+      ...formData,
+      [e.target.name]:e.target.value
+  })
 
   return (
     <div>
@@ -63,6 +73,16 @@ const Navbar = ({ logout,isAuthenticated}) => {
               </li>
               {
                 isAuthenticated ? (
+                  <form>
+                    <input type="search" className='mt-1' onChange={onChange} name='search' value={search} id='search'/>
+                    <Link to={`/search?search=${search}`} className='btn btn-success'>Search</Link>
+                  </form>
+                ) : (
+                  null
+                )
+              }
+              {
+                isAuthenticated ? (
                   <Fragment>
                   <div className="dropdown">
                   <button className="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown">
@@ -91,7 +111,7 @@ const Navbar = ({ logout,isAuthenticated}) => {
               {
                 isAuthenticated ? (
                     <Link to='/profile' className='nav-link'>
-                      <img className='profile-image' src='' alt="no-image"/>
+                      <img className='profile-image' src={getProfile.image} alt="no-image"/>
                     </Link>
                 ) : (
                   null

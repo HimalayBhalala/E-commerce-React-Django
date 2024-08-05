@@ -36,7 +36,8 @@ from .serializers import (
     CustomerOrderSerializer,
     WishListSerializer,
     CustomerProductCountSerializer,
-    GetTotalOrderSerializer
+    GetTotalOrderSerializer,
+    ProductInfoSerializer
 )
 import stripe
 from django.conf import settings
@@ -282,3 +283,12 @@ class GetTotalOrder(APIView):
         order = Order.objects.filter(customer=customer)
         serializer = GetTotalOrderSerializer(order,many=True)
         return Response({"orders":serializer.data})
+    
+class GetSearchingProduct(APIView):
+    def get(self,request,*args,**kwargs):
+        data = request.query_params.get('search')
+        if not data:
+            return Response({"message":"Enter something for searching an product"},status=status.HTTP_404_NOT_FOUND)
+        product = Product.objects.filter(title__icontains=data)
+        serializer = ProductInfoSerializer(product,many=True)
+        return Response({"data":serializer.data},status=status.HTTP_200_OK)

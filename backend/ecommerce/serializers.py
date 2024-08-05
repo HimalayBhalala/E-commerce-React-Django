@@ -68,9 +68,16 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         self.Meta.depth=1
 
 class ProductInfoSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     class Meta:
         model = Product
         fields = ["id","title","description","image","price","usd_price"]
+
+    def get_image(self,obj):
+        if str(obj.image).startswith('http'):
+            return obj.image
+        else:
+            return f"http://127.0.0.1:8000/media/{obj.image}"
 
 class ProductTitleDetailSerializer(serializers.ModelSerializer):
     category_product = ProductSerializer(many=True,read_only=True)

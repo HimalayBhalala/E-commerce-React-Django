@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import SideBar from './SideBar';
 import { TextField, Button } from '@mui/material';
 import axios from 'axios';
 import { change_profile } from '../../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { ProfileContext } from '../../context/ProfileContext';
 
 const Profile = ({change_profile,isAuthenticated}) => {
+
+    const {getProfile} = useContext(ProfileContext);
     const customer_id = localStorage.getItem('customer_id');
     const token = localStorage.getItem('access_token');
     const [customerInfo, setCustomerInfo] = useState({});
@@ -85,7 +88,6 @@ const Profile = ({change_profile,isAuthenticated}) => {
 
     return (
         <div className="container mt-5" style={{ marginBottom: '2rem' }}>
-
             <div className="row">
                 <div className="col-md-3">
                     <SideBar />

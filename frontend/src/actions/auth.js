@@ -209,10 +209,7 @@ export const change_profile = (email, first_name, last_name, mobile, image, cust
     formData.append('first_name', first_name);
     formData.append('last_name', last_name);
     formData.append('mobile', mobile);
-    
-    if (image) {
-        formData.append('image', image);
-    }
+    formData.append('image', image);
 
     const config = {
         headers: {
@@ -223,9 +220,7 @@ export const change_profile = (email, first_name, last_name, mobile, image, cust
 
     try {
         const res = await axios.put(`${process.env.REACT_APP_API_URL}/auth/customer/profile/${customer_id}/`,formData,config);
-        
         if (res.status === 200) {
-            console.log("Profile Data----------",res.data)
             dispatch({
                 type: PROFILE_UPDATE_SUCCESS,
                 payload: res.data

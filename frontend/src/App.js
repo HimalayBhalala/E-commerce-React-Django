@@ -41,11 +41,14 @@ import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
 import AddEmail from './containers/Customer/AddEmail';
 import ForgetPassword from './containers/Customer/ForgetPassword';
+import ProfileProvide from './context/ProfileContext';
+import SearchProduct from './containers/Customer/SearchProduct';
 
 function App() {
   return (
     <div>
       <Provider store={store}>
+      <ProfileProvide>
       <CurrencyProvider>
       <CartProvider>
       <WishListProvider>
@@ -69,6 +72,7 @@ function App() {
             <Route exact path="/add/email" element={<AddEmail />} />
             <Route exact path="/change/password" element={<ChangePassword />} />
             <Route exact path="/forget/password" element={<ForgetPassword />} />
+            <Route exact path="/search" element={<SearchProduct />} />
             <Route exact path="/checkout" element={<Checkout />} />
             <Route exact path="/orders" element={<Orders />} />
             <Route exact path='/order/confirm' element={<OrderConfirm />} />
@@ -94,6 +98,7 @@ function App() {
         </WishListProvider>
         </CartProvider>
         </CurrencyProvider>
+        </ProfileProvide>
       </Provider>
     </div>
   );
