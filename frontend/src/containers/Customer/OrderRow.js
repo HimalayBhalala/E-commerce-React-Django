@@ -56,7 +56,7 @@ function OrderRow(props) {
       <td>
         <span style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={imageUrl}
+            src={(String(imageUrl).startsWith('http')?(imageUrl) : (`${process.env.REACT_APP_API_URL}/${imageUrl}`))}
             className="img-thumbnail"
             style={{ width: "60px", marginRight: "10px" }}
             alt={products.product?.title}

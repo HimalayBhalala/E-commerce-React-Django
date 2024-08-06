@@ -131,14 +131,6 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         self.Meta.depth=1
 
 
-class CustomerAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerAddress
-        fields = ["id","customer","address","default_address"]
-
-    def __init__(self, instance=None, data=..., **kwargs):
-        super(CustomerAddressSerializer,self).__init__(instance, data, **kwargs)
-        self.Meta.depth=1
 
 class CustomerProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -203,8 +195,31 @@ class WishListSerializer(serializers.ModelSerializer):
     def __init__(self, instance=None, data=..., **kwargs):
         super(WishListSerializer,self).__init__(instance, data, **kwargs)
         self.Meta.depth=1
-
     
+class GetTotalOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["id","customer","order_time","order_status"]
+
+class CustomerProductCountSerializer(serializers.ModelSerializer):
+    customer_wishlist = WishListSerializer(many=True,read_only=True)
+    order_lists = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Customer
+        fields = ['id',"user","customer_wishlist","order_lists","image"]
+
+    def get_order_lists(self,obj):
+        order = Order.objects.filter(customer=obj)
+        serializers = GetTotalOrderSerializer(order,many=True)
+        return serializers.data
+    
+
+class CustomerAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerAddress
+        fields = ["id","customer","address","default_address"]
+
 class CustomerSerializer(serializers.ModelSerializer):
     customer_orders = OrderSerializer(many=True,read_only=True)
     customer_address = CustomerAddressSerializer(many=True,read_only=True)
@@ -224,7 +239,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         if len(str(value)) != 10:
             raise serializers.ValidationError("Mobile number must be exactly 10 digits.")
         return value
-    
 
 class CustomerDetailSerializer(serializers.ModelSerializer):
     customer_orders = OrderSerializer(many=True,read_only=True)        
@@ -246,21 +260,34 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Mobile number must be exactly 10 digits.")
         return value
     
-class GetTotalOrderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ["id","customer","order_time","order_status"]
-
-class CustomerProductCountSerializer(serializers.ModelSerializer):
-    customer_wishlist = WishListSerializer(many=True,read_only=True)
-    order_lists = serializers.SerializerMethodField()
-    
+class CustomerAddressDetailSerailizer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['id',"user","customer_wishlist","order_lists","image"]
-
-    def get_order_lists(self,obj):
-        order = Order.objects.filter(customer=obj)
-        serializers = GetTotalOrderSerializer(order,many=True)
-        return serializers.data
+        fields = ["id","user","mobile","image"]
     
+
+class CustomerAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerAddress
+        fields = ["id","customer","address","default_address"]
+        depth = 1
+
+
+    def validate(self,data):
+        address = data.get('address')
+        if not address:
+            raise serializers.ValidationError({"message":"address_field must be required"})
+        return data
+    
+    def create(self, validated_data):
+        customer_id = self.context.get('customer_id')
+        customer = Customer.objects.get(id=customer_id)
+        address = validated_data.get('address')
+        default_address = validated_data.get('default_address')
+        return CustomerAddress.objects.create(customer=customer,address=address,default_address=default_address)
+
+    def update(self, instance, validated_data):
+        instance.address = validated_data.get('address', instance.address)
+        instance.default_address = validated_data.get('default_address',instance.default_address)
+        instance.save()
+        return instance

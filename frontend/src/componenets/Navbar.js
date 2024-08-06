@@ -72,7 +72,7 @@ const Navbar = ({ logout,isAuthenticated,profile_image}) => {
               <div>
                   <form>
                     <input type="search" className='mt-1' onChange={onChange} name='search' value={search} id='search'/>
-                    <Link to={`/search?search=${search}`} className='btn btn-success'>Search</Link>
+                    <Link to={`/search?search=${search}`} className='btn' style={{backgroundColor:"gray"}}>Search</Link>
                   </form>
               </div>
               {

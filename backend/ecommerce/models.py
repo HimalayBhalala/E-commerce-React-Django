@@ -49,7 +49,7 @@ class Product(models.Model):
 class CustomerAddress(models.Model):
     customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="customer_address")
     address = models.TextField()
-    default_address = models.BooleanField(default=False)
+    default_address = models.BooleanField(default=False,blank=True,null=True)
 
     class Meta:
         verbose_name="customer address"

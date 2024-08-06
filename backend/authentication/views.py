@@ -109,7 +109,7 @@ class CustomerProfileView(APIView):
             customer = Customer.objects.get(id=customer_id)
             user = customer.user
 
-            user_serializer = UserInformationSerializer(user, data=request.data, partial=True)
+            user_serializer = UserInformationSerializer(user, data=request.data,partial=True)
             if user_serializer.is_valid(raise_exception=True):
                 user_serializer.save() 
 

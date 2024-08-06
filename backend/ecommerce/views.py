@@ -169,6 +169,7 @@ def create_payment_intent(request):
             intent = stripe.PaymentIntent.create(
                 amount=amount,
                 currency=currency,
+                payment_method_types=['card']
             )
 
             return JsonResponse({
@@ -319,3 +320,45 @@ class getOrderProductDetail(APIView):
             return Response({"data":serializer.data},status=status.HTTP_200_OK)
         except OrderItems.DoesNotExist:
             return Response({"info":"orderitem Does not exists"},status=status.HTTP_404_NOT_FOUND)
+
+
+class AddCustomerAddress(APIView):
+    def post(self, request, *args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        serializer = CustomerAddressSerializer(data=request.data,context={'request':request,'customer_id':customer_id})
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"message":serializer.data})
+        
+class ModifyCustomerAddress(APIView):
+    def get(self, request, *args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        address_id = self.kwargs['address_id']
+        c_address = CustomerAddress.objects.get(id=address_id,customer__id=customer_id)
+        serializer = CustomerAddressSerializer(c_address)
+        return Response({"data":serializer.data},status=status.HTTP_200_OK)
+    
+    def put(self, request, *args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        address_id = self.kwargs['address_id']
+        c_address = CustomerAddress.objects.get(id=address_id,customer__id=customer_id)
+        serializer = CustomerAddressSerializer(c_address,data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({"data":serializer.data},status=status.HTTP_200_OK)
+        return Response({"error":"data is not validate"},status=status.HTTP_400_BAD_REQUEST)    
+
+    def delete(self, request, *args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        address_id = self.kwargs['address_id']
+        c_address = CustomerAddress.objects.get(id=address_id,customer__id=customer_id)
+        c_address.delete()
+        return Response({"data":"deleted successfully"},status=status.HTTP_204_NO_CONTENT)
+
+
+class GetAllCustomerAddress(APIView):
+    def get(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        address_data = CustomerAddress.objects.filter(customer__id=customer_id)
+        serializer = CustomerAddressSerializer(address_data,many=True)
+        return Response({"data":serializer.data})

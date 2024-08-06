@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import SideBar from './SideBar';
 import { TextField,Button } from '@mui/material';
+import axios from 'axios';
 
 const AddAddress = () => {
+    const customer_id = localStorage.getItem('customer_id');
+
     const [formData,setFormData] = useState({
         address:''
     });
@@ -16,6 +19,18 @@ const AddAddress = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        try{
+            axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/customer/address/${customer_id}/`,formData,{headers:{"Content-Type":"application/json"}})
+            .then((response) => {
+                console.log("Response Data",response.data)
+            })
+            .catch((error) => {
+                console.log("Error occure during fetching an api",String(error))
+            })
+        }catch(error){
+            console.log("Error occure during fetching an api")
+        }
     }
   return (
     <div>

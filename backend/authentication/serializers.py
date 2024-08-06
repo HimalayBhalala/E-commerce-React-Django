@@ -97,12 +97,9 @@ class UserInformationSerializer(serializers.ModelSerializer):
         fields = ["id","email","first_name","last_name"]
 
     def update(self, instance, validated_data):
-        email = validated_data.get('email')
-        first_name = validated_data.get('first_name')
-        last_name = validated_data.get('last_name')
-        instance.email = email
-        instance.first_name = first_name
-        instance.last_name = last_name
+        instance.email = validated_data.get('email') or instance.email
+        instance.first_name = validated_data.get('first_name') or instance.first_name
+        instance.last_name = validated_data.get('last_name') or instance.last_name
         instance.save()
         return instance
 
@@ -142,11 +139,8 @@ class GetCustomerProfileSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        mobile = validated_data.get('mobile')
-        image = validated_data.get('image')
-
-        instance.mobile = mobile
-        instance.image = image
+        instance.mobile = validated_data.get('mobile') or instance.mobile
+        instance.image = validated_data.get('image') or instance.image
 
         instance.save()
 

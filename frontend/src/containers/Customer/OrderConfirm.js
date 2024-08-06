@@ -101,7 +101,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   
   const calculateTotalAmount = () => {
     console.log("Total:",localStorage.getItem('total_price'))
-    const payment = parseInt(Math.floo(localStorage.getItem('total_price')))
+    const payment = parseInt(Math.floor(localStorage.getItem('total_price')))
     return payment;
   };
 
