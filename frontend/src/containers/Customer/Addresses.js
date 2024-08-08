@@ -46,12 +46,12 @@ const Addresses = () => {
                         </div>
                     {
                         getAddress.map((addr) => (
-                            <div className="col-md-3 offset-1 mt-1" key={addr.id} style={{border:"2px solid black",backgroundColor:"orange"}}>
-                                <Link to={`/address/${addr.id}`} style={{textDecoration:"none"}}>
+                            <div className="col-md-3 offset-1 mt-1" key={addr?.id} style={{border:"2px solid black",backgroundColor:"orange"}}>
+                                <Link to={`/address/${addr?.id}`} style={{textDecoration:"none"}}>
                                     <div className="card">
                                         <div className="card-body" style={{height:"15rem"}}>
                                             {
-                                                (addr.default_address) ? (
+                                                (addr?.default_address) ? (
                                                     <i className='fa fa-check-circle text-success text-center mt-3 fa-1x' style={{ marginBottom: "11px" }}></i>
                                                 ) : (
                                                     <div className='badge bg-dark mt-3' style={{height:"1.3rem",width:"5rem",marginLeft:"1rem"}}>
@@ -61,13 +61,13 @@ const Addresses = () => {
                                             }
                                             <hr />
                                             <div className="card-title">
-                                                <p className='text-muted' style={{margin:"10px",color:"maroon"}}>{addr.address}</p>
+                                                <p className='text-muted' style={{margin:"10px",color:"maroon"}}>{addr?.address}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </Link>
                                 <div className='text-center mb-2'>
-                                    <button className='btn btn-danger mt-2' onClick={() => removeAddress(addr.id)}>Remove</button>
+                                    <button className='btn btn-danger mt-2' onClick={() => removeAddress(addr?.id)}>Remove</button>
                                 </div>
                             </div>
                         ))

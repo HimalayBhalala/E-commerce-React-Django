@@ -1,44 +1,56 @@
 import React, { useEffect, useState } from 'react'
-import {customer_register} from '../../actions/auth';
+import {customer_register,seller_register} from '../actions/auth';
 import { connect } from 'react-redux';
 import { Button,TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const SellerSignUp = ({customer_register}) => {
-  const [created,setCreated] = useState(false)
+const SignUp = ({customer_register,seller_register}) => {
+  const [created,setCreated] = useState(false);
+  const role = JSON.parse(localStorage.getItem('role'));
   const [formData,setFormData] = useState({
     email : '',
     first_name : '',
     last_name : '',
+    mobile : '',
     password : '',
     confirm_password : ''
   })
 
   const navigate = useNavigate();
 
-  const {email,first_name,last_name,password,confirm_password} = formData;
+  const {email,first_name,last_name,mobile,password,confirm_password} = formData;
 
   const onChange = (e) => setFormData({
     ...formData,
     [e.target.name] : e.target.value
   });
 
+  useEffect(() => {
+    if(role === '' || role === null){
+      navigate("/select/role")
+    }
+
+    if(created){
+      navigate("/login")
+    }
+  },[created,navigate,role]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try{  
-      await customer_register(email,first_name,last_name,password,confirm_password);
-      setCreated(true)
+      if (role === 'customer'){
+        await customer_register(email,first_name,last_name,mobile,password,confirm_password);
+        setCreated(true)
+      }else if(role === 'seller'){
+        await seller_register(email,first_name,last_name,mobile,password,confirm_password);
+        setCreated(true)
+      }
     }catch(error){
       console.log("SignUp Error:"+error)
     }
   };
 
-  useEffect(() => {
-    if(created){
-      navigate("/login")
-    }
-  },[created,navigate]);
 
   return (
     <div>
@@ -70,6 +82,15 @@ const SellerSignUp = ({customer_register}) => {
           fullWidth
           value={email}
           name='email'
+          onChange={onChange}
+        />
+        <TextField
+          label="Mobile Number"
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          value={mobile}
+          name='mobile'
           onChange={onChange}
         />
         <TextField
@@ -105,4 +126,4 @@ const SellerSignUp = ({customer_register}) => {
   )
 };
 
-export default connect(null,{customer_register})(SellerSignUp);
+export default connect(null,{customer_register,seller_register})(SignUp);

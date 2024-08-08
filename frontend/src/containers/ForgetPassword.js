@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { TextField,Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { forget_password } from '../../actions/auth';
+import { forget_password } from '../actions/auth';
 import { connect } from 'react-redux';
 
 const ForgetPassword = ({user,forget_password}) => {
-
+  const role = JSON.parse(localStorage.getItem('role'));
   const user_id = localStorage.getItem('user_id');
 
   const [formData,setFormData] = useState({
@@ -21,13 +21,18 @@ const ForgetPassword = ({user,forget_password}) => {
   const {new_password,confirm_new_password} = formData;
 
   useEffect(() => {
+
+    if(role === '' || role === null){
+      navigate("/select/role")
+    }
+
     if(!user){
       navigate('/add/email')
     }
     if(passwordStatus){
         navigate('/login')
     }
-  },[user,passwordStatus,navigate])
+  },[user,passwordStatus,navigate,role])
 
   const onChange = (e) => setFormData({
     ...formData,

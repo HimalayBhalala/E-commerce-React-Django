@@ -1,114 +1,29 @@
 import axios from 'axios';
 import {
-    SIGNUP_SUCCESS,
-    SIGUP_FAIL,
-    LOGIN_SUCCESS,
-    LOGIN_FAIL,
-    LOGOUT,
-    AUTHENTICATED_SUCCESS,
-    AUTHENTICATED_FAILED,
+    CUSTOMER_SIGNUP_SUCCESS,
+    CUSTOMER_SIGUP_FAIL,
+    CUSTOMER_LOGIN_SUCCESS,
+    CUSTOMER_LOGIN_FAIL,
+    CUSTOMER_AUTHENTICATED_SUCCESS,
+    CUSTOMER_AUTHENTICATED_FAILED,
+    CUSTOMER_PROFILE_UPDATE_SUCCESS,
+    CUSTOMER_PROFILE_UPDATE_FAILED,
+
+    SELLER_SIGNUP_SUCCESS,
+    SELLER_SIGUP_FAIL,
+    SELLER_LOGIN_SUCCESS,
+    SELLER_LOGIN_FAIL,
+    SELLER_AUTHENTICATED_SUCCESS,
+    SELLER_AUTHENTICATED_FAILED,
+    SELLER_PROFILE_UPDATE_SUCCESS,
+    SELLER_PROFILE_UPDATE_FAILED,
+
     CHANGE_PASSWORD_SUCCESS,
     CHANGE_PASSWORD_FAILED,
     EMAIL_VERIFY_SUCCESS,
     EMAIL_VERIFY_FAILED,
-    PROFILE_UPDATE_SUCCESS,
-    PROFILE_UPDATE_FAILED
+    LOGOUT
 } from './types';
-
-export const checkAuthenticated = () => async dispatch => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-        const config = {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            }
-        };
-
-        try {
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/customer/`, config);
-            if (res.status === 200) {
-                dispatch({
-                    type: AUTHENTICATED_SUCCESS,
-                    payload : res
-                });
-            } else {
-                dispatch({
-                    type: AUTHENTICATED_FAILED
-                });
-            }
-        } catch (error) {
-            console.error('Authentication error:', error);
-            dispatch({
-                type: AUTHENTICATED_FAILED
-            });
-        }
-    } else {
-        dispatch({
-            type: AUTHENTICATED_FAILED
-        });
-    }
-};
-
-
-export const customer_register = (email, first_name, last_name, mobile, password, confirm_password) => async dispatch => {
-    const config = {
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-
-    const body = JSON.stringify({ email, first_name, last_name, mobile, password, confirm_password});
-
-    try {
-        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/customer/register/`, body, config);
-        if (res.status === 201) {
-            dispatch({
-                type: SIGNUP_SUCCESS,
-                payload:res.data
-            });
-        } else {
-            dispatch({
-                type: SIGUP_FAIL
-            });
-        }
-    } catch (error) {
-        console.error('Registration error:', error);
-        dispatch({
-            type: SIGUP_FAIL
-        });
-    }
-};
-
-export const login = (email, password) => async dispatch => {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    };
-
-    const body = JSON.stringify({ email, password });
-
-    try {
-        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/login/`, body, config);
-        if (res.status === 200) {
-            dispatch({
-                type: LOGIN_SUCCESS,
-                payload: res.data 
-            });
-            dispatch(checkAuthenticated())
-        } else {
-            dispatch({
-                type: LOGIN_FAIL
-            });
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        dispatch({
-            type: LOGIN_FAIL
-        });
-    }
-};
 
 
 export const change_password = (new_password,confirm_new_password,user_id) => async dispatch => {
@@ -171,37 +86,158 @@ export const forget_password = (new_password,confirm_new_password,user_id) => as
     }
 }
 
-export const email_confirmation = (email) => async dispatch => {
+export const email_confirmation = (email,role) => async dispatch => {
     const config = {
         headers : {
             "Content-Type":"application/json",
         }
     }
     const body = JSON.stringify({email})
-    try{
-        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/add/email/`,body,config)
-        if (res.status === 200){
-            dispatch({
-                type:EMAIL_VERIFY_SUCCESS,
-                payload:res.data
-            })
-            return {success:true,status:res.status}
-        }else{
+
+    if(role === 'customer'){
+        try{
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/customer/add/email/`,body,config)
+            if (res.status === 200){
+                dispatch({
+                    type:EMAIL_VERIFY_SUCCESS,
+                    payload:res.data
+                })
+                return {success:true,status:res.status}
+            }else{
+                dispatch({
+                    type : EMAIL_VERIFY_FAILED
+                })
+                return {success:false,status:res.status}            
+            }
+        }catch(error){
+            console.log("Error occure during fetching an backend api",String(error));
             dispatch({
                 type : EMAIL_VERIFY_FAILED
             })
-            return {success:false,status:res.status}            
-        }
-    }catch(error){
-        console.log("Error occure during fetching an backend api",String(error));
-        dispatch({
-            type : EMAIL_VERIFY_FAILED
-        })
-        return {success:false}
-    }   
+            return {success:false}
+        }   
+    }else if (role === 'seller'){
+        try{
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/seller/add/email/`,body,config)
+            if (res.status === 200){
+                dispatch({
+                    type:EMAIL_VERIFY_SUCCESS,
+                    payload:res.data
+                })
+                return {success:true,status:res.status}
+            }else{
+                dispatch({
+                    type : EMAIL_VERIFY_FAILED
+                })
+                return {success:false,status:res.status}            
+            }
+        }catch(error){
+            console.log("Error occure during fetching an backend api",String(error));
+            dispatch({
+                type : EMAIL_VERIFY_FAILED
+            })
+            return {success:false}
+        }   
+    }
 }
 
-export const change_profile = (email, first_name, last_name, mobile, image, customer_id) => async dispatch => {
+export const customer_checkAuthenticated = () => async dispatch => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        };
+
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/customer/`, config);
+            if (res.status === 200) {
+                dispatch({
+                    type: CUSTOMER_AUTHENTICATED_SUCCESS,
+                    payload : res
+                });
+            } else {
+                dispatch({
+                    type: CUSTOMER_AUTHENTICATED_FAILED
+                });
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            dispatch({
+                type: CUSTOMER_AUTHENTICATED_FAILED
+            });
+        }
+    } else {
+        dispatch({
+            type: CUSTOMER_AUTHENTICATED_FAILED
+        });
+    }
+};
+
+export const customer_register = (email, first_name, last_name, mobile, password, confirm_password) => async dispatch => {
+    const config = {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+
+    const body = JSON.stringify({ email, first_name, last_name, mobile, password, confirm_password});
+
+    try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/customer/register/`, body, config);
+        if (res.status === 201) {
+            dispatch({
+                type: CUSTOMER_SIGNUP_SUCCESS,
+                payload:res.data
+            });
+        } else {
+            dispatch({
+                type: CUSTOMER_SIGUP_FAIL
+            });
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        dispatch({
+            type: CUSTOMER_SIGUP_FAIL
+        });
+    }
+};
+
+export const customer_login = (email, password) => async dispatch => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const body = JSON.stringify({ email, password });
+
+    try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/customer/login/`, body, config);
+        if (res.status === 200) {
+            dispatch({
+                type: CUSTOMER_LOGIN_SUCCESS,
+                payload: res.data 
+            });
+            dispatch(customer_checkAuthenticated())
+        } else {
+            dispatch({
+                type: CUSTOMER_LOGIN_FAIL
+            });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        dispatch({
+            type: CUSTOMER_LOGIN_FAIL
+        });
+    }
+};
+
+
+
+export const customer_change_profile = (email, first_name, last_name, mobile, image, customer_id) => async dispatch => {
     const token = localStorage.getItem('access_token');
 
     const formData = new FormData();
@@ -222,18 +258,150 @@ export const change_profile = (email, first_name, last_name, mobile, image, cust
         const res = await axios.put(`${process.env.REACT_APP_API_URL}/auth/customer/profile/${customer_id}/`,formData,config);
         if (res.status === 200) {
             dispatch({
-                type: PROFILE_UPDATE_SUCCESS,
+                type: CUSTOMER_PROFILE_UPDATE_SUCCESS,
                 payload: res.data
             });
         } else {
             dispatch({
-                type: PROFILE_UPDATE_FAILED,
+                type: CUSTOMER_PROFILE_UPDATE_FAILED,
             });
         }
     } catch (error) {
         console.log("Error occurred during fetching the backend API:", String(error));
     }
 };
+
+
+export const seller_checkAuthenticated = () => async dispatch => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        const config = {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            }
+        };
+
+        try {
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/seller/`, config);
+            if (res.status === 200) {
+                dispatch({
+                    type: SELLER_AUTHENTICATED_SUCCESS,
+                    payload : res
+                });
+            } else {
+                dispatch({
+                    type: SELLER_AUTHENTICATED_FAILED
+                });
+            }
+        } catch (error) {
+            console.error('Authentication error:', error);
+            dispatch({
+                type: SELLER_AUTHENTICATED_FAILED
+            });
+        }
+    } else {
+        dispatch({
+            type: SELLER_AUTHENTICATED_FAILED
+        });
+    }
+};
+
+export const seller_register = (email, first_name, last_name, mobile, password, confirm_password) => async dispatch => {
+    const config = {
+        headers: {
+            "Content-Type": "application/json"
+        }
+    };
+
+    const body = JSON.stringify({ email, first_name, last_name, mobile, password, confirm_password});
+
+    try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/seller/register/`, body, config);
+        if (res.status === 201) {
+            dispatch({
+                type: SELLER_SIGNUP_SUCCESS,
+                payload:res.data
+            });
+        } else {
+            dispatch({
+                type: SELLER_SIGUP_FAIL
+            });
+        }
+    } catch (error) {
+        console.error('Registration error:', error);
+        dispatch({
+            type: SELLER_SIGUP_FAIL
+        });
+    }
+};
+
+export const seller_login = (email, password) => async dispatch => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+
+    const body = JSON.stringify({ email, password });
+
+    try {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/seller/login/`, body, config);
+        if (res.status === 200) {
+            dispatch({
+                type: SELLER_LOGIN_SUCCESS,
+                payload: res.data 
+            });
+            dispatch(seller_checkAuthenticated())
+        } else {
+            dispatch({
+                type: SELLER_LOGIN_FAIL
+            });
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        dispatch({
+            type: SELLER_LOGIN_FAIL
+        });
+    }
+};
+
+
+
+export const seller_change_profile = (email, first_name, last_name, mobile, image, seller_id) => async dispatch => {
+    const token = localStorage.getItem('access_token');
+
+    const formData = new FormData();
+    formData.append('email', email);
+    formData.append('first_name', first_name);
+    formData.append('last_name', last_name);
+    formData.append('mobile', mobile);
+    formData.append('image', image);
+
+    const config = {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`
+        }
+    };
+
+    try {
+        const res = await axios.put(`${process.env.REACT_APP_API_URL}/auth/seller/profile/${seller_id}/`,formData,config);
+        if (res.status === 200) {
+            dispatch({
+                type: SELLER_PROFILE_UPDATE_SUCCESS,
+                payload: res.data
+            });
+        } else {
+            dispatch({
+                type: SELLER_PROFILE_UPDATE_FAILED,
+            });
+        }
+    } catch (error) {
+        console.log("Error occurred during fetching the backend API:", String(error));
+    }
+};
+
 
 
 

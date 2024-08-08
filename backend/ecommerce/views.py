@@ -12,7 +12,7 @@ from .pagination import (
 )
 from rest_framework.decorators import api_view
 from .models import (
-    Vendor,
+    Seller,
     ProductCategory,
     Product,
     Customer,
@@ -23,8 +23,8 @@ from .models import (
     WishList
 )
 from .serializers import (
-    VendorSerializer,
-    VendorDetailSerializer,
+    SellerSerializer,
+    SellerDetailSerializer,
     ProductCategorySerializer,
     ProductTitleDetailSerializer,
     ProductSerializer,
@@ -51,13 +51,13 @@ from django.http import JsonResponse
 stripe.api_key = settings.STRIPE_SECRET_KEY
 import json
 
-class VendorAPIView(ListCreateAPIView):
-    queryset = Vendor.objects.all()
-    serializer_class = VendorSerializer
+class SellerAPIView(ListCreateAPIView):
+    queryset = Seller.objects.all()
+    serializer_class = SellerSerializer
 
-class VendorDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Vendor.objects.all()
-    serializer_class = VendorDetailSerializer
+class SellerDetailAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = Seller.objects.all()
+    serializer_class = SellerDetailSerializer
 
 class ProductCategoryView(ListCreateAPIView):
     queryset = ProductCategory.objects.all()

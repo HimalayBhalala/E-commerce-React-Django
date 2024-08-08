@@ -66,18 +66,18 @@ const removeFromCart = (id) => {
                         <tr key={index}>
                           <td>{index + 1}</td>
                           <td>
-                            <img src={products.product.product_image} className='img-thumbnail' style={{ width: "60px" }} alt="product" />
-                            <p className='mt-2' style={{ marginLeft: "20px" }}>{products.product.product_title}</p>
+                            <img src={products.product?.product_image} className='img-thumbnail' style={{ width: "60px" }} alt="product" />
+                            <p className='mt-2' style={{ marginLeft: "20px" }}>{products.product?.product_title}</p>
                           </td>
                           <td>
                             {currency === 'inr' ? (
-                              <p>₹ {products.product.product_price}</p>
+                              <p>₹ {products.product?.product_price}</p>
                             ) : (
-                              <p>$ {products.product.product_usd_price}</p>
+                              <p>$ {products.product?.product_usd_price}</p>
                             )}
                           </td>
                           <td>
-                            <button className='btn btn-warning btn-large' onClick={() => removeFromCart(products.product.product_id)}>Remove From Cart</button>
+                            <button className='btn btn-warning btn-large' onClick={() => removeFromCart(products.product?.product_id)}>Remove From Cart</button>
                           </td>
                         </tr>
                       ))}

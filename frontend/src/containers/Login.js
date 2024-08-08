@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { login } from '../../actions/auth';
+import { customer_login,seller_login } from '../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-const SellerLogin = ({ login,isAuthenticated }) => {
+const Login = ({ customer_login,isAuthenticated,seller_login}) => {
+  const role = JSON.parse(localStorage.getItem('role'));
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -20,20 +21,29 @@ const SellerLogin = ({ login,isAuthenticated }) => {
     [e.target.name]: e.target.value,
   });
 
+  useEffect(() => {
+    if(role === '' || role === null){
+      navigate("/select/role")
+    }
+
+    if(isAuthenticated){
+      navigate("/")
+    }
+  },[isAuthenticated,navigate,role]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(email, password);
+      if (role === 'customer'){
+        await customer_login(email, password);
+      }else if(role === 'seller'){
+        await seller_login(email,password);
+      }
     } catch (error) {
       console.error("Login Error:", error);
     }
   };
 
-  useEffect(() => {
-    if(isAuthenticated){
-      navigate("/")
-    }
-  },[isAuthenticated,navigate]);
 
   return (
     <div className='container mt-5' style={{marginBottom:"18rem"}}>
@@ -74,4 +84,4 @@ const mapStateToProps = (state) => ({
   isAuthenticated : state.auth.isAuthenticated
 });
 
-export default connect(mapStateToProps, { login })(SellerLogin);
+export default connect(mapStateToProps, { customer_login,seller_login})(Login);

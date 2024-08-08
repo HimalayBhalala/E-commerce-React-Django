@@ -1,11 +1,11 @@
 import { TextField,Button } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { email_confirmation } from '../../actions/auth';
+import { email_confirmation } from '../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 function AddEmail({user,email_confirmation}) {
-
+    const role = JSON.parse(localStorage.getItem('role'));
     const [formData,setFormData] = useState({
         email:''
     })
@@ -13,10 +13,14 @@ function AddEmail({user,email_confirmation}) {
     const navigate = useNavigate();
 
     useEffect(() => {
+        if(role === '' || role === null){
+            navigate("/select/role")
+        }
+
         if(user){
             navigate('/forget/password')
         }
-    },[user])
+    },[user,navigate,role])
 
 
     const {email} = formData;
@@ -29,7 +33,7 @@ function AddEmail({user,email_confirmation}) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const res = await email_confirmation(email)
+            const res = await email_confirmation(email,role)
             if (!(res.success)){
                 navigate('/register')
             }

@@ -1,9 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.exceptions import AuthenticationFailed
-from ecommerce.models import Customer
+from ecommerce.models import Customer,Seller
 
 User = get_user_model()
+
+#------------------------------------------------------------ User -----------------------------------------------
 
 class CreateUserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
@@ -68,6 +70,56 @@ class LoginSerializer(serializers.Serializer):
         return data
 
 
+class UserInformationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id","email","first_name","last_name"]
+
+    def update(self, instance, validated_data):
+        instance.email = validated_data.get('email',instance.email)
+        instance.first_name = validated_data.get('first_name',instance.first_name)
+        instance.last_name = validated_data.get('last_name',instance.last_name)
+        instance.save()
+        return instance
+    
+class ChangedPasswordSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["id","new_password","confirm_new_password"]
+        extra_kwargs = {"new_password":{"read_only":True},'confirm_new_password':{'read_only':True}}
+
+    def validate(self, data):
+        new_password = data.get('new_password')
+        confirm_new_password = data.get('confirm_new_password')
+        if new_password is None:
+            raise serializers.ValidationError({"message":"New Password is required"})
+        
+        if confirm_new_password is None:
+            raise serializers.ValidationError({"message":"Confirm New Password is required"})
+
+        if new_password != confirm_new_password:
+            raise serializers.ValidationError({"message":"New Password and Confirm New Password is not matched"})
+        return data
+
+    def update(self, instance, validated_data):
+        new_password = validated_data.get('new_password')
+
+        instance.set_password(new_password)
+        instance.save()
+        return instance
+
+class EmailVerificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id","email","first_name","last_name"]
+
+
+#---------------------------------------------------------- Customer -----------------------------------------------
+
+
 class CustomerSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
 
@@ -84,24 +136,9 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 
     def to_representation(self, instance):
-        """
-        Convert user field to user's email in representation
-        """
         representation = super().to_representation(instance)
         representation['user'] = instance.user.email
         return representation
-
-class UserInformationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id","email","first_name","last_name"]
-
-    def update(self, instance, validated_data):
-        instance.email = validated_data.get('email') or instance.email
-        instance.first_name = validated_data.get('first_name') or instance.first_name
-        instance.last_name = validated_data.get('last_name') or instance.last_name
-        instance.save()
-        return instance
 
 class CustomerRegistrationSerializer(serializers.ModelSerializer):
     user = CreateUserSerializer(read_only=True)
@@ -136,8 +173,6 @@ class GetCustomerProfileSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "id":{"read_only": True}
         }         
-
-
     def update(self, instance, validated_data):
         instance.mobile = validated_data.get('mobile') or instance.mobile
         instance.image = validated_data.get('image') or instance.image
@@ -146,36 +181,70 @@ class GetCustomerProfileSerializer(serializers.ModelSerializer):
 
         return instance
     
-class ChangedPasswordSerializer(serializers.ModelSerializer):
-    new_password = serializers.CharField(required=True)
-    confirm_new_password = serializers.CharField(required=True)
+
+#---------------------------------------------------- Seller ----------------------------------------------
+
+
+class SellerSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
-        fields = ["id","new_password","confirm_new_password"]
-        extra_kwargs = {"new_password":{"read_only":True},'confirm_new_password':{'read_only':True}}
+        model = Seller
+        fields = ['id', 'user','address','mobile',"image"]
 
-    def validate(self, data):
-        new_password = data.get('new_password')
-        confirm_new_password = data.get('confirm_new_password')
-        if new_password is None:
-            raise serializers.ValidationError({"message":"New Password is required"})
-        
-        if confirm_new_password is None:
-            raise serializers.ValidationError({"message":"Confirm New Password is required"})
+    def get_image(self, obj):
+        image = str(obj.image)
+        if image.startswith('http'):
+            return image
+        else:
+            return f"http://127.0.0.1:8000/media/{image}"
 
-        if new_password != confirm_new_password:
-            raise serializers.ValidationError({"message":"New Password and Confirm New Password is not matched"})
-        return data
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['user'] = instance.user.email
+        return representation
+    
+
+class SellerRegistrationSerializer(serializers.ModelSerializer):
+    user = CreateUserSerializer(read_only=True)
+    image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Seller
+        fields = ["id", "user","mobile","image"]
+        extra_kwargs = {
+            "id": {"read_only": True}
+        }
+    
+    def get_image(self, obj):
+        image = str(obj.image)
+        if image.startswith('http'):
+            return image
+        else:
+            return f"http://127.0.0.1:8000/media/{image}"
+
+
+    def to_representation(self, instance):
+        representation =  super().to_representation(instance)
+        representation['user'] = instance.user
+        return representation
+
+class GetSellerProfileSerializer(serializers.ModelSerializer):
+    user = UserInformationSerializer(read_only=True)
+
+    class Meta:
+        model = Seller
+        fields = ["id","user","mobile","image"]
+        extra_kwargs = {
+            "id":{"read_only": True}
+        }         
+
 
     def update(self, instance, validated_data):
-        new_password = validated_data.get('new_password')
+        instance.mobile = validated_data.get('mobile',instance.mobile)
+        instance.image = validated_data.get('image',instance.image)
 
-        instance.set_password(new_password)
         instance.save()
-        return instance
 
-class CustomerEmailVerificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["id","email","first_name","last_name"]
+        return instance

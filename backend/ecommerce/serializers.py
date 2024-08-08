@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    Vendor,
+    Seller,
     ProductCategory,
     Product,
     Customer,
@@ -11,23 +11,23 @@ from .models import (
     WishList
 )
 
-class VendorSerializer(serializers.ModelSerializer):
-    product_vendor = serializers.StringRelatedField(many=True,read_only=True)
+class SellerSerializer(serializers.ModelSerializer):
+    product_seller = serializers.StringRelatedField(many=True,read_only=True)
     class Meta:
-        model = Vendor
-        fields = ["id","user","address","product_vendor"]
+        model = Seller
+        fields = ["id","user","address","product_seller","mobile","image"]
 
     def __init__(self,*args, **kwargs):
-        super(VendorSerializer,self).__init__(*args, **kwargs)
+        super(SellerSerializer,self).__init__(*args, **kwargs)
         self.Meta.depth=1
 
-class VendorDetailSerializer(serializers.ModelSerializer):
+class SellerDetailSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Vendor
-        fields = ["id","user","address"]
+        model = Seller
+        fields = ["id","user","address","mobile","image"]
 
     def __init__(self,*args,**kwargs):
-        super(VendorDetailSerializer,self).__init__(*args, **kwargs)
+        super(SellerDetailSerializer,self).__init__(*args, **kwargs)
         self.Meta.depth=1
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -36,7 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id","category","image","vendor","customer","title","description","downloads","tags_data","price","usd_price","product_ratings","order_products"]
+        fields = ["id","category","image","seller","customer","title","description","downloads","tags_data","price","usd_price","product_ratings","order_products"]
 
     def get_image(self, obj):
         image = str(obj.image)
@@ -95,7 +95,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id","category","vendor","customer","title","description","customer","price","usd_price","image","downloads","tags_data","product_ratings","order_products"]
+        fields = ["id","category","seller","customer","title","description","customer","price","usd_price","image","downloads","tags_data","product_ratings","order_products"]
 
     def __init__(self,*args,**kwargs):
         super(ProductDetailSerializer,self).__init__(*args,**kwargs)

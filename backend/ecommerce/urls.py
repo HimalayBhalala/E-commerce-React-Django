@@ -22,8 +22,8 @@ urlpatterns = [
 
 
 
-    path("vendors/",views.VendorAPIView.as_view(),name="vendor-lc"),
-    path("vendor/<int:pk>/",views.VendorDetailAPIView.as_view(),name="vendor-rud"),
+    path("sellers/",views.SellerAPIView.as_view(),name="seller-lc"),
+    path("seller/<int:pk>/",views.SellerDetailAPIView.as_view(),name="seller-rud"),
 
 
 

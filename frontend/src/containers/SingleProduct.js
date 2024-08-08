@@ -19,9 +19,9 @@ const SingleProduct = (props) => {
                         </h4>
                         {
                             currency === 'inr' ? (
-                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: ₹ {props.product.price}</h5>
+                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: ₹ {props.product?.price}</h5>
                             ) : (
-                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: $ {props.product.usd_price}</h5>
+                                <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: $ {props.product?.usd_price}</h5>
                             )
                         }
                     </div>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import (
-    Vendor,
+    Seller,
     Product,
     ProductCategory,
     Customer,
@@ -11,16 +11,16 @@ from .models import (
     WishList
 )
 
-class VendorAdmin(admin.ModelAdmin):
-    list_display = ["id","user","address"]
-admin.site.register(Vendor,VendorAdmin)
+class SellerAdmin(admin.ModelAdmin):
+    list_display = ["id","user","address","mobile","image"]
+admin.site.register(Seller,SellerAdmin)
 
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ["id","title","description"]
 admin.site.register(ProductCategory,ProductCategoryAdmin)
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["id","title","tags","customer","category","vendor","price","usd_price","downloads"]
+    list_display = ["id","title","tags","customer","category","seller","price","usd_price","downloads"]
     list_editable = ["usd_price","price"]
 admin.site.register(Product,ProductAdmin)
 

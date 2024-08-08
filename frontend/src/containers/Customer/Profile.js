@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
 import { TextField, Button } from '@mui/material';
 import axios from 'axios';
-import { change_profile } from '../../actions/auth';
+import { customer_change_profile } from '../../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-const Profile = ({change_profile,isAuthenticated}) => {
+const Profile = ({customer_change_profile,isAuthenticated}) => {
 
     const customer_id = localStorage.getItem('customer_id');
     const token = localStorage.getItem('access_token');
@@ -51,7 +51,7 @@ const Profile = ({change_profile,isAuthenticated}) => {
             .catch((error) => {
                 console.log("Error fetching the API", error);
             });
-    }, [customer_id, token]);
+    }, [customer_id, token,navigate,isAuthenticated]);
     
 
     const onChange = (e) => {
@@ -77,7 +77,7 @@ const Profile = ({change_profile,isAuthenticated}) => {
         e.preventDefault();
 
         try{
-            await change_profile(email,first_name,last_name,mobile,image,customer_id)
+            await customer_change_profile(email,first_name,last_name,mobile,image,customer_id)
         }catch(error){
             console.log("Error occure during fetching an api",String(error))
         }
@@ -163,4 +163,4 @@ const mapStateToProps = (state) => ({
     isAuthenticated:state.auth.isAuthenticated
 })
 
-export default connect(mapStateToProps,{change_profile})(Profile);
+export default connect(mapStateToProps,{customer_change_profile})(Profile);

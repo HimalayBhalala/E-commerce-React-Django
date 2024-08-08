@@ -1,9 +1,11 @@
 from django.db import models
 from backend.settings import AUTH_USER_MODEL
 
-class Vendor(models.Model):
+class Seller(models.Model):
     user = models.ForeignKey(AUTH_USER_MODEL,on_delete=models.CASCADE)
     address = models.TextField(null=True,blank=True)
+    mobile = models.CharField(max_length=10,null=True)
+    image = models.ImageField(default='no-image.png',upload_to='seller/image')
 
     def __str__(self):
         return f"{self.user.email}"
@@ -27,7 +29,7 @@ class Customer(models.Model):
 class Product(models.Model):
     category = models.ForeignKey(ProductCategory,on_delete=models.SET_NULL,null=True,blank=True,related_name="category_product")
     customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True,related_name='product_customer')
-    vendor = models.ForeignKey(Vendor,on_delete=models.SET_NULL,null=True,related_name="product_vendor")
+    seller = models.ForeignKey(Seller,on_delete=models.SET_NULL,null=True,related_name="product_seller")
     title = models.CharField(max_length=200)
     description = models.TextField(null=True,blank=True)
     image = models.ImageField(upload_to='product/image',default='no-image.png')
