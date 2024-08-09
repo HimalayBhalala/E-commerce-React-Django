@@ -19,6 +19,7 @@ const SellerSideBar = ({ isAuthenticated,logout })  => {
             <Link to='/seller/dashboard' className="list-group-item list-group-item-action" aria-current="true">Dashboard</Link>
             <Link to='/seller/products' className="list-group-item list-group-item-action">Products</Link>
             <Link to='/seller/add/product' className="list-group-item list-group-item-action">Add Product</Link>
+            <Link to='/seller/add/category' className="list-group-item list-group-item-action">Add Product Category</Link>
             <Link to='/seller/customer' className="list-group-item list-group-item-action">Customer</Link>
             <Link to='/seller/orders' className="list-group-item list-group-item-action">Orders</Link>
             <Link to='/seller/profile' className="list-group-item list-group-item-action">Profile</Link>

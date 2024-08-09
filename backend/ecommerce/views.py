@@ -41,6 +41,8 @@ from .serializers import (
     CustomerProductCountSerializer,
     GetTotalOrderSerializer,
     ProductInfoSerializer,
+    SellerAddNewProductSerializer,
+    SellerAddProductCategorySerializer,
     OrderProductItemSerializer
 )
 import stripe
@@ -64,6 +66,11 @@ class ProductCategoryView(ListCreateAPIView):
     serializer_class = ProductCategorySerializer
 
 class ProductDetailCategoryView(RetrieveUpdateDestroyAPIView):
+    queryset = ProductCategory.objects.all()
+    serializer_class = ProductCategorySerializer
+
+class SellerProductCategoryView(ListCreateAPIView):
+    pagination_class = None
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
 
@@ -362,3 +369,23 @@ class GetAllCustomerAddress(APIView):
         address_data = CustomerAddress.objects.filter(customer__id=customer_id)
         serializer = CustomerAddressSerializer(address_data,many=True)
         return Response({"data":serializer.data})
+    
+@csrf_exempt
+@api_view(["POST"])
+def seller_add_new_category(request,seller_id):
+    if request.method == "POST":
+            serializer = SellerAddProductCategorySerializer(data=request.data,context={'seller_id':seller_id})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response({"data":serializer.data},status=status.HTTP_200_OK)
+            return Response({"data":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt
+@api_view(["POST"])
+def seller_add_new_product(request,seller_id,category_id):
+      if request.method == "POST":
+            serializer = SellerAddNewProductSerializer(data=request.data,context={'seller_id':seller_id,'category_id':category_id})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response({"data":serializer.data},status=status.HTTP_200_OK)
+            return Response({"data":serializer.errors},status=status.HTTP_400_BAD_REQUEST)

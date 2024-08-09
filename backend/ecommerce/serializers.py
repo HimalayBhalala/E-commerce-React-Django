@@ -26,9 +26,6 @@ class SellerDetailSerializer(serializers.ModelSerializer):
         model = Seller
         fields = ["id","user","address","mobile","image"]
 
-    def __init__(self,*args,**kwargs):
-        super(SellerDetailSerializer,self).__init__(*args, **kwargs)
-        self.Meta.depth=1
 
 class ProductSerializer(serializers.ModelSerializer):
     product_ratings = serializers.StringRelatedField(many=True,read_only=True)
@@ -291,3 +288,64 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
         instance.default_address = validated_data.get('default_address',instance.default_address)
         instance.save()
         return instance
+    
+class SellerAddProductCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ["id","seller","title","description","category_image"]
+
+    def validate(self, data):
+        title = data.get('title')
+        if not title:
+            raise serializers.ValidationError("Category title is required")
+        return data
+
+    def create(self, validated_data):
+        seller_id = self.context.get('seller_id')
+
+        seller = Seller.objects.get(id=seller_id)
+
+        if not seller:
+            raise serializers.ValidationError("Seller is not Found")
+
+        return ProductCategory.objects.create(seller=seller,**validated_data)
+    
+
+class SellerAddNewProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id","title","description","image","currency","price","usd_price"]
+
+    def create(self, validated_data):
+        seller_id = self.context.get('seller_id')
+        seller = Seller.objects.get(id=seller_id)
+        category_id = self.context.get('category_id')
+        category = ProductCategory.objects.get(id=category_id)
+   
+        currency = validated_data.get('currency')
+        price = validated_data.get('price')
+        usd_price = validated_data.get('usd_price')
+        title = validated_data.get('title')
+        description = validated_data.get('description')
+        image = validated_data.get('image')
+
+        if not title:
+            raise serializers.ValidationError("Title is required for adding product")
+
+        if currency == 'INR':
+            usd_price = round(price / 83,2)
+        if currency == "USD":
+            price = int(usd_price * 83)
+
+        if not seller:
+            raise serializers.ValidationError("Seller is not Found")
+        if not category:
+            raise serializers.ValidationError("Catogory is not Found")
+        return Product.objects.create(seller=seller,category=category,price=price,usd_price=usd_price,title=title,description=description,image=image)
+    
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['category'] = ProductCategorySerializer(instance.category).data
+        representation['seller'] = SellerDetailSerializer(instance.seller).data
+        return representation

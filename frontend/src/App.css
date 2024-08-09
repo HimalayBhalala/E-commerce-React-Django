@@ -83,3 +83,12 @@ body{
   border-radius: 50%;
   object-fit: cover;
 }
+
+
+.not-found{
+  color: red;
+  margin: 25rem;
+  text-align: center;
+  font-size: large;
+  font-weight: 100;
+}

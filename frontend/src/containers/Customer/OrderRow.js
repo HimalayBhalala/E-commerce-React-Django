@@ -77,7 +77,7 @@ function OrderRow(props) {
         {products.order?.order_time}
       </td>
       <td>
-        {products.order.order_status ? (
+        {products.order?.order_status ? (
           <span className="text-success">
             <i className="fa fa-check-circle"></i> Completed
           </span>
@@ -91,7 +91,7 @@ function OrderRow(props) {
         {products.order.order_status === true && (
           <button
             className="btn btn-primary btn-sm"
-            onClick={() => countDownloads(products.product.id)}
+            onClick={() => countDownloads(products.product?.id)}
           >
             Download &nbsp;
             <span className="badge text-dark bg-white">{totalDownloads}</span>

@@ -24,6 +24,9 @@ urlpatterns = [
 
     path("sellers/",views.SellerAPIView.as_view(),name="seller-lc"),
     path("seller/<int:pk>/",views.SellerDetailAPIView.as_view(),name="seller-rud"),
+    path("seller/add/category/<int:seller_id>/",views.seller_add_new_category,name='add-product-category'),
+    path("seller/add/product/<int:seller_id>/<int:category_id>/",views.seller_add_new_product,name='seller-add-product'),
+    path("seller/categories/",views.SellerProductCategoryView.as_view(),name="seller-product-categories"),
 
 
 

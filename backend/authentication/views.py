@@ -21,6 +21,7 @@ from .serializers import (
     SellerRegistrationSerializer,
     GetSellerProfileSerializer
 )
+from notification.message_notification import send_notification
 
 #-------------------------------------------------------- User ------------------------------------------------
 
@@ -80,6 +81,7 @@ class CustomerRegistrationView(APIView):
                     'mobile':customer_serializer.data.get('mobile')
                 }
             }
+            send_notification("New Customer registered", 'notify_registration')
             return Response(response_data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -111,6 +113,7 @@ class CustomerLoginAPIView(APIView):
                 },
                 'customer': customer_data
             }
+            send_notification("Customer logged in", 'notify_login')
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
     

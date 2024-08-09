@@ -11,6 +11,7 @@ class Seller(models.Model):
         return f"{self.user.email}"
 
 class ProductCategory(models.Model):
+    seller = models.ForeignKey(Seller,on_delete=models.SET_NULL,null=True,blank=True,related_name='seller_category')
     title = models.CharField(max_length=200)
     description = models.TextField(null=True,blank=True)
     category_image = models.ImageField(upload_to='category/image',default='no-image.png')
@@ -27,12 +28,18 @@ class Customer(models.Model):
         return f"{self.user.email}"
     
 class Product(models.Model):
+    CURRENCY_CHOICES = [
+        ('USD', 'USD'),
+        ('INR', 'INR'),
+    ]
+
     category = models.ForeignKey(ProductCategory,on_delete=models.SET_NULL,null=True,blank=True,related_name="category_product")
     customer = models.ForeignKey(Customer,on_delete=models.SET_NULL,null=True,blank=True,related_name='product_customer')
     seller = models.ForeignKey(Seller,on_delete=models.SET_NULL,null=True,related_name="product_seller")
     title = models.CharField(max_length=200)
     description = models.TextField(null=True,blank=True)
     image = models.ImageField(upload_to='product/image',default='no-image.png')
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='INR')
     tags = models.TextField(null=True,blank=True,default='')
     price = models.FloatField(default=0,max_length=10)
     usd_price = models.FloatField(default=83,max_length=10)

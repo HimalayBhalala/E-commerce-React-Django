@@ -16,7 +16,7 @@ class SellerAdmin(admin.ModelAdmin):
 admin.site.register(Seller,SellerAdmin)
 
 class ProductCategoryAdmin(admin.ModelAdmin):
-    list_display = ["id","title","description"]
+    list_display = ["id","title","description","seller","category_image"]
 admin.site.register(ProductCategory,ProductCategoryAdmin)
 
 class ProductAdmin(admin.ModelAdmin):
