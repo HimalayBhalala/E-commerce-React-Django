@@ -26,7 +26,10 @@ urlpatterns = [
     path("seller/<int:pk>/",views.SellerDetailAPIView.as_view(),name="seller-rud"),
     path("seller/add/category/<int:seller_id>/",views.seller_add_new_category,name='add-product-category'),
     path("seller/add/product/<int:seller_id>/<int:category_id>/",views.seller_add_new_product,name='seller-add-product'),
+    path("seller/products/<int:seller_id>/<int:product_id>/",views.seller_edit_product,name='seller-edit-product'),
     path("seller/categories/",views.SellerProductCategoryView.as_view(),name="seller-product-categories"),
+    path("seller/products/<int:seller_id>/",views.get_seller_all_product,name='get-seller-product'),
+    path("seller/customers/<int:seller_id>/",views.get_seller_customer,name="get-seller-customer"),
 
 
 

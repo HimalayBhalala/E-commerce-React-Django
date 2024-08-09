@@ -16,7 +16,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const [orderId, setOrderId] = useState(0);
   const isInitialMount = useRef(true);
   const [payment_confirm,setPaymentConfirm] = useState(false);
-  const {currency} = useContext(CurrencyContext);
+  const {getCurrency} = useContext(CurrencyContext);
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -64,14 +64,14 @@ const OrderConfirm = ({ isAuthenticated }) => {
   
   const handlePayment = async () => {
     setIsLoading(true);
-    localStorage.setItem('order-currency',currency)
+    localStorage.setItem('order-currency',getCurrency)
     try {
       const stripe = await stripePromise;
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/ecommerce/add-payment/`,
         {
           amount: calculateTotalAmount(),
-          currency: currency,
+          currency: getCurrency,
         }
       );
       
@@ -115,7 +115,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
         formData.append("order", order_id);
         formData.append("product", cart.product.product_id);
         formData.append("quantity", 1);
-        if(currency === 'inr'){
+        if(getCurrency === 'inr'){
           formData.append("price", cart.product.product_price);
         }else{
           formData.append("price", cart.product.product_usd_price);

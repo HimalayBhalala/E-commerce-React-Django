@@ -4,7 +4,7 @@ import { CurrencyContext } from '../context/CurrencyContex';
 
 const SingleProduct = (props) => {
     
-    const {currency} = useContext(CurrencyContext);
+    const {getCurrency} = useContext(CurrencyContext);
 
     return (
         <div className="col-12 col-md-3 mb-4">
@@ -18,7 +18,7 @@ const SingleProduct = (props) => {
                             </Link>
                         </h4>
                         {
-                            currency === 'inr' ? (
+                            getCurrency === 'inr' ? (
                                 <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: ₹ {props.product?.price}</h5>
                             ) : (
                                 <h5 className='card-title' style={{ color: 'darkslategrey' }}>Price: $ {props.product?.usd_price}</h5>

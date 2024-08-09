@@ -33,7 +33,7 @@ class ProductSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id","category","image","seller","customer","title","description","downloads","tags_data","price","usd_price","product_ratings","order_products"]
+        fields = ["id","category","image","seller","customer","title","description","downloads","tags_data","price","usd_price","product_stemp","product_ratings","order_products"]
 
     def get_image(self, obj):
         image = str(obj.image)
@@ -68,13 +68,30 @@ class ProductInfoSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id","title","description","image","price","usd_price"]
+        fields = ["id","category","title","description","image","price","usd_price","product_stemp"]
+        depth = 1
 
     def get_image(self,obj):
         if str(obj.image).startswith('http'):
             return obj
         else:
             return f"http://127.0.0.1:8000/media/{obj.image}"
+   
+    
+class ProductUpdateInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ["id","category","title","description","image","price","usd_price","product_stemp"]
+        depth = 1
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title',instance.title)
+        instance.description = validated_data.get('description',instance.description)
+        instance.image = validated_data.get('image',instance.image)
+        instance.price = validated_data.get('price',instance.price)
+        instance.usd_price = validated_data.get('usd_price',instance.usd_price)
+        instance.save()
+        return instance
 
 class ProductTitleDetailSerializer(serializers.ModelSerializer):
     category_product = ProductSerializer(many=True,read_only=True)
@@ -92,7 +109,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["id","category","seller","customer","title","description","customer","price","usd_price","image","downloads","tags_data","product_ratings","order_products"]
+        fields = ["id","category","seller","customer","title","description","customer","price","usd_price","image","downloads","tags_data","product_ratings","order_products","product_stemp"]
 
     def __init__(self,*args,**kwargs):
         super(ProductDetailSerializer,self).__init__(*args,**kwargs)
@@ -132,7 +149,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
 class CustomerProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id","title","price","usd_price"]
+        fields = ["id","title","price","usd_price","product_stemp"]
     
 class CustomerOrderSerializer(serializers.ModelSerializer):
     product = ProductInfoSerializer()
@@ -314,7 +331,7 @@ class SellerAddProductCategorySerializer(serializers.ModelSerializer):
 class SellerAddNewProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id","title","description","image","currency","price","usd_price"]
+        fields = ["id","title","description","image","currency","price","usd_price","product_stemp"]
 
     def create(self, validated_data):
         seller_id = self.context.get('seller_id')
@@ -349,3 +366,58 @@ class SellerAddNewProductSerializer(serializers.ModelSerializer):
         representation['category'] = ProductCategorySerializer(instance.category).data
         representation['seller'] = SellerDetailSerializer(instance.seller).data
         return representation
+    
+
+class getProductSellerListSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Seller
+        fields = ["id","user","address","mobile","image","products"]
+
+    def get_image(self,obj):
+        if str(obj.image).startswith('http'):
+            return obj.image
+        else:
+            return f"http://127.0.0.1:8000/media/{obj.image}"
+
+    def get_products(self,obj):
+        product = Product.objects.filter(seller=obj)
+        product_serializer = ProductInfoSerializer(product,many=True)
+        return product_serializer.data
+    
+class getSellerCustomerOrderSerializer(serializers.ModelSerializer):
+    products = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Seller
+        fields = ["id","user","address","mobile","image","products"]
+
+    def get_image(self,obj):
+        if str(obj.image).startswith('http'):
+            return obj.image
+        else:
+            return f"http://127.0.0.1:8000/media/{obj.image}"
+
+    def get_products(self,obj):     
+        product = Product.objects.filter(seller=obj)
+        product_serializer = ProductInfoSerializer(product,many=True)
+        return product_serializer.data
+    
+class getSingleProductSellerSerializer(serializers.ModelSerializer):
+    product = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    class Meta:
+        model = Seller
+        fields = ["id","user","address","mobile","image","product"]
+
+    def get_image(self,obj):
+        if str(obj.image).startswith('http'):
+            return obj.image
+        else:
+            return f"http://127.0.0.1:8000/media/{obj.image}"
+
+    def get_product(self,obj):     
+        product_data = self.context.get('product_data')
+        return product_data
+    

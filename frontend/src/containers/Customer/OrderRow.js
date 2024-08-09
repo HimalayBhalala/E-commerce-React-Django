@@ -4,7 +4,7 @@ import { CurrencyContext } from "../../context/CurrencyContex";
 
 function OrderRow(props) {
   const index = props.index;
-  const {currency} = useContext(CurrencyContext);
+  const {getCurrency} = useContext(CurrencyContext);
   const products = props.products;
 
   const [totalDownloads, setTotalDownloads] = useState(
@@ -66,7 +66,7 @@ function OrderRow(props) {
       </td>
       <td>
         {
-          currency === 'inr' ? (
+          getCurrency === 'inr' ? (
             <p>₹ {products.product?.price}</p>
           ) : (
             <p>$ {products.product?.usd_price}</p>

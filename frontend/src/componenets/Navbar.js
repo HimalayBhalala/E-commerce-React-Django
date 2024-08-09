@@ -8,7 +8,7 @@ import { CurrencyContext } from '../context/CurrencyContex';
 const Navbar = ({ logout, isAuthenticated, profile_image }) => {
   const role = JSON.parse(localStorage.getItem('role')) || null;
   const cartData = useContext(CartContext);
-  const { currency, setCurrency } = useContext(CurrencyContext);
+  const { getCurrency, setCurrency } = useContext(CurrencyContext);
   const [formData, setFormData] = useState([]);
 
   const handleCurrencyChange = (e) => {
@@ -70,7 +70,7 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
               </div>
 
               <li className='nav-link'>
-                <select value={currency} onChange={handleCurrencyChange}>
+                <select value={getCurrency} onChange={handleCurrencyChange}>
                   <option value="inr">INR</option>
                   <option value="usd">USD</option>
                 </select>

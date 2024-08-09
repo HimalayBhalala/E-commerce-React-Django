@@ -1,8 +1,27 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SellerSideBar from './SellerSideBar';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const SellerDashBoard = () => {
+
+  const seller_id = localStorage.getItem('seller_id');
+  const [getTotalCountProduct,setTotalCountProduct] = useState(0);
+
+  useEffect(() => {
+    const getTotalProduct = async () => {
+      try{
+        await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/products/${seller_id}`)
+          .then((response) => {
+            setTotalCountProduct(response.data.data.seller.products.length)
+          })
+      }catch(error){
+        console.log("Error during fetching an api",String(error))
+      }
+    } 
+    getTotalProduct();
+  },[seller_id])
+
   return (
     <div>
       <div className="container mt-5" style={{marginBottom:"12rem"}}>
@@ -18,7 +37,7 @@ const SellerDashBoard = () => {
                           <div className="card-title">
                             <h3>Total Products</h3>
                           </div>
-                            <Link style={{fontSize:"25px"}}>45</Link>
+                            <Link style={{fontSize:"25px"}}>{getTotalCountProduct}</Link>
                       </div>
                   </div>
                 </div>

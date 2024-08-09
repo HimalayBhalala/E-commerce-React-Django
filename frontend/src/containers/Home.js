@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import logo from '../product.jpg';
 import { Link } from 'react-router-dom';
 import SingleProduct from './SingleProduct';
+import { CurrencyContext } from '../context/CurrencyContex';
 
 const Home = () => {
     const baseURL = 'http://127.0.0.1:8000/ecommerce';
     const [productData, setProductsData] = useState([]);
     const [categoryData, setCategoryData] = useState([]);
+    const {getCurrency} = useContext(CurrencyContext);
     const [popularProductData, setPopularProductData] = useState([]);
 
     useEffect(() => {
@@ -116,7 +118,13 @@ const Home = () => {
                                 <img src={product.image} className='card-img-top large-image' alt="image9" />
                                 <div className="card-body">
                                     <h4 className="card-title">{product.title}</h4>
-                                    <h5 className='card-title text-muted'>Price: $ {product.price}</h5>
+                                    {
+                                        getCurrency === 'inr' ? (
+                                            <h5 className='card-title text-muted'>Price: ₹ {product.price}</h5>
+                                        ) : (
+                                            <h5 className='card-title text-muted'>Price: $ {product.usd_price}</h5>
+                                        )
+                                    }
                                 </div>
                                 <div className="card-footer">
                                     <button title='Add to Cart' className='btn btn-success btn-sm'>

@@ -1,8 +1,37 @@
-import React from 'react'
+import React, { useContext, useEffect,useState } from 'react'
 import SellerSideBar from './SellerSideBar';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { CurrencyContext } from '../../context/CurrencyContex';
 
 const SellerProducts = () => {
+
+    const seller_id = localStorage.getItem('seller_id');
+    const [getProduct,setProduct] = useState([]);
+    const {getCurrency} = useContext(CurrencyContext);
+
+    useEffect(() => {
+        const getTotalProduct = async () => {
+            try{
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/products/${seller_id}`)
+                setProduct(response.data.data.seller.products)
+            }catch(error){
+                console.log("Error during fetching an api",String(error))
+            }
+        } 
+    getTotalProduct();
+  },[seller_id])
+
+  const deleteProduct = async (seller_id,product_id) => {
+    try{
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/ecommerce/seller/products/${seller_id}/${product_id}`)
+        console.log("Product deleted successfully",response.data)
+        setProduct(getProduct.filter((product) => product.id !== product_id))
+    }catch(error){
+        console.log("Error during fetching an api",String(error))
+    }
+  }
+
   return (
     <div>
         <div className="container mt-5" style={{marginBottom:"12rem"}}>
@@ -28,19 +57,29 @@ const SellerProducts = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Success</td>
-                                        <td>Rs.500</td>
-                                        <td>Published</td>
-                                        <td>
-                                            <span>
-                                                <Link className="btn btn-info">View</Link>
-                                                <Link className='btn btn-primary ms-1'>Edit</Link>
-                                                <Link className='btn btn-danger ms-1'>Delete</Link>
-                                            </span>
-                                        </td>
-                                    </tr>
+                                    {
+                                        getProduct.map((product,index) => (
+                                            <tr key={product?.id}>
+                                                <td>{index + 1}</td>
+                                                <td>{product?.title}</td>
+                                                {
+                                                    getCurrency === 'inr' ? (
+                                                        <td>₹ {product?.price}</td>
+                                                    ) : (
+                                                        <td>$ {product?.usd_price}</td>                                                        
+                                                    )
+                                                }
+                                                <td>Published</td>
+                                                <td>
+                                                    <span>
+                                                        <Link className="btn btn-info ms-1" to={`/product/${product?.title}/${product?.id}`}>View</Link>
+                                                        <Link className='btn btn-primary ms-1' to={`/seller/edit/product/${seller_id}/${product?.id}`}>Edit</Link>
+                                                        <Link className='btn btn-danger ms-1' onClick={() => deleteProduct(seller_id,product?.id)} >Delete</Link>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    }
                                 </tbody>
                             </table>
                         </div>

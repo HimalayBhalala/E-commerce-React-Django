@@ -7,7 +7,7 @@ import { WishListContext } from '../../context/WishListContext';
 const WishList = () => {
     const get_customer_id = parseInt(localStorage.getItem('customer_id'));
     const { wish_list, setWishList } = useContext(WishListContext);
-    const { currency } = useContext(CurrencyContext);
+    const { getCurrency } = useContext(CurrencyContext);
 
     useEffect(() => {
         const fetchWishListData = async () => {
@@ -64,7 +64,7 @@ const WishList = () => {
                                                     <span style={{ marginLeft: "20px" }}>{item.product.title}</span>
                                                 </td>
                                                 <td>
-                                                    {currency === 'inr' ? (
+                                                    {getCurrency === 'inr' ? (
                                                         <p>₹ {item.product.price}</p>
                                                     ) : (
                                                         <p>$ {item.product.usd_price}</p>

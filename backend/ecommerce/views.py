@@ -2,9 +2,6 @@ from rest_framework.generics import ListCreateAPIView,RetrieveUpdateDestroyAPIVi
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import viewsets,status
-from datetime import datetime
-import pytz
-from django.utils import timezone
 from .pagination import (
     HomeProductPagination,
     HomeCategoryProductPagination,
@@ -41,8 +38,11 @@ from .serializers import (
     CustomerProductCountSerializer,
     GetTotalOrderSerializer,
     ProductInfoSerializer,
+    ProductUpdateInfoSerializer,
     SellerAddNewProductSerializer,
     SellerAddProductCategorySerializer,
+    getSingleProductSellerSerializer,
+    getProductSellerListSerializer,
     OrderProductItemSerializer
 )
 import stripe
@@ -389,3 +389,73 @@ def seller_add_new_product(request,seller_id,category_id):
                 serializer.save()
                 return Response({"data":serializer.data},status=status.HTTP_200_OK)
             return Response({"data":serializer.errors},status=status.HTTP_400_BAD_REQUEST)
+      
+@api_view(["GET"])
+def get_seller_all_product(request,seller_id):
+    if request.method == "GET":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller not found with a given url"},status=status.HTTP_404_NOT_FOUND)
+        product_serializer = getProductSellerListSerializer(seller)
+        return Response({"data":{"seller":product_serializer.data}},status=status.HTTP_200_OK)
+    
+@api_view(["GET","PUT","DELETE"])
+@csrf_exempt
+def seller_edit_product(request,seller_id,product_id):
+    if request.method == "GET":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+            try:
+                product = Product.objects.get(id=product_id,seller=seller)
+            except Product.DoesNotExist:
+                return Response({"message":"Product not found with a given product id."},status=status.HTTP_404_NOT_FOUND)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller not found with a given seller id."},status=status.HTTP_404_NOT_FOUND)
+        
+        product_serializer = ProductInfoSerializer(product)
+        seller_serializer = getSingleProductSellerSerializer(seller,context={'product_data':product_serializer.data})
+        return Response({"data":seller_serializer.data},status=status.HTTP_200_OK)
+
+    if request.method == "PUT":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+            try:
+                product = Product.objects.get(id=product_id,seller=seller)
+            except Product.DoesNotExist:
+                return Response({"message":"Product not found with a given product id."},status=status.HTTP_404_NOT_FOUND)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller not found with a given seller id."},status=status.HTTP_404_NOT_FOUND)
+        
+        product_serializer = ProductUpdateInfoSerializer(product,data=request.data,partial=True)
+
+        if product_serializer.is_valid(raise_exception=True):
+            product_serializer.save()
+            seller_serializer = getSingleProductSellerSerializer(seller,context={'product_data':product_serializer.data})
+            return Response({"data":seller_serializer.data},status=status.HTTP_200_OK)
+        return Response({"message":"Product has failed to updated"},status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == "DELETE":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+            try:
+                product = Product.objects.get(id=product_id,seller=seller).delete()
+                return Response({"message":"Product Deleted Successfully"},status=status.HTTP_204_NO_CONTENT)
+            except Product.DoesNotExist:
+                return Response({"message":"Product not found with a given product id."},status=status.HTTP_404_NOT_FOUND)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller not found with a given seller id."},status=status.HTTP_404_NOT_FOUND)
+        
+@api_view(["GET"])
+def get_seller_customer(request,seller_id):
+    if request.method == "GET":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+            customer = Customer.objects.all()
+            product = Product.objects.filter(seller=seller,customer__in=customer)
+            print(product)
+
+            serializer = SellerDetailSerializer(seller)
+            return Response({"data":{"seller":serializer.data}},status=status.HTTP_200_OK)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller Does not exists"},status=status.HTTP_400_BAD_REQUEST)

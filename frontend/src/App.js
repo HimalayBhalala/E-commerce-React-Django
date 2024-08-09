@@ -42,6 +42,7 @@ import SellerProducts from './containers/Seller/SellerProducts';
 import SellerOrders from './containers/Seller/SellerOrders';
 import SellerCustomers from './containers/Seller/SellerCustomers';
 import SellerAddProduct from './containers/Seller/SellerAddProduct';
+import SellerEditProduct from './containers/Seller/SellerEditProduct';
 import SellerChangePassword from './containers/Seller/SellerChangePassword';
 import Report from './containers/Seller/Reports';
 import TagProduct from './containers/TagProduct';
@@ -93,13 +94,14 @@ function App() {
                       {/* Seller Panel */}
                       <Route path="/seller/dashboard" element={<SellerDashBoard />} />
                       <Route path="/seller/products" element={<SellerProducts />} />
+                      <Route path="/seller/add/category" element={<AddCategory />} />
                       <Route path="/seller/add/product" element={<SellerAddProduct />} />
+                      <Route path="/seller/edit/product/:seller_id/:product_id" element={<SellerEditProduct />} />
                       <Route path="/seller/customer" element={<SellerCustomers />} />
                       <Route path="/seller/orders" element={<SellerOrders />} />
                       <Route path="/seller/profile" element={<SellerProfile />} />
                       <Route path="/seller/change/password" element={<SellerChangePassword />} />
                       <Route path="/seller/report" element={<Report />} />
-                      <Route path="seller/add/category" element={<AddCategory />} />
 
                       <Route path="*" element={<NotFound />} />
 

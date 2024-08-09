@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import SellerSideBar from './SellerSideBar';
 import axios from 'axios';
+import { CurrencyContext } from '../../context/CurrencyContex';
+import { useNavigate } from 'react-router-dom';
+import { ariaHidden } from '@mui/material/Modal/ModalManager';
 
 const SellerAddProduct = () => {
     const seller_id = localStorage.getItem('seller_id');
+    const {getCurrency} = useContext(CurrencyContext);
+    const [imageURL,setImageUrl] = useState(null);
     const [formData, setFormData] = useState({
         category: '',
         title: '',
         price: '',
         usd_price:'',
-        currency: 'INR',
+        currency: String(getCurrency).toUpperCase() ,
         description: '',
         image: null
     });
     const [categories, setCategories] = useState([]);
+    const [getProductStatus,setProductStatus] = useState(false)
+    const navigate = useNavigate();
 
     const { category, title, price,usd_price,currency, description, image } = formData;
 
     useEffect(() => {
+        if(getProductStatus){
+            navigate("/seller/products")
+        }
+
         const GetData = () => {
         axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/categories/`)
             .then((response) => {
@@ -28,7 +39,7 @@ const SellerAddProduct = () => {
             });
         }
         GetData();
-    }, []);
+    }, [getProductStatus]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -53,6 +64,7 @@ const SellerAddProduct = () => {
             }
         })
             .then((response) => {
+                setProductStatus(true)
                 console.log("Product Added Successfully", response);
             })
             .catch((error) => {
@@ -61,17 +73,27 @@ const SellerAddProduct = () => {
     };
 
     const onChange = (e) => {
-        const { name, value, type, files } = e.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'file' ? files[0] : value
-        });
+        if (e.target.name === 'image'){
+            const file = e.target.files[0]
+            if(file){
+                setImageUrl(URL.createObjectURL(file))
+                setFormData({
+                    ...formData,
+                    [e.target.name] : file
+                });
+            }
+        }else{
+            setFormData({
+               ...formData,
+               [e.target.name] : e.target.value
+            });
+        }
     };
 
     return (
         <div>
             <div className="container mt-5" style={{ marginBottom: "1rem" }}>
-                {console.log("Category",formData)}
+                {console.log("Currency",formData)}
                 <div className="row">
                     <div className="col-md-3">
                         <SellerSideBar />
@@ -91,11 +113,16 @@ const SellerAddProduct = () => {
                                     </select>
                                 </div>
                                 <div className="mt-2">
-                                    <label className='form-label' htmlFor="currency">Currency: </label>
-                                    <select className="form-select form-control" id='currency' name='currency' value={currency} onChange={onChange}>
-                                        <option value="INR">INR</option>
-                                        <option value="USD">USD</option>
-                                    </select>
+                                    <label htmlFor="currency">Currency: </label>
+                                    <div className="form-control" id='currency' name='currency' value={currency} onChange={onChange}>
+                                        {(String(getCurrency).toUpperCase() === 'INR') ? 
+                                        (   
+                                            <div value="INR">INR</div> 
+                                        ) : 
+                                        (
+                                            <div value="USD">USD</div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="mt-2">
                                     <label className='form-label' htmlFor="title">Title: </label>
@@ -119,8 +146,11 @@ const SellerAddProduct = () => {
                                     <textarea className='form-control' rows='4' cols='4' id='description' name='description' value={description} onChange={onChange} required />
                                 </div>
                                 <div className="mt-2">
-                                    <label htmlFor="image" className='form-label'>Choose Image</label>
+                                    <label htmlFor="image" className='form-label'>Add New Image</label>
                                     <input className='form-control' type="file" name='image' id='image' onChange={onChange} />
+                                    <div className='mt-5 mb-5' style={{height:"auto",width:"10rem",alignItems:"center"}}>
+                                        <img className='mt-3' style={{display: "flex",width: "-webkit-fill-available",height:"auto",objectFit:"cover",display:imageURL ? 'block' : 'none'}} src={imageURL} />
+                                    </div>
                                 </div>
                                 <div className='text-center'>
                                     <button type='submit' className='btn btn-primary mt-3 mb-3'>Submit</button>

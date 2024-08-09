@@ -4,13 +4,13 @@ import { CurrencyContext } from "./CurrencyContex";
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-    const {currency} = useContext(CurrencyContext); 
+    const {getCurrency} = useContext(CurrencyContext); 
     const CartData = JSON.parse(localStorage.getItem('cartDetail')) || [];
     const [cartData, setCartData] = useState(CartData);
 
     const totalProductPrice = () => {
       var sum = 0
-      if(currency === 'inr'){
+      if(getCurrency === 'inr'){
         cartData.map((products) => {
           sum += products.product.product_price
         })        

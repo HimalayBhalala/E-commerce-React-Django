@@ -16,7 +16,7 @@ const ProductDetail = ({ isAuthenticated }) => {
     const [addCart, setAddCart] = useState(false);
     const [isInWishlist, setIsInWishlist] = useState(false);
     const { setCartData } = useContext(CartContext);
-    const { currency } = useContext(CurrencyContext);
+    const { getCurrency } = useContext(CurrencyContext);
     const { wish_list } = useContext(WishListContext);
 
     const getCustomerId = parseInt(localStorage.getItem('customer_id'));
@@ -127,7 +127,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                 <div className="col-8 mt-5">
                     <p><span className="fs-4"><b>Product Title: </b></span><span className='fs-5'>{productDetail.title}</span></p>
                     <p><span className="fs-4"><b>Product Description: </b></span><span className='fs-5'>{productDetail.description}</span></p>
-                    <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{currency === 'inr' ? '₹' : '$'} {currency === 'inr' ? productDetail.price : productDetail.usd_price}</span></p>
+                    <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{getCurrency === 'inr' ? '₹' : '$'} {getCurrency === 'inr' ? productDetail.price : productDetail.usd_price}</span></p>
                     <hr className='mt-5' />
                     <div className="mt-1 mt-5">
                         <a href="#" className='btn btn-dark btn-sm' target="_blank" rel="noopener noreferrer" title='Demo'>

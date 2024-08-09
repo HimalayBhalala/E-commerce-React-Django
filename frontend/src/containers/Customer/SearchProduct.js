@@ -7,7 +7,7 @@ export default function SearchProduct() {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const result = queryParams.get('search');
-    const { currency } = useContext(CurrencyContext);
+    const { getCurrency } = useContext(CurrencyContext);
 
     const [getProductData, setProductData] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -63,7 +63,7 @@ export default function SearchProduct() {
                                                 </Link>
                                             </h4>
                                             {
-                                                currency === 'inr' ? (
+                                                getCurrency === 'inr' ? (
                                                     <h5 className='card-price small-price' style={{ color: 'darkslategrey' }}>
                                                         Price: ₹ {product?.price}
                                                     </h5>
