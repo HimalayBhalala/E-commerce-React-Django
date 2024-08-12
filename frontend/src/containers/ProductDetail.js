@@ -130,9 +130,6 @@ const ProductDetail = ({ isAuthenticated }) => {
                     <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{getCurrency === 'inr' ? '₹' : '$'} {getCurrency === 'inr' ? productDetail.price : productDetail.usd_price}</span></p>
                     <hr className='mt-5' />
                     <div className="mt-1 mt-5">
-                        <a href="#" className='btn btn-dark btn-sm' target="_blank" rel="noopener noreferrer" title='Demo'>
-                            <i className='fa-solid fa-cart-plus'></i> Demo
-                        </a>
                         {
                             !addCart ? (
                                 <button className='btn btn-success btn-sm ms-1' type='button' onClick={addToCart} title='Add to Cart'>

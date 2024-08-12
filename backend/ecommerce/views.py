@@ -301,7 +301,7 @@ class GetSearchingProduct(APIView):
         data = request.query_params.get('search')
         if not data:
             return Response({"message":"Enter something for searching an product"},status=status.HTTP_404_NOT_FOUND)
-        product = Product.objects.filter(title__icontains=data)
+        product = Product.objects.filter(title__icontains=data) or Product.objects.filter(price__icontains=data) or Product.objects.filter(usd_price__icontains=data)
         serializer = ProductInfoSerializer(product,many=True)
         return Response({"data":serializer.data},status=status.HTTP_200_OK)
     

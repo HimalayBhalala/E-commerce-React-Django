@@ -3,7 +3,6 @@ import SellerSideBar from './SellerSideBar';
 import axios from 'axios';
 import { CurrencyContext } from '../../context/CurrencyContex';
 import { useNavigate } from 'react-router-dom';
-import { ariaHidden } from '@mui/material/Modal/ModalManager';
 
 const SellerAddProduct = () => {
     const seller_id = localStorage.getItem('seller_id');
@@ -20,6 +19,7 @@ const SellerAddProduct = () => {
     });
     const [categories, setCategories] = useState([]);
     const [getProductStatus,setProductStatus] = useState(false)
+
     const navigate = useNavigate();
 
     const { category, title, price,usd_price,currency, description, image } = formData;
@@ -39,7 +39,7 @@ const SellerAddProduct = () => {
             });
         }
         GetData();
-    }, [getProductStatus]);
+    }, [getProductStatus,navigate]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -149,7 +149,7 @@ const SellerAddProduct = () => {
                                     <label htmlFor="image" className='form-label'>Add New Image</label>
                                     <input className='form-control' type="file" name='image' id='image' onChange={onChange} />
                                     <div className='mt-5 mb-5' style={{height:"auto",width:"10rem",alignItems:"center"}}>
-                                        <img className='mt-3' style={{display: "flex",width: "-webkit-fill-available",height:"auto",objectFit:"cover",display:imageURL ? 'block' : 'none'}} src={imageURL} />
+                                        <img className='mt-3' style={{width: "-webkit-fill-available",height:"auto",objectFit:"cover",display:imageURL ? 'block' : 'none'}} src={imageURL} alt='product_img' />
                                     </div>
                                 </div>
                                 <div className='text-center'>

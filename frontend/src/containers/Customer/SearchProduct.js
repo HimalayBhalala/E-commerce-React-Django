@@ -10,7 +10,6 @@ export default function SearchProduct() {
     const { getCurrency } = useContext(CurrencyContext);
 
     const [getProductData, setProductData] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const config = {
@@ -18,7 +17,6 @@ export default function SearchProduct() {
                 'Content-Type': "application/json"
             }
         };
-        setLoading(true); // Set loading to true before making the API call
         axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/search/?search=${result}`, config)
             .then((response) => {
                 if (response.status === 200) {
@@ -30,22 +28,14 @@ export default function SearchProduct() {
             .catch((error) => {
                 console.log("Error Occurred during fetching an API", String(error));
             })
-            .finally(() => {
-                setLoading(false); // Set loading to false after the API call is completed
-            });
     }, [result]);
 
     return (
         <div className='container text-center'>
-            {console.log("Product", getProductData)}
             <h1 style={{ textAlign: "center" }} className='mt-3'>Search Results</h1>
             <hr />
             <div className="row mt-3">
-                {loading ? ( // Show loading message if data is still being fetched
-                    <div style={{ padding: "5rem" }}>
-                        <h1 className='text-center'>Loading...</h1>
-                    </div>
-                ) : (
+                {
                     getProductData.length > 0 ? (
                         getProductData.map((product) => (
                             <div key={product?.id} className="col-12 col-md-3 mb-4 offset-1">
@@ -91,7 +81,7 @@ export default function SearchProduct() {
                             <h1 className='text-center'>No product found....</h1>
                         </div>
                     )
-                )}
+                }
             </div>
         </div>
     );

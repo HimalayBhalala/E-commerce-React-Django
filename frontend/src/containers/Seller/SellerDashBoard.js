@@ -7,6 +7,8 @@ const SellerDashBoard = () => {
 
   const seller_id = localStorage.getItem('seller_id');
   const [getTotalCountProduct,setTotalCountProduct] = useState(0);
+  const [getTotalCountOrder,setTotalCountOrder] = useState(0);
+
 
   useEffect(() => {
     const getTotalProduct = async () => {
@@ -18,7 +20,18 @@ const SellerDashBoard = () => {
       }catch(error){
         console.log("Error during fetching an api",String(error))
       }
+    }
+    const getTotalOrder = async () => {
+      try{
+        await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/orders/${seller_id}`)
+          .then((response) => {
+            setTotalCountOrder(response.data.data.length)
+          })
+      }catch(error){
+        console.log("Error during fetching an api",String(error))
+      }
     } 
+    getTotalOrder();
     getTotalProduct();
   },[seller_id])
 
@@ -33,12 +46,14 @@ const SellerDashBoard = () => {
               <div className="row">
                 <div className="col-md-4">
                   <div className="card">
-                      <div className="card-body text-center">
-                          <div className="card-title">
+                    <div className="card-body text-center">
+                      <div className="card-title">
                             <h3>Total Products</h3>
-                          </div>
-                            <Link style={{fontSize:"25px"}}>{getTotalCountProduct}</Link>
                       </div>
+                      <div style={{ fontSize: "25px", color: 'maroon' }}>
+                        {getTotalCountProduct}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="col-md-4">
@@ -47,7 +62,9 @@ const SellerDashBoard = () => {
                       <div className="card-title">
                         <h3>Total Orders</h3>
                       </div>
-                        <Link style={{fontSize:"25px"}}>134</Link>
+                      <div style={{ fontSize: "25px", color: 'maroon' }}>
+                        {getTotalCountOrder}
+                      </div>
                     </div>
                   </div>
                 </div>

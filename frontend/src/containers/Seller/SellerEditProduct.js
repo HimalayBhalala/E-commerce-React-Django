@@ -61,7 +61,7 @@ const SellerEditProduct = () => {
                 image: product.image || null
             });
         }
-    }, [product, getCurrency,productUpdateStatus]);
+    }, [product, getCurrency,productUpdateStatus,navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
