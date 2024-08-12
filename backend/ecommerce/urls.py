@@ -29,8 +29,10 @@ urlpatterns = [
     path("seller/products/<int:seller_id>/<int:product_id>/",views.seller_edit_product,name='seller-edit-product'),
     path("seller/categories/",views.SellerProductCategoryView.as_view(),name="seller-product-categories"),
     path("seller/products/<int:seller_id>/",views.get_seller_all_product,name='get-seller-product'),
-    path("seller/customers/<int:seller_id>/",views.get_seller_customer,name="get-seller-customer"),
-
+    path("seller/orders/<int:seller_id>/",views.get_seller_customer_order,name="get-seller-orders"),
+    path("seller/customers/<int:seller_id>/",views.get_seller_customer,name="get-seller-customers"),
+    path("seller/customer/order/<int:seller_id>/<int:customer_id>/",views.get_seller_customer_orders,name="get-seller-customer-orders"),
+    path("seller/customer/orders/<int:seller_id>/",views.get_seller_all_orders,name="get-seller-all-orders"),
 
 
 

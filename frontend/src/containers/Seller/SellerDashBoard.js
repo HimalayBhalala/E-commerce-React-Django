@@ -8,9 +8,9 @@ const SellerDashBoard = () => {
   const seller_id = localStorage.getItem('seller_id');
   const [getTotalCountProduct,setTotalCountProduct] = useState(0);
   const [getTotalCountOrder,setTotalCountOrder] = useState(0);
+  const [getTotalCustomer,setTotalCustomer] = useState(0);
 
-
-  useEffect(() => {
+  useEffect(() => {  
     const getTotalProduct = async () => {
       try{
         await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/products/${seller_id}`)
@@ -21,18 +21,29 @@ const SellerDashBoard = () => {
         console.log("Error during fetching an api",String(error))
       }
     }
+
     const getTotalOrder = async () => {
       try{
         await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/orders/${seller_id}`)
           .then((response) => {
-            setTotalCountOrder(response.data.data.length)
+            setTotalCountOrder(response.data.data.seller.length)
           })
       }catch(error){
         console.log("Error during fetching an api",String(error))
       }
     } 
+
+    const getTotalSellerCustomer = async () => {
+      try{
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/seller/customers/${seller_id}/`)
+          setTotalCustomer(res.data.data.customers.length)
+      }catch(error){
+          console.log("Check Network connection",String(error))
+      }
+    }
     getTotalOrder();
     getTotalProduct();
+    getTotalSellerCustomer();
   },[seller_id])
 
   return (
@@ -74,7 +85,9 @@ const SellerDashBoard = () => {
                       <div className="card-title">
                           <h3>Total Customer</h3>
                       </div>
-                        <Link style={{fontSize:"25px"}}>30</Link>
+                      <div style={{ fontSize: "25px", color: 'maroon' }}>
+                        {getTotalCustomer}
+                      </div>
                     </div>
                   </div>
                 </div>

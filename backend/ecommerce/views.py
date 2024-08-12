@@ -43,6 +43,8 @@ from .serializers import (
     SellerAddProductCategorySerializer,
     getSingleProductSellerSerializer,
     getProductSellerListSerializer,
+    CustomerDetailInfoSerializer,
+    SellerCustomerOrderDetailSerializer,
     OrderProductItemSerializer
 )
 import stripe
@@ -447,15 +449,88 @@ def seller_edit_product(request,seller_id,product_id):
             return Response({"message":"Seller not found with a given seller id."},status=status.HTTP_404_NOT_FOUND)
         
 @api_view(["GET"])
-def get_seller_customer(request,seller_id):
+def get_seller_customer_order(request,seller_id):
     if request.method == "GET":
         try:
             seller = Seller.objects.get(id=seller_id)
-            customer = Customer.objects.all()
-            product = Product.objects.filter(seller=seller,customer__in=customer)
-            print(product)
-
-            serializer = SellerDetailSerializer(seller)
+            order = Order.objects.all()
+            product = Product.objects.filter(seller=seller)
+            order_item = OrderItems.objects.filter(product__in=product,order__in=order)
+            serializer = SellerCustomerOrderDetailSerializer(order_item,many=True)
             return Response({"data":{"seller":serializer.data}},status=status.HTTP_200_OK)
         except Seller.DoesNotExist:
             return Response({"message":"Seller Does not exists"},status=status.HTTP_400_BAD_REQUEST)
+        
+@api_view(["GET"])
+def get_seller_customer(request, seller_id):
+    try:
+        seller = Seller.objects.get(id=seller_id)
+    except Seller.DoesNotExist:
+        return Response({"error": "Seller not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    seller_serializer = SellerDetailSerializer(seller)
+
+    order_items = OrderItems.objects.filter(product__seller=seller).select_related('order__customer')
+    unique_customers = order_items.values('order__customer').distinct()
+
+    customer_ids = [item['order__customer'] for item in unique_customers]
+    customers = Customer.objects.filter(id__in=customer_ids)
+    
+    customer_serializer = CustomerDetailInfoSerializer(customers, many=True)
+
+    return Response({
+        "data": {
+            "seller": seller_serializer.data,
+            "customers": customer_serializer.data
+        }
+    }, status=status.HTTP_200_OK)
+
+@api_view(["GET","DELETE"])
+def get_seller_customer_orders(request,customer_id,seller_id):
+    if request.method == "GET":
+        try:
+            customer = Customer.objects.get(id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({"Message":"Customer is not found"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            seller = Seller.objects.get(id=seller_id)
+        except Seller.DoesNotExist:
+            return Response({"Message":"Seller is not found"},status=status.HTTP_400_BAD_REQUEST)
+        
+        order = Order.objects.filter(customer=customer)
+        order_items = OrderItems.objects.filter(order__in=order,product__seller=seller)
+        order_item_serializer = SellerCustomerOrderDetailSerializer(order_items,many=True)
+        return Response({"data":order_item_serializer.data},status=status.HTTP_200_OK)
+    
+    if request.method == "DELETE":
+        try:
+            customer = Customer.objects.get(id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({"Message":"Customer is not found"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            seller = Seller.objects.get(id=seller_id)
+        except Seller.DoesNotExist:
+            return Response({"Message":"Seller is not found"},status=status.HTTP_400_BAD_REQUEST)
+        
+        order = Order.objects.filter(customer=customer)
+        order_items = OrderItems.objects.filter(order__in=order,product__seller=seller).delete()
+        return Response({"data":"customer remove success fully...."},status=status.HTTP_204_NO_CONTENT)
+
+@api_view(["GET"])
+def get_seller_all_orders(request,seller_id):
+    try:
+        customer = Customer.objects.all()
+    except Customer.DoesNotExist:
+        return Response({"Message":"Customer is not found"},status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        seller = Seller.objects.get(id=seller_id)
+    except Seller.DoesNotExist:
+        return Response({"Message":"Seller is not found"},status=status.HTTP_400_BAD_REQUEST)
+    
+    order = Order.objects.filter(customer__in=customer)
+    order_items = OrderItems.objects.filter(order__in=order,product__seller=seller)
+    order_item_serializer = SellerCustomerOrderDetailSerializer(order_items,many=True)
+    return Response({"data":order_item_serializer.data},status=status.HTTP_200_OK)

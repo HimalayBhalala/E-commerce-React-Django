@@ -44,6 +44,7 @@ import SellerCustomers from './containers/Seller/SellerCustomers';
 import SellerAddProduct from './containers/Seller/SellerAddProduct';
 import SellerEditProduct from './containers/Seller/SellerEditProduct';
 import SellerChangePassword from './containers/Seller/SellerChangePassword';
+import SellerShowCustomerOrder from './containers/Seller/SellerShowCustomerOrder';
 import Report from './containers/Seller/Reports';
 import TagProduct from './containers/TagProduct';
 
@@ -98,6 +99,7 @@ function App() {
                       <Route path="/seller/add/product" element={<SellerAddProduct />} />
                       <Route path="/seller/edit/product/:seller_id/:product_id" element={<SellerEditProduct />} />
                       <Route path="/seller/customer" element={<SellerCustomers />} />
+                      <Route path="/seller/order/:seller_id/:customer_id" element={<SellerShowCustomerOrder/>} />
                       <Route path="/seller/orders" element={<SellerOrders />} />
                       <Route path="/seller/profile" element={<SellerProfile />} />
                       <Route path="/seller/change/password" element={<SellerChangePassword />} />

@@ -421,3 +421,19 @@ class getSingleProductSellerSerializer(serializers.ModelSerializer):
         product_data = self.context.get('product_data')
         return product_data
     
+class CustomerDetailInfoSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField(read_only=True)
+    class Meta:
+        model = Customer
+        fields = ["id","user","email","mobile","image"]
+
+    def get_email(self,obj):
+        email = obj.user.email
+        return email
+    
+class SellerCustomerOrderDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItems
+        fields = ["id","order","product"]
+        depth = 1
+    
