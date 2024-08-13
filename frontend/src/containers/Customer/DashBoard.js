@@ -44,13 +44,15 @@ const DashBoard = () => {
         const orders = response.data.orders;
         const labels = [];
         const data = [];
-
         orders.forEach(order => {
+          console.log("orderDate------------------",order.order_time,typeof(order.order_time))
           const orderDate = new Date(order.order_time).toLocaleDateString();
+          console.log("OrderDate",orderDate)
           const index = labels.indexOf(orderDate);
-
+          
           if (index === -1) {
             labels.push(orderDate);
+            console.log("Order data",labels)
             data.push(1);
           } else {
             data[index] += 1;
@@ -77,6 +79,7 @@ const DashBoard = () => {
 
   return (
     <div>
+      {console.log("Order Data",orderData)}
       <div className="container mt-5" style={{ marginBottom: "12rem" }}>
         <div className="row">
           <div className="col-md-3">

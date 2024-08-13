@@ -37,59 +37,67 @@ const WishList = () => {
                 <div className="col-md-3">
                     <SideBar />
                 </div>
-                <div className="col-md-9">
-                    <div className="table-responsive">
-                        <table className="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Sr.No</th>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {
-                                    wish_list.length >= 0 ? (
-                                        wish_list.map((item, index) => (
-                                            <tr key={item.product.id}>
-                                                <td>{index + 1}</td>
-                                                <td>
-                                                    <img
-                                                        src={`${process.env.REACT_APP_API_URL}/${item.product.image}`}
-                                                        className='img-thumbnail'
-                                                        style={{ width: "60px" }}
-                                                        alt={item.product.title}
-                                                    />
-                                                    <span style={{ marginLeft: "20px" }}>{item.product.title}</span>
-                                                </td>
-                                                <td>
-                                                    {getCurrency === 'inr' ? (
-                                                        <p>₹ {item.product.price}</p>
-                                                    ) : (
-                                                        <p>$ {item.product.usd_price}</p>
-                                                    )}
-                                                </td>
-                                                <td>
-                                                    <button
-                                                        className='btn btn-danger btn-sm'
-                                                        onClick={() => removeFromWishList(item.product.id, get_customer_id)}
-                                                    >
-                                                        Remove
-                                                    </button>
-                                                </td>
+                {
+                    wish_list.length <= 0 ? (
+                        <div className="col-md-9">
+                            <h1 className='text-center' style={{marginTop:"7.4rem"}}>No product added in wishlist</h1>
+                        </div>
+                    ) : (
+                    <div className="col-md-9">
+                        <div className="table-responsive">
+                            <table className="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Sr.No</th>
+                                        <th>Product</th>
+                                        <th>Price</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {
+                                        wish_list.length >= 0 ? (
+                                            wish_list.map((item, index) => (
+                                                <tr key={item.product.id}>
+                                                    <td>{index + 1}</td>
+                                                    <td>
+                                                        <img
+                                                            src={`${process.env.REACT_APP_API_URL}/${item.product.image}`}
+                                                            className='img-thumbnail'
+                                                            style={{ width: "60px" }}
+                                                            alt={item.product.title}
+                                                        />
+                                                        <span style={{ marginLeft: "20px" }}>{item.product.title}</span>
+                                                    </td>
+                                                    <td>
+                                                        {getCurrency === 'inr' ? (
+                                                            <p>₹ {item.product.price}</p>
+                                                        ) : (
+                                                            <p>$ {item.product.usd_price}</p>
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        <button
+                                                            className='btn btn-danger btn-sm'
+                                                            onClick={() => removeFromWishList(item.product.id, get_customer_id)}
+                                                        >
+                                                            Remove
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="4" className="text-center">No items in the wishlist</td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="4" className="text-center">No items in the wishlist</td>
-                                        </tr>
-                                    )
-                                }
-                            </tbody>
-                        </table>
+                                        )
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                )
+            }
             </div>
         </div>
     );

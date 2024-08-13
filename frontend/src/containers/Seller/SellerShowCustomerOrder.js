@@ -51,7 +51,7 @@ const SellerShowCustomerOrder = () => {
                                 {
                                     getCustomerOrder.map((products,index) => (
                                     <tr key={products.product.id}>
-                                        <td>{index}</td>
+                                        <td>{index + 1}</td>
                                         <td>
                                             <span style={{display:"flex"}}>
                                             <img src={`${process.env.REACT_APP_API_URL}/${products.product?.image}`} className='img-thumbnail' style={{width:"60px"}} alt="product1" />

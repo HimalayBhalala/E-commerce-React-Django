@@ -114,7 +114,6 @@ const SellerEditProduct = () => {
 
     return (
         <div>
-            {console.log("Get categories",categories)}
             <div className="container mt-5" style={{ marginBottom: "1rem" }}>
                 <div className="row">
                     <div className="col-md-3">

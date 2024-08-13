@@ -19,8 +19,18 @@ const SellerCustomers = () => {
         getSellerCustomer();
     },[seller_id])
 
-    const customerRemoveFromList = () => {
-        console.log("Customer is removed")
+    const customerRemoveFromList = async (customer_id) => {
+        try{
+            const res = await axios.delete(`${process.env.REACT_APP_API_URL}/ecommerce/seller/customer/order/${seller_id}/${customer_id}/`)
+            if (res.status === 204){
+                console.log("Customer removed successfully....")
+                setCustomer((getCustomer.filter((customer) => (customer.id !== customer_id))))
+            }else{
+                console.log("No respose found in given request.")
+            }
+        }catch(error){
+            console.log("Error during fetching an api",String(error));
+        }
     }
 
   return (
@@ -53,7 +63,7 @@ const SellerCustomers = () => {
                                                     <td>{customer?.mobile}</td>
                                                     <td>
                                                         <Link className='btn btn-sm btn-primary' to={`/seller/order/${seller_id}/${customer.id}`} >Order</Link>
-                                                        <Link className='btn btn-danger btn-sm ms-1' onClick={customerRemoveFromList}>Remove From List</Link>
+                                                        <Link className='btn btn-danger btn-sm ms-1' onClick={() => {customerRemoveFromList(customer.id)}}>Remove From List</Link>
                                                     </td>
                                                 </tr>
                                             ))

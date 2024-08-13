@@ -7,14 +7,14 @@ import { CurrencyContext } from '../../context/CurrencyContex';
 const Checkout = ({ isAuthenticated }) => {
   const { setCartData } = useContext(CartContext);
   const cart = JSON.parse(localStorage.getItem('cartDetail')) || [];
-  const {currency} = useContext(CurrencyContext);
+  const {getCurrency} = useContext(CurrencyContext);
   const { cartData } = useContext(CartContext);
   const navigate = useNavigate();
 
   
     const totalPrice = () => {
         var sum = parseFloat(0);
-        if (currency === 'inr'){
+        if (getCurrency === 'inr'){
             cartData.forEach(item => {
             sum += item.product.product_price
             });
@@ -70,7 +70,7 @@ const removeFromCart = (id) => {
                             <p className='mt-2' style={{ marginLeft: "20px" }}>{products.product?.product_title}</p>
                           </td>
                           <td>
-                            {currency === 'inr' ? (
+                            {getCurrency === 'inr' ? (
                               <p>₹ {products.product?.product_price}</p>
                             ) : (
                               <p>$ {products.product?.product_usd_price}</p>
@@ -88,7 +88,7 @@ const removeFromCart = (id) => {
                           <th className='text-center'>Total Price</th>
                         </td>
                         <td>
-                          {currency === 'inr' ? (
+                          {getCurrency === 'inr' ? (
                             <th>₹ {totalPrice()}</th>
                           ) : (
                             <th>$ {totalPrice()}</th>

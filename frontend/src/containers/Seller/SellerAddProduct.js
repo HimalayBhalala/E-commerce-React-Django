@@ -93,7 +93,6 @@ const SellerAddProduct = () => {
     return (
         <div>
             <div className="container mt-5" style={{ marginBottom: "1rem" }}>
-                {console.log("Currency",formData)}
                 <div className="row">
                     <div className="col-md-3">
                         <SellerSideBar />
