@@ -2,17 +2,23 @@ import React, { useEffect, useState } from 'react';
 import SideBar from './SideBar';
 import { TextField, Button } from '@mui/material';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const UpdateAddress = () => {
     const customer_id = localStorage.getItem('customer_id');
     const { address_id } = useParams();
+    const [getAddressStatus,setAddressStatus] = useState(false);
     const [formData, setFormData] = useState({
         address: '',
         default_address: false
     });
 
+    const navigate = useNavigate();
+
     useEffect(() => {
+        if(getAddressStatus){
+            navigate("/addresses")
+        }
         axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/update-address/${customer_id}/${address_id}/`)
             .then((response) => {
                 setFormData({
@@ -23,7 +29,7 @@ const UpdateAddress = () => {
             .catch((error) => {
                 console.error("Error fetching address info", error);
             });
-    }, [customer_id, address_id]);
+    }, [customer_id, address_id,getAddressStatus]);
 
     const onChange = (e) => {
         const { name, type, checked, value } = e.target;
@@ -37,6 +43,7 @@ const UpdateAddress = () => {
         e.preventDefault();
         axios.put(`${process.env.REACT_APP_API_URL}/ecommerce/customer/update-address/${customer_id}/${address_id}/`, formData, { headers: { "Content-Type": "application/json" } })
             .then((response) => {
+                setAddressStatus(true)
                 console.log("Address updated successfully", response.data);
             })
             .catch((error) => {

@@ -35,12 +35,12 @@ const SellerCustomers = () => {
 
   return (
     <div>
-        <div className="container mt-5" style={{marginBottom:"12rem"}}>
+        <div className="container mt-5">
             <div className="row">
                 <div className="col-md-3">
                     <SellerSideBar />
                 </div>
-                <div className="col-md-9"> 
+                <div className="col-md-9" style={{marginBottom:"32.3rem"}}> 
                     <div className="form-control">           
                         <h2 className='text-center'>Welcome,Seller</h2>
                         <hr />

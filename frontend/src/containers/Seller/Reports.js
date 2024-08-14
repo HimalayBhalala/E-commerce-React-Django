@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom';
 const SellerDashBoard = () => {
   return (
     <div>
-      <div className="container mt-5" style={{marginBottom:"12rem"}}>
+      <div className="container mt-5">
         <div className="row">
             <div className="col-md-3">
               <SellerSideBar/>
             </div>
-            <div className="col-md-9">
-              <div className="row">
+            <div className="col-md-9" style={{marginBottom:"40rem"}}>
+              <div className="row" style={{color:"black"}}>
                 <div className="col-md-4">
                   <div className="card">
                       <div className="card-body text-center">

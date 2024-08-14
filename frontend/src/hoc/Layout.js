@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Navbar from '../componenets/Navbar';
 import { customer_checkAuthenticated, seller_checkAuthenticated } from '../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Layout = ({ customer_checkAuthenticated, seller_checkAuthenticated, children }) => {
+  const {themeMode} = useContext(ThemeContext);
   const role = JSON.parse(localStorage.getItem('role'));
   const navigate = useNavigate();
 
@@ -19,7 +21,7 @@ const Layout = ({ customer_checkAuthenticated, seller_checkAuthenticated, childr
   }, [role, navigate, customer_checkAuthenticated, seller_checkAuthenticated]);
 
   return (
-    <div>
+    <div style={{backgroundColor : (themeMode === "dark") ? "black" : "floralwhite",color : (themeMode === "dark") ? "white" : "black"}}>
       <Navbar />
       {children}
     </div>

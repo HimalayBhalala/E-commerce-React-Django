@@ -4,16 +4,23 @@ import { Link } from 'react-router-dom';
 import { logout } from '../actions/auth';
 import { CartContext } from '../context/CardContext';
 import { CurrencyContext } from '../context/CurrencyContex';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Navbar = ({ logout, isAuthenticated, profile_image }) => {
   const role = JSON.parse(localStorage.getItem('role')) || null;
   const cartData = useContext(CartContext);
   const { getCurrency, setCurrency } = useContext(CurrencyContext);
   const [formData, setFormData] = useState([]);
+  const {themeMode,setThemeMode} = useContext(ThemeContext);
 
   const handleCurrencyChange = (e) => {
     setCurrency(e.target.value);
   };
+
+  const changeMode = () => {
+    const newMode = themeMode === "dark" ? "light" : "dark"
+    setThemeMode(newMode)
+  }
 
   const { search } = formData;
 
@@ -24,7 +31,7 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
 
   return (
     <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <nav className={`navbar navbar-expand-lg navbar-${themeMode === "dark"?"light" : "dark"} bg-${themeMode === "dark"?"light" : "dark"}`}>
         <div className="container-fluid lm-sm" style={{ marginLeft: "6em", marginRight: "2em" }}>
           <Link className="navbar-brand" to="/">E-Commerce</Link>
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +39,13 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
           </button>
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav ms-auto">
+              <form className='text-center'>
+                <div class="form-check form-switch text-center" style={{marginTop:"0.6rem",marginRight:"5rem"}}>
+                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" name="mode" value={themeMode} checked={themeMode === "dark" ? true : false} onClick={() => changeMode()}/>
+                  <label class="form-check-label" for="flexSwitchCheckChecked" style={{color : themeMode === "dark" ? "black" : "white"}}>{themeMode === "dark" ? "Dark" : "Light"}</label>
+                </div>
+              </form>
+
               <Link className="nav-link active" aria-current="page" to="/">Home</Link>
               <Link className='nav-link' to="/categories">Category</Link>
 
@@ -92,7 +106,6 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
                   null
                 )
               }
-
               {
                 isAuthenticated ? (
                   role === 'customer' ? (

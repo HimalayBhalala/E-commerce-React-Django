@@ -117,6 +117,7 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z') 
     class Meta:
         model = Order
         fields = ["id", "customer", "order_time","order_status"]
@@ -164,12 +165,18 @@ class CustomerOrderSerializer(serializers.ModelSerializer):
     
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product_title = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = OrderItems
-        fields = ['order', 'product', 'quantity', 'price']
+        fields = ['order', 'product', 'quantity', 'price','product_title']
         extra_kwargs = {
             'order': {'required': True},
         }
+        depth = 1
+
+    def get_product_title(self,obj):
+        product_title = obj.product.title
+        return product_title
 
 class OrderProductItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -211,6 +218,7 @@ class WishListSerializer(serializers.ModelSerializer):
         self.Meta.depth=1
     
 class GetTotalOrderSerializer(serializers.ModelSerializer):
+    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z')
     class Meta:
         model = Order
         fields = ["id","customer","order_time","order_status"]
@@ -423,17 +431,23 @@ class getSingleProductSellerSerializer(serializers.ModelSerializer):
     
 class CustomerDetailInfoSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField(read_only=True)
+    date_joined = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Customer
-        fields = ["id","user","email","mobile","image"]
+        fields = ["id","user","email","mobile","image","date_joined"]
 
     def get_email(self,obj):
         email = obj.user.email
         return email
     
+    def get_date_joined(self,obj):
+        date_joined = obj.user.date_joined
+        return date_joined
+    
 class SellerCustomerOrderDetailSerializer(serializers.ModelSerializer):
+    product = ProductDetailSerializer(read_only=True)
     class Meta:
         model = OrderItems
         fields = ["id","order","product"]
-        depth = 1
+        depth = 2
     

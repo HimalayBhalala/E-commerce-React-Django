@@ -6,7 +6,7 @@ const AllProduct = () => {
     const baseURL = 'http://127.0.0.1:8000/ecommerce';
     const [products, setProduct] = useState([]);
     const [totalResults, setTotalResults] = useState(0);
-    const { currency } = useContext(CurrencyContext);
+    const { getCurrency } = useContext(CurrencyContext);
 
     useEffect(() => {
         fetchData(baseURL + '/products');
@@ -66,7 +66,7 @@ const AllProduct = () => {
                                                 </Link>
                                             </h4>
                                             {
-                                                currency === 'inr' ? (
+                                                getCurrency === 'inr' ? (
                                                     <h5 className='card-price small-price' style={{ color: 'darkslategrey' }}>
                                                         Price: ₹ {product.price}
                                                     </h5>
@@ -91,7 +91,7 @@ const AllProduct = () => {
                         ))
                     }
                 </div>
-                <nav aria-label="Page navigation example" style={{ marginTop: "2rem" }}>
+                <nav aria-label="Page navigation example">
                     <ul className="pagination justify-content-center">
                         <li className="page-item">
                             <Link 
@@ -104,7 +104,7 @@ const AllProduct = () => {
                             </Link>
                         </li>
                         {links}
-                        <li className="page-item">
+                        <li className="page-item" style={{marginBottom:"1.5rem"}}>
                             <Link 
                                 className="page-link" 
                                 onClick={() => changeUrl(baseURL + `/products/?page=${totalPages}`)}

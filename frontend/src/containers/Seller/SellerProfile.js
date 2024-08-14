@@ -85,12 +85,12 @@ const SellerProfile = ({seller_change_profile,isAuthenticated}) => {
     
 
     return (
-        <div className="container mt-5" style={{ marginBottom: '2rem' }}>
+        <div className="container mt-5">
             <div className="row">
                 <div className="col-md-3">
                     <SellerSideBar />
                 </div>
-                <div className="col-md-9">
+                <div className="col-md-9" style={{marginBottom:"10rem"}}>
                     <h1>Welcome, {sellerInfo.user?.first_name}</h1>
                     <hr />
                     <div style={{ border: '2px solid black', background: 'white' }}>

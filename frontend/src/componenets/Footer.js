@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { ThemeContext } from '../context/ThemeContext';
 
 export default function Footer() {
+  const {themeMode} = useContext(ThemeContext);
+
   return (
     <div>
       <footer className="text-center text-white bg-dark">
         <div className="container">
-          <section className="mt-5">
+          <section>
             <div className="row text-center d-flex justify-content-center pt-5">
               <div className="col-md-2">
                 <h6 className="text-uppercase font-weight-bold">

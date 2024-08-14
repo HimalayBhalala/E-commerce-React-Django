@@ -61,7 +61,7 @@ const Categories = () => {
                         })
                 }
             </div>
-            <nav aria-label="Page navigation example" style={{ marginTop: "2rem" }}>
+            <nav aria-label="Page navigation example" style={{ marginTop: "2rem"}}>
                     <ul className="pagination justify-content-center">
                         <li className="page-item">
                             <Link 
@@ -74,7 +74,7 @@ const Categories = () => {
                             </Link>
                         </li>
                         {links}
-                        <li className="page-item">
+                        <li className="page-item" style={{marginBottom:"2rem"}} >
                             <Link 
                                 className="page-link" 
                                 onClick={() => changeUrl(baseURL + `/categories/?page=${totalPages}`)}

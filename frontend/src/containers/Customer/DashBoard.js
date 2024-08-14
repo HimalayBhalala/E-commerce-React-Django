@@ -45,14 +45,11 @@ const DashBoard = () => {
         const labels = [];
         const data = [];
         orders.forEach(order => {
-          console.log("orderDate------------------",order.order_time,typeof(order.order_time))
           const orderDate = new Date(order.order_time).toLocaleDateString();
-          console.log("OrderDate",orderDate)
           const index = labels.indexOf(orderDate);
           
           if (index === -1) {
             labels.push(orderDate);
-            console.log("Order data",labels)
             data.push(1);
           } else {
             data[index] += 1;
@@ -131,13 +128,6 @@ const DashBoard = () => {
                           legend: {
                             position: 'top',
                           },
-                          tooltip: {
-                            callbacks: {
-                              label: function(tooltipItem) {
-                                return `${tooltipItem.dataset.label}: ${tooltipItem.raw} orders`;
-                              }
-                            }
-                          }
                         },
                         scales: {
                           x: {
@@ -156,7 +146,7 @@ const DashBoard = () => {
                       }}
                     />
                   </div>
-                    <p className='text-center mt-3'>Chart of total order based on date</p>
+                    <p className='text-center mt-3'>Chart of total order based on date (format = month-date-year)</p>
                 </div>
               </div>
             </div>

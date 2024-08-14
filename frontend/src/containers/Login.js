@@ -46,7 +46,7 @@ const Login = ({ customer_login,isAuthenticated,seller_login}) => {
 
 
   return (
-    <div className='container mt-5' style={{marginBottom:"18rem"}}>
+    <div className='container mt-5'>
       <div className='form-control mt-5 text-center'>
       <form onSubmit={handleSubmit}>
         <TextField

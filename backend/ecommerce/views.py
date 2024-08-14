@@ -471,6 +471,7 @@ def get_seller_customer(request, seller_id):
     seller_serializer = SellerDetailSerializer(seller)
 
     order_items = OrderItems.objects.filter(product__seller=seller).select_related('order__customer')
+    order_item_serializer = OrderItemSerializer(order_items,many=True)
     unique_customers = order_items.values('order__customer').distinct()
 
     customer_ids = [item['order__customer'] for item in unique_customers]
@@ -481,7 +482,8 @@ def get_seller_customer(request, seller_id):
     return Response({
         "data": {
             "seller": seller_serializer.data,
-            "customers": customer_serializer.data
+            "customers": customer_serializer.data,
+            "products":order_item_serializer.data
         }
     }, status=status.HTTP_200_OK)
 
