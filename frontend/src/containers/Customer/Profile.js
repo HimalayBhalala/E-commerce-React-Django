@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import SideBar from './SideBar';
 import { TextField, Button } from '@mui/material';
 import axios from 'axios';
 import { customer_change_profile } from '../../actions/auth';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const Profile = ({customer_change_profile,isAuthenticated}) => {
 
     const customer_id = localStorage.getItem('customer_id');
     const token = localStorage.getItem('access_token');
     const [customerInfo, setCustomerInfo] = useState({});
+    const {themeMode} = useContext(ThemeContext);
     const [formData, setFormData] = useState({
         email: '',
         first_name: '',
@@ -133,7 +135,7 @@ const Profile = ({customer_change_profile,isAuthenticated}) => {
                             />
                             <div>
                                 <label htmlFor="image">
-                                    <Button component="span" color="grey" className="mt-2" variant="contained">
+                                    <Button component="span" style={{color : themeMode === "dark" ? "white" : "black",backgroundColor:"GrayText"}}  className="mt-2" variant="contained">
                                         Upload New Profile Image
                                     </Button>
                                 </label>

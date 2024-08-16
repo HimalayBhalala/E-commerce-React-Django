@@ -5,6 +5,8 @@ import { Provider } from 'react-redux';
 import store from './storage';
 import Layout from './hoc/Layout';
 import Footer from './componenets/Footer';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 import Home from './containers/Home';
 import Categories from './containers/Categories';
@@ -55,6 +57,9 @@ import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
 import { ThemeProvider } from './context/ThemeContext';
 
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
+
+
 function App() {
   return (
       <Provider store={store}>
@@ -64,6 +69,7 @@ function App() {
               <WishListProvider>
                 <Router>
                   <Layout>
+                  <Elements stripe={stripePromise}>
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/register" element={<SignUp />} />
@@ -110,6 +116,7 @@ function App() {
                         <Route path="*" element={<NotFound />} />
 
                       </Routes>
+                      </Elements>
                     </Layout>
                   <Footer />
                 </Router>

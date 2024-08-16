@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { CartContext } from '../../context/CardContext';
 import { CurrencyContext } from '../../context/CurrencyContex';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const Checkout = ({ isAuthenticated }) => {
   const { setCartData } = useContext(CartContext);
+  const {themeMode} = useContext(ThemeContext);
   const cart = JSON.parse(localStorage.getItem('cartDetail')) || [];
   const {getCurrency} = useContext(CurrencyContext);
   const { cartData } = useContext(CartContext);
@@ -54,7 +56,7 @@ const removeFromCart = (id) => {
                 <div className="table-responsive">
                   <table className="table table-bordered">
                     <thead>
-                      <tr>
+                      <tr style={{color : themeMode === "dark" ? "white" : "black"}}>
                         <th>Sr.No</th>
                         <th>Product</th>
                         <th>Price</th>
@@ -63,7 +65,7 @@ const removeFromCart = (id) => {
                     </thead>
                     <tbody>
                       {cartData.map((products, index) => (
-                        <tr key={index}>
+                        <tr key={index} style={{color : themeMode === "dark" ? "white" : "black"}}>
                           <td>{index + 1}</td>
                           <td>
                             <img src={products.product?.product_image} className='img-thumbnail' style={{ width: "60px" }} alt="product" />
@@ -85,13 +87,13 @@ const removeFromCart = (id) => {
                     <tfoot>
                       <tr>
                         <td colSpan='2' align='center'>
-                          <th className='text-center'>Total Price</th>
+                          <th className='text-center' style={{color : themeMode === "dark" ? "white" : "black"}}>Total Price</th>
                         </td>
                         <td>
                           {getCurrency === 'inr' ? (
-                            <th>₹ {totalPrice()}</th>
+                            <th style={{color : themeMode === "dark" ? "white" : "black"}}>₹ {totalPrice()}</th>
                           ) : (
-                            <th>$ {totalPrice()}</th>
+                            <th style={{color : themeMode === "dark" ? "white" : "black"}}>$ {totalPrice()}</th>
                           )}
                         </td>
                       </tr>

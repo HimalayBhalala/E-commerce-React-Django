@@ -47,8 +47,9 @@ const Login = ({ customer_login,isAuthenticated,seller_login}) => {
 
   return (
     <div className='container mt-5'>
+      <div>
       <div className='form-control mt-5 text-center'>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} >
         <TextField
           label="Email"
           variant="outlined"
@@ -74,6 +75,7 @@ const Login = ({ customer_login,isAuthenticated,seller_login}) => {
       </form>
       <div className='mt-2'>
         If not Register ! Please First Register <a href='/register'>SignUp</a>
+      </div>
       </div>
     </div>
   </div>

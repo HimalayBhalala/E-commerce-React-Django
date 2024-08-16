@@ -112,7 +112,7 @@ const ProductDetail = ({ isAuthenticated }) => {
     );
 
     return (
-        <div className='container mt-5' style={{ marginBottom: '3.8rem' }}>
+        <div className='container mt-5'>
             <h1 className='text-center mb-5'>Product Information</h1>
             <hr />
             <div className="row mt-5 card-img-container">
@@ -167,7 +167,8 @@ const ProductDetail = ({ isAuthenticated }) => {
             </div>
             <div style={{ textAlign: 'center' }}>
                 <h2 className='mt-5 mb-3'>Related Products</h2>
-                <div id="relatedProductsSlider" className="carousel slide carousel-dark" data-bs-ride="carousel" style={{ margin: 'auto', maxWidth: '70rem' }}>
+                <hr />
+                <div id="relatedProductsSlider" className="carousel slide carousel-dark mt-5" data-bs-ride="carousel" style={{ margin: 'auto', maxWidth: '70rem' }}>
                     <div className="carousel-inner">
                         {relatedProduct.length > 0 ? (
                             relatedProduct.map((product, index) => (
@@ -183,11 +184,9 @@ const ProductDetail = ({ isAuthenticated }) => {
                     </div>
                     <button className="carousel-control-prev" type="button" data-bs-target="#relatedProductsSlider" data-bs-slide="prev">
                         <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span className="visually-hidden">Previous</span>
                     </button>
                     <button className="carousel-control-next" type="button" data-bs-target="#relatedProductsSlider" data-bs-slide="next">
                         <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span className="visually-hidden">Next</span>
                     </button>
                 </div>
             </div>

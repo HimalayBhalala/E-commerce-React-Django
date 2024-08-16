@@ -3,10 +3,12 @@ import SideBar from './SideBar';
 import axios from 'axios';
 import { CurrencyContext } from '../../context/CurrencyContex';
 import { WishListContext } from '../../context/WishListContext';
+import { ThemeContext } from '../../context/ThemeContext';
 
 const WishList = () => {
     const get_customer_id = parseInt(localStorage.getItem('customer_id'));
     const { wish_list, setWishList } = useContext(WishListContext);
+    const {themeMode} = useContext(ThemeContext);
     const { getCurrency } = useContext(CurrencyContext);
 
     useEffect(() => {
@@ -47,7 +49,7 @@ const WishList = () => {
                         <div className="table-responsive">
                             <table className="table table-bordered">
                                 <thead>
-                                    <tr>
+                                    <tr style={{color : themeMode === "dark" ? "white" : "black"}}>
                                         <th>Sr.No</th>
                                         <th>Product</th>
                                         <th>Price</th>
@@ -58,7 +60,7 @@ const WishList = () => {
                                     {
                                         wish_list.length >= 0 ? (
                                             wish_list.map((item, index) => (
-                                                <tr key={item.product.id}>
+                                                <tr key={item.product.id} style={{color : themeMode === "dark" ? "white" : "black"}}>
                                                     <td>{index + 1}</td>
                                                     <td>
                                                         <img

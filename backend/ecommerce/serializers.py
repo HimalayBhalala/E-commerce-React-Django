@@ -117,11 +117,11 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z') 
+    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z',read_only=True) 
     class Meta:
         model = Order
         fields = ["id", "customer", "order_time","order_status"]
-        read_only_fields = ["id", "order_time","order_status"]
+        extra_kwargs = {'order_time' : {'read_only':True},'id': {'read_only':True}}
 
     def create(self, validated_data):
         customer = validated_data.pop('customer', None)
@@ -165,6 +165,7 @@ class CustomerOrderSerializer(serializers.ModelSerializer):
     
 class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
     product_title = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = OrderItems
@@ -218,10 +219,11 @@ class WishListSerializer(serializers.ModelSerializer):
         self.Meta.depth=1
     
 class GetTotalOrderSerializer(serializers.ModelSerializer):
-    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z')
+    order_time = serializers.DateTimeField(format='%Y-%m-%dT%H:%M:%S%z',read_only=True)
     class Meta:
         model = Order
         fields = ["id","customer","order_time","order_status"]
+        extra_kwargs = {'order_time' : {'read_only':True}}
 
 class CustomerProductCountSerializer(serializers.ModelSerializer):
     customer_wishlist = WishListSerializer(many=True,read_only=True)

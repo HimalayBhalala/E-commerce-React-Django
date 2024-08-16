@@ -1,11 +1,13 @@
 import { useContext, useState } from "react";
 import axios from "axios";
 import { CurrencyContext } from "../../context/CurrencyContex";
+import { ThemeContext } from "../../context/ThemeContext";
 
 function OrderRow(props) {
   const index = props.index;
   const {getCurrency} = useContext(CurrencyContext);
   const products = props.products;
+  const {themeMode} = useContext(ThemeContext);
 
   const [totalDownloads, setTotalDownloads] = useState(
     products.product?.downloads || 0
@@ -51,7 +53,7 @@ function OrderRow(props) {
   const imageUrl = products.product?.image;
 
   return (
-    <tr key={index}>
+    <tr key={index} style={{color : themeMode === "dark" ? "white" : "black"}}>
       <td>{index + 1}</td>
       <td>
         <span style={{ display: "flex", alignItems: "center" }}>

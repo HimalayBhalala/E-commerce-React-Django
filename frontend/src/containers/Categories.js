@@ -74,7 +74,7 @@ const Categories = () => {
                             </Link>
                         </li>
                         {links}
-                        <li className="page-item" style={{marginBottom:"2rem"}} >
+                        <li className="page-item" style={{marginBottom:"3rem"}} >
                             <Link 
                                 className="page-link" 
                                 onClick={() => changeUrl(baseURL + `/categories/?page=${totalPages}`)}

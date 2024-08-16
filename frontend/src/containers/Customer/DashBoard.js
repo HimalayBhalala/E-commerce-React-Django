@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import SideBar from './SideBar';
 import { Line } from 'react-chartjs-2';
@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
+import { ThemeContext } from '../../context/ThemeContext';
 
 ChartJS.register(
   LineElement,
@@ -26,6 +27,7 @@ ChartJS.register(
 const DashBoard = () => {
   const [totalOrder, setTotalOrder] = useState(0);
   const [totalwishlist, setTotalWishList] = useState(0);
+  const {themeMode} = useContext(ThemeContext);
   const [orderData, setOrderData] = useState({ labels: [], datasets: [] });
   const customer_id = localStorage.getItem('customer_id');
 
@@ -78,7 +80,7 @@ const DashBoard = () => {
     <div>
       {console.log("Order Data",orderData)}
       <div className="container mt-5" style={{ marginBottom: "12rem" }}>
-        <div className="row">
+        <div className="row" style={{color : themeMode === "dark" ? "black" : "black"}}>
           <div className="col-md-3">
             <SideBar />
           </div>

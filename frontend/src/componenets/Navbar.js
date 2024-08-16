@@ -51,7 +51,7 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
 
               {isAuthenticated && role === 'customer' && (
                 <Link className='nav-link' to="/checkout">
-                  My Cart (<span className='text-white'>{cartData.cartData.length}</span>)
+                  My Cart (<span style={{color : themeMode === "dark" ? "black" : "white"}}>{cartData.cartData.length}</span>)
                 </Link>
               )}
 

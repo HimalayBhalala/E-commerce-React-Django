@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import SideBar from "./SideBar";
 import OrderRow from "./OrderRow";
 import { Link } from "react-router-dom";
+import { ThemeContext } from "../../context/ThemeContext";
+import axios from "axios";
 // import { CurrencyContext } from "../../context/CurrencyContex";
 
 const Orders = () => {
   const customer_id = JSON.parse(localStorage.getItem("customer_id"));
   const [orderItem, setOrderItem] = useState([]);
+  const {themeMode} = useContext(ThemeContext);
   // const {currency} = useContext(CurrencyContext);
   // const order_currency = localStorage.getItem('order-currency');
   const [formData,setFormData] = useState([]);
@@ -16,11 +19,11 @@ const Orders = () => {
     if (customer_id) {
       const fetchData = async () => {
         try {
-          const response = await fetch(
+          const response = await axios.get(
             `${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/`
           );
-          const res = await response.json();
-          setOrderItem(res.data);
+          console.log("Response Data is",response.data.data)
+          setOrderItem(response.data.data);
         } catch (error) {
           console.error("Error fetching order items:", error);
         }
@@ -83,7 +86,7 @@ const Orders = () => {
               <div className="table-responsive">
                 <table className="table table-bordered">
                   <thead>
-                    <tr>
+                    <tr style={{color : themeMode === "dark" ? "white" : "black"}}>
                       <th>Sr.No</th>
                       <th>Product</th>
                       <th>Price</th>

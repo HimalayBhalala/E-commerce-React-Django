@@ -46,6 +46,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
       );
 
       const order_id = response.data.id;
+      console.log("Order id is ",order_id)
       await addOrderItem(order_id);
       await updateOrderStatus(order_id)
       setOrderPlaced(true);
@@ -108,7 +109,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
   const addOrderItem = async (order_id) => {
     const cartInfo = localStorage.getItem("cartDetail");
     const cartJson = JSON.parse(cartInfo) || [];
-
+    console.log()
     if (cartJson.length > 0) {
       const requests = cartJson.map((cart) => {
         const formData = new FormData();
@@ -140,7 +141,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
 
   return (
     <div>
-      {localStorage.getItem('total_price')}
+      {console.log(localStorage.getItem("customer_id"))}
       {isLoading ? (
         <p className="text-center">
           <h1>Processing your order...</h1>

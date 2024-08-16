@@ -93,3 +93,15 @@ body{
 }
 
 
+.carousel-control-prev, .carousel-control-next {
+  height: 100px;
+  width: 100px;
+  outline: rgb(202, 176, 176);
+  background-color: rgba(255, 255, 255, 0.3);
+  background-size: 100%, 100%;
+  border-radius: 50%;
+  border: 1px solid black;
+  align-items: center;
+  text-align: center;
+  margin-top: 15%;
+}
