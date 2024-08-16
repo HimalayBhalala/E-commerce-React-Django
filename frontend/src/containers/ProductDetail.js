@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { WishListContext } from '../context/WishListContext';
 import { CurrencyContext } from '../context/CurrencyContex';
+import RatingReview from './Customer/RatingReview';
+import { TextField } from '@mui/material';
 
 const ProductDetail = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -18,6 +20,12 @@ const ProductDetail = ({ isAuthenticated }) => {
     const { setCartData } = useContext(CartContext);
     const { getCurrency } = useContext(CurrencyContext);
     const { wish_list } = useContext(WishListContext);
+    const [getReviewForm,setReviewForm] = useState(0);
+    const [rating,setRating] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [formData,setFormData] = useState({
+        review : ''
+    });
 
     const getCustomerId = parseInt(localStorage.getItem('customer_id'));
 
@@ -111,8 +119,39 @@ const ProductDetail = ({ isAuthenticated }) => {
         ))
     );
 
+    const reviewIsAdded = () => {
+        setReviewForm(true)
+    }
+
+
+        const handleSubmit = async (customer_id, product_id) => {
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
+        formData['rating'] = rating;
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/customer/rating/${customer_id}/${product_id}/`, formData);
+            if (response.status === 201) {
+                console.log("Reviews added Successfully", response);
+            }
+        } catch (error) {
+            console.log("Error occurred during fetching an API", String(error));
+        } finally {
+            setIsSubmitting(false);
+        }
+        };
+
+
+    const onChange = (e) => setFormData({
+        ...formData,
+        [e.target.name] : e.target.value
+    })
+
+    const {review} = formData;
+
     return (
         <div className='container mt-5'>
+            {console.log("Ecommerce is",rating)}
             <h1 className='text-center mb-5'>Product Information</h1>
             <hr />
             <div className="row mt-5 card-img-container">
@@ -129,7 +168,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                     <p><span className="fs-4"><b>Product Description: </b></span><span className='fs-5'>{productDetail.description}</span></p>
                     <p><span className="fs-4"><b>Product Price: </b></span><span className='fs-5'>{getCurrency === 'inr' ? '₹' : '$'} {getCurrency === 'inr' ? productDetail.price : productDetail.usd_price}</span></p>
                     <hr className='mt-5' />
-                    <div className="mt-1 mt-5">
+                    <div className="mt-1 mt-1">
                         {
                             !addCart ? (
                                 <button className='btn btn-success btn-sm ms-1' type='button' onClick={addToCart} title='Add to Cart'>
@@ -158,11 +197,44 @@ const ProductDetail = ({ isAuthenticated }) => {
                         >
                             <i className='fa-solid fa-heart'></i> {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                         </button>
+                        <button className='btn btn-dark btn-sm ms-1' title='Add Review & Rating'>
+                            <span onClick={reviewIsAdded}><i className="fa-regular fa-star"></i> Add Review & Rating</span>
+                        </button>
                     </div>
-                    <div className="producttags mt-5">
+                    <div className="producttags mt-1">
                         <h5 className='mt-3'><b>Tags</b></h5>
                         {renderTags().length > 0 ? renderTags() : <p className='fs-5'>No tags available</p>}
                     </div>
+                    <div>
+                        <h5 className='mt-3'><b>Rating and Reviews</b></h5>
+                        <div className='form-control'>
+                            customer name : mohan, <br />
+                            rating : 4, <br />
+                            review : This is a very good product and book is very good for increasing coding idea.......
+                        </div>
+                    </div>
+            {
+                getReviewForm ? (
+                    <div className='mt-2'>
+                        <form className='form-control' onSubmit={handleSubmit(getCustomerId,productDetail?.id)}>
+                            <p style={{fontSize:"2rem"}}>Select Rating<RatingReview name='rating' rating={rating} setRating={setRating}/></p>
+                            <hr />
+                            <p style={{fontSize:"2rem"}}>Review</p>
+                            <TextField 
+                                type='text'
+                                fullWidth
+                                margin='normal'
+                                name = 'review'
+                                value={review}
+                                onChange={onChange}
+                            />
+                            <button className='btn btn-primary mt-3' style={{margin:"auto", alignItems:"center" }} type='submit'>Submit</button>
+                        </form>
+                    </div>
+                ) : (
+                    null
+                )
+            }
                 </div>
             </div>
             <div style={{ textAlign: 'center' }}>

@@ -27,6 +27,7 @@ ChartJS.register(
 const DashBoard = () => {
   const [totalOrder, setTotalOrder] = useState(0);
   const [totalwishlist, setTotalWishList] = useState(0);
+  const [totalAddress,setTotalAddress] = useState(0);
   const {themeMode} = useContext(ThemeContext);
   const [orderData, setOrderData] = useState({ labels: [], datasets: [] });
   const customer_id = localStorage.getItem('customer_id');
@@ -74,11 +75,18 @@ const DashBoard = () => {
       .catch((error) => {
         console.log("Error during fetching order data", String(error));
       });
+
+      axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/addresses/${customer_id}/`)
+        .then((response) => {
+          setTotalAddress(response.data.data.length)
+        })
+        .catch((error) => {
+          console.log("Error occure suring fetching an api",String(error))
+        })
   }, [customer_id]);
 
   return (
     <div>
-      {console.log("Order Data",orderData)}
       <div className="container mt-5" style={{ marginBottom: "12rem" }}>
         <div className="row" style={{color : themeMode === "dark" ? "black" : "black"}}>
           <div className="col-md-3">
@@ -112,7 +120,7 @@ const DashBoard = () => {
                     <div className="card-title">
                       <h3>Total Addresses</h3>
                     </div>
-                    <div style={{ fontSize: "25px", color: 'maroon' }}>{1}</div>
+                    <div style={{ fontSize: "25px", color: 'maroon' }}>{totalAddress}</div>
                   </div>
                 </div>
               </div>

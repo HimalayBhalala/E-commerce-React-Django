@@ -10,6 +10,7 @@ const Home = () => {
     const [categoryData, setCategoryData] = useState([]);
     const {getCurrency} = useContext(CurrencyContext);
     const [popularProductData, setPopularProductData] = useState([]);
+    const [popularSellerData, setPopularSellerData] = useState([]);
 
     useEffect(() => {
         function fetchProductData() {
@@ -60,13 +61,31 @@ const Home = () => {
                 });
         }
 
+        function fetchPopularSellerData() {
+            fetch(baseURL + '/home/popular/sellers/')
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error("Network issue during fetching an api");
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    setPopularSellerData(data.data)
+                })
+                .catch((error) => {
+                    console.log("Error During fetching an api", error);
+                });
+        }
+
         fetchPopularProductData();
+        fetchPopularSellerData();
         fetchProductData();
         fetchCategoryData();
     }, []);
 
     return (
         <div>
+            {console.log("Popular Seller",popularSellerData)}
             <div className='container'>
                 <div className="row mt-3">
                     <h3 className='mb-4'>
@@ -145,50 +164,21 @@ const Home = () => {
                     </Link>
                 </h3>
                 <div className="row">
-                    <div className="col-12 col-md-3 mb-4">
-                        <div className="card">
-                            <img src={logo} className='card-img-top' alt="image13" />
-                            <div className="card-body">
-                                <h4 className="card-title">Seller Name</h4>
+                    {
+                        popularSellerData.map((seller) => (
+                            <div className="col-12 col-md-3 mb-4">
+                                <div className="card fixed-size-card">
+                                    <img src={`${process.env.REACT_APP_API_URL}/${seller.image}`} className='card-img-top large-image' alt="image13" />
+                                    <div className="card-body">
+                                        <h4 className="card-title">{seller.first_name}</h4>
+                                    </div>
+                                    <div className="card-footer">
+                                        Categories : <Link to="/">Python</Link> , <Link href='/'>Java</Link>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="card-footer">
-                                Categories : <Link to="/">Python</Link> , <Link href='/'>Java</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-12 col-md-3 mb-4">
-                        <div className="card">
-                            <img src={logo} className='card-img-top' alt="image14" />
-                            <div className="card-body">
-                                <h4 className="card-title">Seller Name</h4>
-                            </div>
-                            <div className="card-footer">
-                                Categories : <Link to="/">JavaScript</Link> , <Link href='/'>C++</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-12 col-md-3 mb-4">
-                        <div className="card">
-                            <img src={logo} className='card-img-top' alt="image15" />
-                            <div className="card-body">
-                                <h4 className="card-title">Seller Name</h4>
-                            </div>
-                            <div className="card-footer">
-                                Categories : <Link to="/">PHP</Link> , <Link href='/'>Node Js</Link>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-12 col-md-3 mb-4">
-                        <div className="card">
-                            <img src={logo} className='card-img-top' alt="image16" />
-                            <div className="card-body">
-                                <h4 className="card-title">Seller Name</h4>
-                            </div>
-                            <div className="card-footer">
-                                Categories : <Link to="/">C#</Link> , <Link href='/'>Swift</Link>
-                            </div>
-                        </div>
-                    </div>
+                        ))
+                    }
                 </div>
             </div>
         </div>

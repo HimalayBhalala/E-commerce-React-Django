@@ -7,7 +7,7 @@ from .pagination import (
     HomeCategoryProductPagination,
     PopularProductPagination
 )
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from .models import (
     Seller,
     ProductCategory,
@@ -45,11 +45,13 @@ from .serializers import (
     getProductSellerListSerializer,
     CustomerDetailInfoSerializer,
     SellerCustomerOrderDetailSerializer,
-    OrderProductItemSerializer
+    OrderProductItemSerializer,
 )
 import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import AllowAny
+
 from django.http import JsonResponse
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -536,3 +538,35 @@ def get_seller_all_orders(request,seller_id):
     order_items = OrderItems.objects.filter(order__in=order,product__seller=seller)
     order_item_serializer = SellerCustomerOrderDetailSerializer(order_items,many=True)
     return Response({"data":order_item_serializer.data},status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def popular_seller(request):
+    seller = Seller.objects.all()
+    seller_serializer = SellerDetailSerializer(seller,many=True)
+    category = ProductCategory.objects.all().filter(seller__in=seller)
+    category_serializer = ProductCategorySerializer(category,many=True)
+    return Response({"data":seller_serializer.data,"category":category_serializer.data},status=status.HTTP_200_OK)
+
+class CustomerAddingRating(APIView):
+    def post(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        product_id = self.kwargs['product_id']
+        try:
+            customer = Customer.objects.get(id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({"message":"Customer is not found with a given id"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message":"Product is not found with a given id"},status=status.HTTP_400_BAD_REQUEST)
+        
+        if ProductRating.objects.filter(product=product,customer=customer).exists():
+            return Response({"message":"You have aleady added rating"})
+        else:
+            serializer = ProductRatingSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save(customer=customer,product=product)
+                return Response({"data":serializer.data},status=status.HTTP_201_CREATED)
+            

@@ -5,6 +5,7 @@ urlpatterns = [
     path("home/products/",views.ProductHomeView.as_view(),name='home-product'),
     path("home/categories/",views.ProductCategoryHomeView.as_view(),name='home-product-category'),
     path("home/popular/products/",views.PopularProductView.as_view(),name='popular-product'),
+    path("home/popular/sellers/",views.popular_seller,name='popular-seller'),
     path("products/",views.ProductAPIView.as_view(),name="product-lc"),
     path("product/<int:pk>/",views.ProductDetailAPIView.as_view(),name="product-rud"),
     path("product/related/<int:pk>/",views.RelatedProductView.as_view(),name="related-product"),
@@ -48,5 +49,6 @@ urlpatterns = [
     path('customer/address/<int:customer_id>/',views.AddCustomerAddress.as_view(),name='add-address'),
     path('customer/update-address/<int:customer_id>/<int:address_id>/',views.ModifyCustomerAddress.as_view(),name='update-address'),
     path('customer/addresses/<int:customer_id>/',views.GetAllCustomerAddress.as_view(),name="get-all-address"),
+    path('customer/rating/<int:customer_id>/<int:product_id>/',views.CustomerAddingRating.as_view(),name='customer-rating')
 
 ]

@@ -1,14 +1,23 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SideBar from './SideBar';
 import { TextField,Button } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AddAddress = () => {
     const customer_id = localStorage.getItem('customer_id');
-
+    const [addressStatus,setAddressStatus] = useState(false);
     const [formData,setFormData] = useState({
         address:''
     });
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(addressStatus){
+            navigate('/addresses')
+        }
+    },[addressStatus])
 
     const {address} = formData;
 
@@ -24,6 +33,7 @@ const AddAddress = () => {
             axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/customer/address/${customer_id}/`,formData,{headers:{"Content-Type":"application/json"}})
             .then((response) => {
                 console.log("Response Data",response.data)
+                setAddressStatus(true)
             })
             .catch((error) => {
                 console.log("Error occure during fetching an api",String(error))

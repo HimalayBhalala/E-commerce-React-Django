@@ -22,9 +22,14 @@ class SellerSerializer(serializers.ModelSerializer):
         self.Meta.depth=1
 
 class SellerDetailSerializer(serializers.ModelSerializer):
+    first_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = Seller
-        fields = ["id","user","address","mobile","image"]
+        fields = ["id","user","address","mobile","image","first_name"]
+
+    def get_first_name(self,obj):
+        user = obj.user
+        return user.first_name
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -167,9 +172,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     order = serializers.PrimaryKeyRelatedField(queryset=Order.objects.all())
     product_title = serializers.SerializerMethodField(read_only=True)
+    seller = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = OrderItems
-        fields = ['order', 'product', 'quantity', 'price','product_title']
+        fields = ['order', 'product', 'quantity','seller','price','product_title']
         extra_kwargs = {
             'order': {'required': True},
         }
@@ -178,6 +184,14 @@ class OrderItemSerializer(serializers.ModelSerializer):
     def get_product_title(self,obj):
         product_title = obj.product.title
         return product_title
+    
+    def get_seller(self,obj):
+        seller = obj.product.seller
+        return seller.id
+    
+    def to_representation(self, instance):
+        representation =  super().to_representation(instance)
+        return representation
 
 class OrderProductItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -195,17 +209,19 @@ class ProductRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductRating
         fields = ["id","customer","rating","review","add_time"]
+        extra_kwargs = {"add_time":{"read_only":True},"id":{"read_only":True}}
 
     def __init__(self,*args,**kwargs):
         super(ProductRatingSerializer,self).__init__(*args, **kwargs)
         self.Meta.depth=1
 
-    def validate(self,data):
-        customer = data.get("customer")
-        product = data.get("product")
+    def validate(self, data):
+        rating = data.get('rating')
 
-        if ProductRating.objects.filter(customer=customer,product=product).exists():
-            raise ValueError("You have aleady added rating")
+        if not rating:
+            raise serializers.ValidationError("Rating must be required")
+        if int(rating) <= 1 or int(rating) >= 5:
+            raise serializers.ValidationError("Rating  must be added between an 1 and 5")
         return data
     
 
@@ -452,4 +468,3 @@ class SellerCustomerOrderDetailSerializer(serializers.ModelSerializer):
         model = OrderItems
         fields = ["id","order","product"]
         depth = 2
-    
