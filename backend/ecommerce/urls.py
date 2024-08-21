@@ -11,7 +11,6 @@ urlpatterns = [
     path("product/related/<int:pk>/",views.RelatedProductView.as_view(),name="related-product"),
     path("product/tag/<str:tag_name>/",views.ProductTagAPIView.as_view(),name="product-tag"),
     path("categories/",views.ProductCategoryView.as_view(),name="product-categories"),
-    path("category/<int:pk>/",views.ProductDetailCategoryView.as_view(),name="product-detail-categories"),
     path("category/title/<str:title>/",views.ProductTitleDetailCategoryView.as_view(),name="product-title-detail-categories"),
     path("orders/",views.OrderAPIView.as_view(),name="order-lc"),
     path("orderitems/",views.OrderItemAPIView.as_view(),name='order-item'),
@@ -19,12 +18,10 @@ urlpatterns = [
     path('add-payment/', views.create_payment_intent, name='create-payment-intent'),
     path('count_product_download/<int:product_id>/',views.count_product_download,name='count-product-download'),
     path('update-order-status/<int:order_id>/',views.update_order_status, name='update-order-status'),
-
-
+    path('rating/review/<int:product_id>/',views.get_all_customer_review,name="customer-review"),
 
 
     path("sellers/",views.SellerAPIView.as_view(),name="seller-lc"),
-    path("seller/<int:pk>/",views.SellerDetailAPIView.as_view(),name="seller-rud"),
     path("seller/add/category/<int:seller_id>/",views.seller_add_new_category,name='add-product-category'),
     path("seller/add/product/<int:seller_id>/<int:category_id>/",views.seller_add_new_product,name='seller-add-product'),
     path("seller/products/<int:seller_id>/<int:product_id>/",views.seller_edit_product,name='seller-edit-product'),
@@ -34,7 +31,7 @@ urlpatterns = [
     path("seller/customers/<int:seller_id>/",views.get_seller_customer,name="get-seller-customers"),
     path("seller/customer/order/<int:seller_id>/<int:customer_id>/",views.get_seller_customer_orders,name="get-seller-customer-orders"),
     path("seller/customer/orders/<int:seller_id>/",views.get_seller_all_orders,name="get-seller-all-orders"),
-
+    path("products/<int:seller_id>/",views.seller_all_products,name="seller-product-lc"),
 
 
     path("customers/",views.CustomerAPIView.as_view(),name="customer-lc"),
@@ -49,6 +46,7 @@ urlpatterns = [
     path('customer/address/<int:customer_id>/',views.AddCustomerAddress.as_view(),name='add-address'),
     path('customer/update-address/<int:customer_id>/<int:address_id>/',views.ModifyCustomerAddress.as_view(),name='update-address'),
     path('customer/addresses/<int:customer_id>/',views.GetAllCustomerAddress.as_view(),name="get-all-address"),
-    path('customer/rating/<int:customer_id>/<int:product_id>/',views.CustomerAddingRating.as_view(),name='customer-rating')
-
+    path('customer/rating/<int:customer_id>/<int:product_id>/',views.CustomerAddingRating.as_view(),name='customer-rating'),
+    path('customer/orders/<int:order_id>/',views.GetAllOrderProduct.as_view(),name='get-order'),
+    path('customer/orders/<int:order_id>/<int:product_id>/',views.RemoveProductFromOrder.as_view(),name='get-order-product')
 ]

@@ -1,29 +1,26 @@
 import React, { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 import SideBar from "./SideBar";
 import OrderRow from "./OrderRow";
-import { Link } from "react-router-dom";
 import { ThemeContext } from "../../context/ThemeContext";
-import axios from "axios";
-// import { CurrencyContext } from "../../context/CurrencyContex";
 
 const Orders = () => {
-  const customer_id = JSON.parse(localStorage.getItem("customer_id"));
   const [orderItem, setOrderItem] = useState([]);
-  const {themeMode} = useContext(ThemeContext);
-  // const {currency} = useContext(CurrencyContext);
-  // const order_currency = localStorage.getItem('order-currency');
-  const [formData,setFormData] = useState([]);
+  const [formData, setFormData] = useState({});
+  const { themeMode } = useContext(ThemeContext);
 
+  const customerId = JSON.parse(localStorage.getItem("customer_id"));
+  const { date } = formData;
 
   useEffect(() => {
-    if (customer_id) {
+    if (customerId) {
       const fetchData = async () => {
         try {
           const response = await axios.get(
-            `${process.env.REACT_APP_API_URL}/ecommerce/${customer_id}/orderitems/`
+            `${process.env.REACT_APP_API_URL}/ecommerce/${customerId}/orderitems/`
           );
-          console.log("Response Data is",response.data.data)
-          setOrderItem(response.data.data);
+          setOrderItem(response.data.data || []);
         } catch (error) {
           console.error("Error fetching order items:", error);
         }
@@ -31,23 +28,34 @@ const Orders = () => {
 
       fetchData();
     }
-  }, [customer_id]);
-
-  const onChange = (e) => setFormData({
-    ...formData,
-    [e.target.name] : e.target.value
-  })
-
-  const {date} = formData;
+  }, [customerId]);
+  
+  const onChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
 
   return (
     <>
-    <div className="mt-2" style={{alignItems:"end",float:"right",marginRight:"1rem"}}>
-      <input type="date" name="date" value={date} onChange={onChange} style={{height:"2.28rem"}}/>
-      <Link className="btn" style={{backgroundColor:"silver",color:"darkblue"}} to={`/order/${date}`} >Get Order</Link>
-    </div>
-    {
-      (orderItem.length <= 0) ? (
+      <div className="mt-2" style={{ alignItems: "end", float: "right", marginRight: "1rem" }}>
+        <input
+          type="date"
+          name="date"
+          value={date || ""}
+          onChange={onChange}
+          style={{ height: "2.28rem" }}
+        />
+        <Link
+          className="btn"
+          style={{ backgroundColor: "silver", color: "darkblue" }}
+          to={`/order/${date}`}
+        >
+          Get Order
+        </Link>
+      </div>
+      {orderItem.length === 0 ? (
         <div className="container mt-5" style={{ marginBottom: "12rem" }}>
           <div className="row">
             <div className="col-md-3">
@@ -55,28 +63,17 @@ const Orders = () => {
             </div>
             <div className="col-md-9">
               <div className="text-center">
-                <h1 className="text-center" style={{marginTop:"4.5rem"}}>Currently no active order has been present.</h1>
-                <Link className="btn btn-primary text-center mt-5" to='/'>Go to Shopping</Link>
+                <h1 className="text-center" style={{ marginTop: "4.5rem" }}>
+                  Currently, no active orders are present.
+                </h1>
+                <Link className="btn btn-primary text-center mt-5" to="/">
+                  Go to Shopping
+                </Link>
               </div>
             </div>
           </div>
         </div>
       ) : (
-        // (order_currency !== currency) ? (
-        //   <div className="container mt-5" style={{ marginBottom: "12rem" }}>
-        //   <div className="row">
-        //     <div className="col-md-3">
-        //       <SideBar />
-        //     </div>
-        //     <div className="col-md-9">
-        //       <div className="text-center">
-        //         <h1 className="text-center" style={{marginTop:"4.5rem"}}>Your order has been not found in this currency.</h1>
-        //         <Link className="btn btn-primary text-center mt-5" to='/'>Go to Shopping</Link>
-        //       </div>
-        //     </div>
-        //   </div>
-        // </div>
-        // ) : (
         <div className="container mt-5" style={{ marginBottom: "12rem" }}>
           <div className="row">
             <div className="col-md-3">
@@ -86,11 +83,11 @@ const Orders = () => {
               <div className="table-responsive">
                 <table className="table table-bordered">
                   <thead>
-                    <tr style={{color : themeMode === "dark" ? "white" : "black"}}>
+                    <tr style={{ color: themeMode === "dark" ? "white" : "black" }}>
                       <th>Sr.No</th>
                       <th>Product</th>
                       <th>Price</th>
-                      <th>Data & Time</th>
+                      <th>Date & Time</th>
                       <th>Status</th>
                       <th>Action</th>
                     </tr>
@@ -105,10 +102,7 @@ const Orders = () => {
             </div>
           </div>
         </div>
-      )
-    // )
-    // }
-    }
+      )}
     </>
   );
 };

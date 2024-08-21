@@ -73,14 +73,14 @@ const SellerShowCustomerOrder = () => {
                                             </span>
                                         </td>
                                         <td>
-                                            <div class="btn-group">
-                                                <Link class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <div className="btn-group">
+                                                <Link className="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Change Status
                                                 </Link>
-                                                <ul class="dropdown-menu">
-                                                    <li><Link class="dropdown-item" to="#">Approved</Link></li>
-                                                    <li><Link class="dropdown-item" to="#">Processing</Link></li>
-                                                    <li><Link class="dropdown-item" to="#">Cancelled</Link></li>
+                                                <ul className="dropdown-menu">
+                                                    <li><Link className="dropdown-item" to="#">Approved</Link></li>
+                                                    <li><Link className="dropdown-item" to="#">Processing</Link></li>
+                                                    <li><Link className="dropdown-item" to="#">Cancelled</Link></li>
                                                 </ul>
                                             </div>
                                         </td>

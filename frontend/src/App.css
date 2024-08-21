@@ -105,3 +105,109 @@ body{
   text-align: center;
   margin-top: 15%;
 }
+
+.read-only{
+  pointer-events: none;
+}
+
+.spin-loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid blue;
+  border-right: 16px solid green;
+  border-bottom: 16px solid red;
+  border-left: 16px solid pink;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.orders-container {
+  margin-top: 1rem;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.date-input {
+  height: 2.28rem;
+  margin-right: 1rem;
+}
+
+.filter-btn {
+  background-color: silver;
+  color: darkblue;
+}
+
+.empty-orders, .orders-list {
+  display: flex;
+  margin-bottom: 12rem;
+}
+
+.no-orders-message {
+  text-align: center;
+  margin-top: 4.5rem;
+}
+
+.table-responsive {
+  margin-top: 2rem;
+}
+
+.make-payment-container {
+  margin-top: 1rem;
+}
+
+.make-payment-container.dark {
+  background-color: #333;
+  color: white;
+}
+
+.make-payment-container.light {
+  background-color: #fff;
+  color: black;
+}
+
+.loading-message {
+  text-align: center;
+  color: #007bff;
+  font-weight: bold;
+}
+
+.error-message {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: black;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+}
+
+.table-responsive {
+  margin-top: 2rem;
+}
+
+img.img-thumbnail {
+  width: 60px;
+}

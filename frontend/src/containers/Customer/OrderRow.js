@@ -1,40 +1,39 @@
 import { useContext, useState } from "react";
 import axios from "axios";
-import { CurrencyContext } from "../../context/CurrencyContex";
+import { CurrencyContext } from "../../context/CurrencyContex"; // Fixed typo
 import { ThemeContext } from "../../context/ThemeContext";
+import { Link } from "react-router-dom";
 
 function OrderRow(props) {
-  const index = props.index;
-  const {getCurrency} = useContext(CurrencyContext);
-  const products = props.products;
-  const {themeMode} = useContext(ThemeContext);
+  const { index, products } = props; 
+  const { getCurrency } = useContext(CurrencyContext);
+  const { themeMode } = useContext(ThemeContext);
 
-  const [totalDownloads, setTotalDownloads] = useState(
-    products.product?.downloads || 0
-  );
+  const [totalDownloads, setTotalDownloads] = useState(products.product?.downloads || 0);
 
-  async function countDownloads(product_id) {
-    const formData = new FormData();
-    formData.append("product_id", product_id);
-
+  const countDownloads = async (product_id) => {
     try {
+      const formData = new FormData();
+      formData.append("product_id", product_id);
+
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/ecommerce/count_product_download/${product_id}/`,
         formData
       );
+
       if (response.data.bool === true) {
         setTotalDownloads(response.data.downloads);
         const imageUrl = products.product?.image;
-        downloadImage(imageUrl, products.product?.image || "download");
+        downloadImage(imageUrl, products.product?.title || "download");
       } else {
-        console.log("API response indicates failure:", response.data);
+        console.error("API response indicates failure:", response.data);
       }
     } catch (error) {
-      console.log("Error during fetching an API", error);
+      console.error("Error during API request:", error);
     }
-  }
+  };
 
-  function downloadImage(imageUrl, fileName) {
+  const downloadImage = (imageUrl, fileName) => {
     axios({
       url: imageUrl,
       method: "GET",
@@ -47,18 +46,22 @@ function OrderRow(props) {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }).catch((error) => {
+      console.error("Error during image download:", error);
     });
-  }
+  };
 
   const imageUrl = products.product?.image;
+  const imageSrc = (imageUrl?.startsWith('http') ? imageUrl : `${process.env.REACT_APP_API_URL}/${imageUrl}`);
 
   return (
-    <tr key={index} style={{color : themeMode === "dark" ? "white" : "black"}}>
+    <tr style={{ color: themeMode === "dark" ? "white" : "black" }}>
+      {console.log("Orders",products)}
       <td>{index + 1}</td>
       <td>
         <span style={{ display: "flex", alignItems: "center" }}>
           <img
-            src={(String(imageUrl).startsWith('http')?(imageUrl) : (`${process.env.REACT_APP_API_URL}/${imageUrl}`))}
+            src={imageSrc}
             className="img-thumbnail"
             style={{ width: "60px", marginRight: "10px" }}
             alt={products.product?.title}
@@ -67,19 +70,15 @@ function OrderRow(props) {
         </span>
       </td>
       <td>
-        {
-          getCurrency === 'inr' ? (
-            <p>₹ {products.product?.price}</p>
-          ) : (
-            <p>$ {products.product?.usd_price}</p>
-          )
-        }
+        {getCurrency === 'inr' ? (
+          <p>₹ {products.product?.price}</p>
+        ) : (
+          <p>$ {products.product?.usd_price}</p>
+        )}
       </td>
+      <td>{products.order?.order_time}</td>
       <td>
-        {products.order?.order_time}
-      </td>
-      <td>
-        {products.order?.order_status ? (
+        {products.order?.order_status === 'completed' ? (
           <span className="text-success">
             <i className="fa fa-check-circle"></i> Completed
           </span>
@@ -90,15 +89,21 @@ function OrderRow(props) {
         )}
       </td>
       <td>
-        {products.order.order_status === true && (
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => countDownloads(products.product?.id)}
-          >
-            Download &nbsp;
-            <span className="badge text-dark bg-white">{totalDownloads}</span>
-          </button>
-        )}
+        {
+          products.order?.order_status === 'completed' ? (
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => countDownloads(products.product?.id)}
+            >
+              Download &nbsp;
+              <span className="badge text-dark bg-white">{totalDownloads}</span>
+            </button>
+          ) : (
+            <div>
+              <Link className="btn btn-dark" to={`/make/payment/${products.order?.id}`}>Pay</Link>
+            </div>
+          )
+        }
       </td>
     </tr>
   );

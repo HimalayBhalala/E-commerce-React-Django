@@ -206,22 +206,25 @@ class OrderProductItemSerializer(serializers.ModelSerializer):
         self.Meta.depth=1
 
 class ProductRatingSerializer(serializers.ModelSerializer):
+    first_name = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = ProductRating
-        fields = ["id","customer","rating","review","add_time"]
+        fields = ["id","customer","product","rating","review","add_time","first_name"]
         extra_kwargs = {"add_time":{"read_only":True},"id":{"read_only":True}}
 
     def __init__(self,*args,**kwargs):
         super(ProductRatingSerializer,self).__init__(*args, **kwargs)
         self.Meta.depth=1
 
+    def get_first_name(self,obj):
+        user = obj.customer.user
+        return user.first_name.capitalize()
+
     def validate(self, data):
         rating = data.get('rating')
 
         if not rating:
             raise serializers.ValidationError("Rating must be required")
-        if int(rating) <= 1 or int(rating) >= 5:
-            raise serializers.ValidationError("Rating  must be added between an 1 and 5")
         return data
     
 

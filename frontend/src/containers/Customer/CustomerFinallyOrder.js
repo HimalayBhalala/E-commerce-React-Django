@@ -8,17 +8,17 @@ import { CurrencyContext } from "../../context/CurrencyContex";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const OrderConfirm = ({ isAuthenticated }) => {
+const CustomerFinallyOrder = ({ isAuthenticated }) => {
   const { setCartData } = useContext(CartContext);
-  const { getCurrency } = useContext(CurrencyContext);
   const navigate = useNavigate();
-  const { order_id } = useParams(); // Use the order_id from URL params
   const [isLoading, setIsLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [paymentConfirm, setPaymentConfirm] = useState(false);
   const [orderId, setOrderId] = useState(null);
-
+  const [paymentConfirm, setPaymentConfirm] = useState(false);
   const isInitialMount = useRef(true);
+  const { getCurrency } = useContext(CurrencyContext);
+
+  const { order_id } = useParams();
 
   useEffect(() => {
     if (isInitialMount.current) {
@@ -28,68 +28,46 @@ const OrderConfirm = ({ isAuthenticated }) => {
     if (!isAuthenticated) {
       navigate("/login");
     } else if (!orderPlaced) {
-      addOrder();
+      addOrder(); // Ensure order is added only if payment is confirmed
     }
   }, [isAuthenticated, orderPlaced, navigate]);
 
-  const addOrder = async () => {
-    setIsLoading(true);
-
-    try {
-      const customerID = JSON.parse(localStorage.getItem("customer_id"));
-      const formData = new FormData();
-      formData.append("customer", parseInt(customerID, 10));
-
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/ecommerce/orders/`,
-        formData
-      );
-
-      const order_id = response.data.id;
-      setOrderId(order_id); // Set order ID
-      await addOrderItems(order_id);
-
-      if (paymentConfirm) {
-        await updateOrderStatus(order_id);
-      }
-
-      setOrderPlaced(true);
-    } catch (error) {
-      console.error("Error adding order:", error);
-    } finally {
-      setIsLoading(false);
+  const calculateTotalAmount = () => {
+    const totalPrice = parseFloat(localStorage.getItem('total_price')) || 0;
+    if (totalPrice <= 0) {
+      console.error("Invalid total amount for payment.");
+      return 0;
     }
-  };
-
-  const updateOrderStatus = async (order_id) => {
-    try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/update-order-status/${order_id}/`, {
-        status: 'completed' // Update to completed status
-      });
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
+    return Math.floor(totalPrice * 100); // Convert to cents
   };
 
   const handlePayment = async () => {
     setIsLoading(true);
     localStorage.setItem('order-currency', getCurrency);
-
     try {
       const stripe = await stripePromise;
+      const totalAmount = calculateTotalAmount();
+      
+      if (totalAmount <= 0) {
+        setIsLoading(false);
+        return;
+      }
+      
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/ecommerce/add-payment/`,
         {
-          amount: calculateTotalAmount(),
+          amount: totalAmount,
           currency: getCurrency,
         }
       );
 
       const { clientSecret } = response.data;
+      const elements = stripe.elements();
+      const cardElement = elements.getElement("cardElement");
 
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: stripe.elements().getElement("cardElement"),
+          card: cardElement,
         },
       });
 
@@ -98,7 +76,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
       } else if (result.paymentIntent.status === "succeeded") {
         console.log("Payment successful!");
         setPaymentConfirm(true);
-        await addOrder(); // Ensure order is added after payment is successful
+        addOrder(result.paymentIntent.id); // Pass payment intent ID to addOrder
       }
     } catch (error) {
       console.error("Error handling payment:", error);
@@ -107,19 +85,45 @@ const OrderConfirm = ({ isAuthenticated }) => {
     }
   };
 
-  const calculateTotalAmount = () => {
-    const totalPrice = parseFloat(localStorage.getItem('total_price')) || 0;
-    return Math.floor(totalPrice * 100);
+  const addOrder = async (paymentIntentId) => {
+    if (orderPlaced) return;
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_API_URL}/ecommerce/order/${order_id}`
+      );
+
+      const order_item_id = response.data.id;
+      await addOrderItem(order_item_id);
+      await updateOrderStatus(order_item_id, paymentIntentId);
+      setOrderPlaced(true);
+      setOrderId(order_item_id);
+    } catch (error) {
+      console.error("Error adding order:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const addOrderItems = async (order_id) => {
+  const updateOrderStatus = async (order_item_id, paymentIntentId) => {
+    try {
+      await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/update-order-status/${order_id}/`, {
+        paymentIntentId
+      });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const addOrderItem = async (order_item_id) => {
     const cartInfo = localStorage.getItem("cartDetail");
     const cartJson = JSON.parse(cartInfo) || [];
 
     if (cartJson.length > 0) {
       const requests = cartJson.map((cart) => {
         const formData = new FormData();
-        formData.append("order", order_id);
+        formData.append("order", order_item_id);
         formData.append("product", cart.product.product_id);
         formData.append("quantity", 1);
         formData.append("price", getCurrency === 'inr' ? cart.product.product_price : cart.product.product_usd_price);
@@ -172,6 +176,18 @@ const OrderConfirm = ({ isAuthenticated }) => {
                     {orderId}
                   </span>
                 </p>
+                <div className="text-center mt-4">
+                  <div className="btn btn-success me-2">
+                    <Link style={{ textDecoration: 'none', color: 'black' }} to='/'>
+                      Go to home
+                    </Link>
+                  </div>
+                  <div className="btn btn-warning">
+                    <Link to='/orders' style={{ textDecoration: 'none', color: 'black' }}>
+                      Click here to view Order details
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
@@ -189,7 +205,7 @@ const OrderConfirm = ({ isAuthenticated }) => {
                 <h1 className="text-center">
                   <span style={{ color: "black" }}>
                     <i className="fa-solid fa-spinner spinner"></i>
-                    &nbsp;&nbsp;Your order has not been confirmed. Please complete the payment for your selected product. {orderId}
+                    &nbsp;&nbsp;Your order has not been confirmed. Please complete the payment for your selected product. {order_id}
                   </span>
                 </h1>
               </div>
@@ -230,16 +246,6 @@ const OrderConfirm = ({ isAuthenticated }) => {
               </div>
             </div>
           )}
-          {paymentConfirm && (
-            <div className="text-center">
-              <div className="btn btn-success mt-5 ms-1">
-                <Link style={{ textDecoration: 'none', color: 'black' }} to='/'>Go to home</Link>
-              </div>
-              <div className="btn btn-warning text-center mt-5 ms-1">
-                <Link to='/orders' style={{ textDecoration: 'none', color: 'black' }}>Click here to view Order details</Link>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
@@ -250,4 +256,4 @@ const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
 });
 
-export default connect(mapStateToProps)(OrderConfirm);
+export default connect(mapStateToProps)(CustomerFinallyOrder);

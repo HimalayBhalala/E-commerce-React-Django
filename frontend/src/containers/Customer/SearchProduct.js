@@ -8,30 +8,50 @@ export default function SearchProduct() {
     const queryParams = new URLSearchParams(location.search);
     const result = queryParams.get('search');
     const { getCurrency } = useContext(CurrencyContext);
+    const [loader,setLoader] = useState(true);
 
     const [getProductData, setProductData] = useState([]);
 
     useEffect(() => {
-        const config = {
-            headers: {
-                'Content-Type': "application/json"
-            }
-        };
-        axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/search/?search=${result}`, config)
-            .then((response) => {
-                if (response.status === 200) {
-                    setProductData(response.data.data);
-                } else {
-                    setProductData([]);
+
+        const fetchData = () => {
+            try{
+                const config = {
+                    headers: {
+                        'Content-Type': "application/json"
+                    }
+                };
+                axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/search/?search=${result}`, config)
+                    .then((response) => {
+                        if (response.status === 200) {
+                            setProductData(response.data.data);
+                        } else {
+                            setProductData([]);
+                        }
+                    })
+                    .catch((error) => {
+                        console.log("Error Occurred during fetching an API", String(error));
+                    })
+                }catch(error){
+                    console.log("Error Occurred during fetching an API", String(error));                    
+                }finally{
+                    setInterval(() => {
+                        setLoader(false)
+                    }, 500);
                 }
-            })
-            .catch((error) => {
-                console.log("Error Occurred during fetching an API", String(error));
-            })
+        }
+
+        fetchData();
     }, [result]);
 
     return (
         <div className='container text-center'>
+            {
+                 loader ? (
+                    <div className='spin-loader mt-5 mb-5' style={{margin:"auto"}}>
+                    </div>
+                ) : (
+            <>
             <h1 style={{ textAlign: "center" }} className='mt-3'>Search Results</h1>
             <hr />
             <div className="row mt-3">
@@ -83,6 +103,9 @@ export default function SearchProduct() {
                     )
                 }
             </div>
+            </>
+           )
+            }
         </div>
     );
 }

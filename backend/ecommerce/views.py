@@ -7,6 +7,7 @@ from .pagination import (
     HomeCategoryProductPagination,
     PopularProductPagination
 )
+from django.db.models import Avg, OuterRef, Subquery
 from rest_framework.decorators import api_view,permission_classes
 from .models import (
     Seller,
@@ -60,16 +61,9 @@ import json
 class SellerAPIView(ListCreateAPIView):
     queryset = Seller.objects.all()
     serializer_class = SellerSerializer
-
-class SellerDetailAPIView(RetrieveUpdateDestroyAPIView):
-    queryset = Seller.objects.all()
-    serializer_class = SellerDetailSerializer
+    pagination_class = None
 
 class ProductCategoryView(ListCreateAPIView):
-    queryset = ProductCategory.objects.all()
-    serializer_class = ProductCategorySerializer
-
-class ProductDetailCategoryView(RetrieveUpdateDestroyAPIView):
     queryset = ProductCategory.objects.all()
     serializer_class = ProductCategorySerializer
 
@@ -195,19 +189,22 @@ def create_payment_intent(request):
     else:
         return JsonResponse({'error': 'Method not allowed'}, status=405)
     
-@csrf_exempt
-def update_order_status(request,order_id):
-    if request.method == "POST":
-        status_info = Order.objects.filter(id=order_id).update(order_status=True)
-        if status_info:
-            data = {
-                "order-status":True
-            }
-        else:
-            data = {
-                "order_status":False
-            }
-        return JsonResponse(data)
+@api_view(['POST'])
+def update_order_status(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=404)
+
+    payment_status = request.data.get('payment_status')
+
+    if payment_status == 'succeeded':
+        order.order_status = Order.COMPLETED
+    else:
+        order.order_status = Order.PENDING
+
+    order.save()
+    return Response({'status': 'Order status updated'}, status=200)
 
 class GetCustomerOrder(APIView):
     def get(self,request,*args,**kwargs):
@@ -539,17 +536,48 @@ def get_seller_all_orders(request,seller_id):
     order_item_serializer = SellerCustomerOrderDetailSerializer(order_items,many=True)
     return Response({"data":order_item_serializer.data},status=status.HTTP_200_OK)
 
-
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def popular_seller(request):
-    seller = Seller.objects.all()
-    seller_serializer = SellerDetailSerializer(seller,many=True)
-    category = ProductCategory.objects.all().filter(seller__in=seller)
-    category_serializer = ProductCategorySerializer(category,many=True)
-    return Response({"data":seller_serializer.data,"category":category_serializer.data},status=status.HTTP_200_OK)
+    sellers_with_ratings = Seller.objects.annotate(
+        average_rating=Avg(
+            Subquery(
+                ProductRating.objects.filter(
+                    product__seller=OuterRef('pk')
+                ).values('product').annotate(
+                    avg_rating=Avg('rating')
+                ).values('avg_rating')
+            )
+        )
+    ).order_by('average_rating')
+
+    seller_serializer = SellerDetailSerializer(sellers_with_ratings, many=True)
+    
+    categories = ProductCategory.objects.filter(seller__in=sellers_with_ratings)
+    category_serializer = ProductCategorySerializer(categories, many=True)
+
+    return Response({
+        "data": seller_serializer.data,
+        "categories": category_serializer.data
+    }, status=status.HTTP_200_OK)
 
 class CustomerAddingRating(APIView):
+    def get(self,request,*args, **kwargs):
+        customer_id = self.kwargs['customer_id']
+        product_id = self.kwargs['product_id']
+        try:
+            customer = Customer.objects.get(id=customer_id)
+        except Customer.DoesNotExist:
+            return Response({"message":"Customer is not found with a given id"},status=status.HTTP_400_BAD_REQUEST)
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message":"Product is not found with a given id"},status=status.HTTP_400_BAD_REQUEST)
+        rating = ProductRating.objects.filter(customer=customer,product=product)
+        rating_serializer = ProductRatingSerializer(rating,many=True)
+        return Response({"data":rating_serializer.data},status=status.HTTP_200_OK)
+
+    
     def post(self,request,*args, **kwargs):
         customer_id = self.kwargs['customer_id']
         product_id = self.kwargs['product_id']
@@ -570,3 +598,48 @@ class CustomerAddingRating(APIView):
                 serializer.save(customer=customer,product=product)
                 return Response({"data":serializer.data},status=status.HTTP_201_CREATED)
             
+    
+@api_view(["GET"])
+def get_all_customer_review(request,product_id):
+    if request.method == "GET":
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message":"Product is not exists with a given id"})
+        rating = ProductRating.objects.filter(product=product)
+        rating_serializer = ProductRatingSerializer(rating,many=True)
+        return Response({"data":rating_serializer.data},status=status.HTTP_200_OK)
+    
+
+@api_view(["GET"])
+def seller_all_products(request,seller_id):
+    if request.method == "GET":
+        try:
+            seller = Seller.objects.get(id=seller_id)
+        except Seller.DoesNotExist:
+            return Response({"message":"Seller is not found with a given id"})
+        product = Product.objects.filter(seller=seller)
+        product_serializer = ProductSerializer(product,many=True)
+        return Response({"data":product_serializer.data},status=status.HTTP_200_OK)
+    
+
+class GetAllOrderProduct(APIView):
+    def get(self,request,order_id,*args, **kwargs):
+        product_item = OrderItems.objects.filter(order__id=order_id)
+        product_item_serializer = OrderProductItemSerializer(product_item,many=True)
+        return Response({"data":product_item_serializer.data},status=status.HTTP_200_OK)
+    
+class RemoveProductFromOrder(APIView):
+    def delete(self,request,order_id,product_id):
+        try:
+            order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            return Response({"message":"Order is not exists"},status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({"message":"Product is not exists"},status=status.HTTP_400_BAD_REQUEST)
+        
+        OrderItems.objects.filter(order=order,product=product).delete()
+        return Response({"message":"Product is remove successfully"},status=status.HTTP_204_NO_CONTENT)

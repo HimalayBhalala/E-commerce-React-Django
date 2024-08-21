@@ -8,6 +8,7 @@ import { WishListContext } from '../context/WishListContext';
 import { CurrencyContext } from '../context/CurrencyContex';
 import RatingReview from './Customer/RatingReview';
 import { TextField } from '@mui/material';
+import { RatingContext } from '../context/RatingContext';
 
 const ProductDetail = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -20,14 +21,16 @@ const ProductDetail = ({ isAuthenticated }) => {
     const { setCartData } = useContext(CartContext);
     const { getCurrency } = useContext(CurrencyContext);
     const { wish_list } = useContext(WishListContext);
-    const [getReviewForm,setReviewForm] = useState(0);
-    const [rating,setRating] = useState(0);
+    const { setRatingInfo } = useContext(RatingContext);
+    const [getIsInRating, setIsInRating] = useState(false);
+    const [getReviewForm, setReviewForm] = useState(false);
+    const [rating, setRating] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [formData,setFormData] = useState({
-        review : ''
-    });
-
+    const [getRatingData, setRatingData] = useState([]);
+    const [visibleReviews, setVisibleReviews] = useState(1);
+    const [showMore, setShowMore] = useState(true);
     const getCustomerId = parseInt(localStorage.getItem('customer_id'));
+    const [formData, setFormData] = useState({ review: '' });
 
     useEffect(() => {
         if (!isAuthenticated) {
@@ -44,14 +47,25 @@ const ProductDetail = ({ isAuthenticated }) => {
                 setTagData(data.tags_data || []);
                 checkProductExists();
                 checkIfInWishlist();
+                checkRatingIsAdded();
             } catch (error) {
                 console.error('Error fetching product data:', error);
             }
         };
 
+        const checkRatingIsAdded = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/customer/rating/${getCustomerId}/${product_id}/`);
+                setRatingInfo(response.data.data);
+                checkIfRatingExists(response.data.data);
+            } catch (error) {
+                console.error("Error occurred during fetching an API", String(error));
+            }
+        };
+
         const fetchRelatedData = async () => {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/ecommerce/product/related/${product_id}`);
+                const response = await fetch(`http://127.0.0.1:8000/ecommerce/product/related/${product_id}/`);
                 if (!response.ok) throw new Error('Network response was not ok');
                 const data = await response.json();
                 setRelatedProduct(data || []);
@@ -60,9 +74,21 @@ const ProductDetail = ({ isAuthenticated }) => {
             }
         };
 
+        const getRatingInformation = async () => {
+            try {
+                await axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/rating/review/${product_id}/`)
+                    .then((response) => {
+                        setRatingData(response.data.data);
+                    })
+            } catch (error) {
+                console.log("Error during fetching an api", String(error));
+            }
+        };
+
         fetchData();
         fetchRelatedData();
-    }, [product_id, isAuthenticated, navigate, wish_list]);
+        getRatingInformation();
+    }, [product_id, isAuthenticated, navigate, wish_list, getCustomerId]);
 
     const checkProductExists = () => {
         const cartDataInfo = JSON.parse(localStorage.getItem('cartDetail')) || [];
@@ -73,6 +99,11 @@ const ProductDetail = ({ isAuthenticated }) => {
     const checkIfInWishlist = () => {
         const exists = wish_list.some(item => item.product.id === parseInt(product_id));
         setIsInWishlist(exists);
+    };
+
+    const checkIfRatingExists = (ratingInfo) => {
+        const exists = ratingInfo.some(item => item.product.id === parseInt(product_id));
+        setIsInRating(exists);
     };
 
     const addToCart = () => {
@@ -108,7 +139,7 @@ const ProductDetail = ({ isAuthenticated }) => {
     };
 
     const removeProductFromWishlist = () => {
-            setIsInWishlist(false);
+        setIsInWishlist(false);
     };
 
     const renderTags = () => (
@@ -120,38 +151,48 @@ const ProductDetail = ({ isAuthenticated }) => {
     );
 
     const reviewIsAdded = () => {
-        setReviewForm(true)
-    }
+        setReviewForm(true);
+    };
 
-
-        const handleSubmit = async (customer_id, product_id) => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         if (isSubmitting) return;
 
         setIsSubmitting(true);
         formData['rating'] = rating;
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/customer/rating/${customer_id}/${product_id}/`, formData);
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/customer/rating/${getCustomerId}/${productDetail?.id}/`, formData);
             if (response.status === 201) {
                 console.log("Reviews added Successfully", response);
+                setFormData({ review: '' });
+                setRating(0);
+                setReviewForm(false);
             }
         } catch (error) {
             console.log("Error occurred during fetching an API", String(error));
         } finally {
             setIsSubmitting(false);
         }
-        };
-
+    };
 
     const onChange = (e) => setFormData({
         ...formData,
-        [e.target.name] : e.target.value
-    })
+        [e.target.name]: e.target.value
+    });
 
-    const {review} = formData;
+    const handleShowMore = () => {
+        if (visibleReviews < getRatingData.length) {
+            setVisibleReviews(prev => prev + 1);
+            if (visibleReviews >= getRatingData.length) {
+                setShowMore(false);
+            }
+        }
+    };
+
+    const { review } = formData;
 
     return (
         <div className='container mt-5'>
-            {console.log("Ecommerce is",rating)}
             <h1 className='text-center mb-5'>Product Information</h1>
             <hr />
             <div className="row mt-5 card-img-container">
@@ -176,7 +217,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                                 </button>
                             ) : (
                                 <button className='btn btn-warning btn-sm ms-1' type='button' onClick={removeFromCart} title='Remove from Cart'>
-                                    <i className='fa-solid fa-cart-plus'></i> Remove From Cart
+                                    <i className='fa-solid fa-cart-arrow-down'></i> Remove From Cart
                                 </button>
                             )
                         }
@@ -197,7 +238,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                         >
                             <i className='fa-solid fa-heart'></i> {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                         </button>
-                        <button className='btn btn-dark btn-sm ms-1' title='Add Review & Rating'>
+                        <button className='btn btn-dark btn-sm ms-1' title='Add Review & Rating' disabled={getIsInRating}>
                             <span onClick={reviewIsAdded}><i className="fa-regular fa-star"></i> Add Review & Rating</span>
                         </button>
                     </div>
@@ -207,34 +248,53 @@ const ProductDetail = ({ isAuthenticated }) => {
                     </div>
                     <div>
                         <h5 className='mt-3'><b>Rating and Reviews</b></h5>
-                        <div className='form-control'>
-                            customer name : mohan, <br />
-                            rating : 4, <br />
-                            review : This is a very good product and book is very good for increasing coding idea.......
-                        </div>
+                        {
+                            getRatingData.length < 1 ? (
+                                <p className='text-center mt-2' style={{ fontSize: "1.5rem" }}>Rating and Review is not available.</p>
+                            ) : (
+                                <div>
+                                    {
+                                        getRatingData.slice(0, visibleReviews).map((review, index) => (
+                                            <div key={index} className='read-only form-control mb-3'>
+                                                <b>Customer name :</b> {review.first_name} <br />
+                                                <b>Rating :</b> <RatingReview rating={review.rating} /> <br />
+                                                <b>Review :</b> {review.review}
+                                            </div>
+                                        ))
+                                    }
+                                    {showMore && getRatingData.length > visibleReviews && (
+                                        <button className='btn btn-primary mt-3' onClick={handleShowMore}>
+                                            Show More
+                                        </button>
+                                    )}
+                                </div>
+                            )
+                        }
                     </div>
-            {
-                getReviewForm ? (
-                    <div className='mt-2'>
-                        <form className='form-control' onSubmit={handleSubmit(getCustomerId,productDetail?.id)}>
-                            <p style={{fontSize:"2rem"}}>Select Rating<RatingReview name='rating' rating={rating} setRating={setRating}/></p>
-                            <hr />
-                            <p style={{fontSize:"2rem"}}>Review</p>
-                            <TextField 
-                                type='text'
-                                fullWidth
-                                margin='normal'
-                                name = 'review'
-                                value={review}
-                                onChange={onChange}
-                            />
-                            <button className='btn btn-primary mt-3' style={{margin:"auto", alignItems:"center" }} type='submit'>Submit</button>
-                        </form>
-                    </div>
-                ) : (
-                    null
-                )
-            }
+                    {
+                        getReviewForm ? (
+                            <div className='mt-2'>
+                                <form className='form-control' onSubmit={handleSubmit}>
+                                    <p style={{ fontSize: "2rem" }}>Select Rating
+                                        <RatingReview name='rating' rating={rating} setRating={setRating} />
+                                    </p>
+                                    <hr />
+                                    <p style={{ fontSize: "2rem" }}>Review</p>
+                                    <TextField 
+                                        type='text'
+                                        fullWidth
+                                        margin='normal' 
+                                        name='review'
+                                        value={review}
+                                        onChange={onChange}
+                                    />
+                                    <button className='btn btn-primary mt-3' style={{ margin: "auto", alignItems: "center" }} type='submit' disabled={isSubmitting}>
+                                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                                    </button>
+                                </form>
+                            </div>
+                        ) : null
+                    }
                 </div>
             </div>
             <div style={{ textAlign: 'center' }}>

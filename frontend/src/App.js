@@ -56,6 +56,11 @@ import { CartProvider } from './context/CardContext';
 import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { RatingProvider } from './context/RatingContext';
+import ShowAllSellerProduct from './containers/ShowAllSellerProduct';
+import ViewAllSeller from './containers/ViewAllSeller';
+import MakePayment from './containers/Customer/MakePayment';
+import CustomerFinallyOrder from './containers/Customer/CustomerFinallyOrder';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
@@ -64,66 +69,72 @@ function App() {
   return (
       <Provider store={store}>
         <ThemeProvider>
-          <CurrencyProvider>
-            <CartProvider>
-              <WishListProvider>
-                <Router>
-                  <Layout>
-                  <Elements stripe={stripePromise}>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/register" element={<SignUp />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/add/email" element={<AddEmail />} />
-                        <Route path="/products" element={<AllProduct />} />
-                        <Route path="/forget/password" element={<ForgetPassword />} />
-                        <Route path="/select/role" element={<SelectRole />} />
-                        <Route path="/categories" element={<Categories />} />
-                        <Route path="/about" element={<AboutUs />} />
-                        <Route path="/help" element={<Help />} />
-                        <Route path="/contact" element={<ContactUs />} />
-                        <Route path="/product/tag/:tag" element={<TagProduct />} />
-                        <Route path="/product/:product_slug/:product_id" element={<ProductDetail />} />
-                        <Route path="/category/:category_slug" element={<CategoryProducts />} />
-                        
-                        {/* Customer Panel */}
-                        <Route path="/dashboard" element={<DashBoard />} />
-                        <Route path="/profile" element={<Profile />} />
-                        <Route path="/change/password" element={<ChangePassword />} />
-                        <Route path="/search" element={<SearchProduct />} />
-                        <Route path="/checkout" element={<Checkout />} />
-                        <Route path="/orders" element={<Orders />} />
-                        <Route path="/order/confirm" element={<OrderConfirm />} />
-                        <Route path="/wishlist" element={<WishList />} />
-                        <Route path="/addresses" element={<Addresses />} />
-                        <Route path="/add/address" element={<AddAddress />} />
-                        <Route path="/order/:date" element={<SortedOrderDate />} />
-                        <Route path="/address/:address_id" element={<UpdateAddress />} />
-                        
-                        {/* Seller Panel */}
-                        <Route path="/seller/dashboard" element={<SellerDashBoard />} />
-                        <Route path="/seller/products" element={<SellerProducts />} />
-                        <Route path="/seller/add/category" element={<AddCategory />} />
-                        <Route path="/seller/add/product" element={<SellerAddProduct />} />
-                        <Route path="/seller/edit/product/:seller_id/:product_id" element={<SellerEditProduct />} />
-                        <Route path="/seller/customer" element={<SellerCustomers />} />
-                        <Route path="/seller/order/:seller_id/:customer_id" element={<SellerShowCustomerOrder/>} />
-                        <Route path="/seller/orders" element={<SellerOrders />} />
-                        <Route path="/seller/profile" element={<SellerProfile />} />
-                        <Route path="/seller/change/password" element={<SellerChangePassword />} />
-                        <Route path="/seller/report" element={<Report />} />
+          <RatingProvider>
+            <CurrencyProvider>
+              <CartProvider>
+                <WishListProvider>
+                  <Router>
+                    <Layout>
+                    <Elements stripe={stripePromise}>
+                      <Routes>
+                          <Route path="/" element={<Home />} />
+                          <Route path="/register" element={<SignUp />} />
+                          <Route path="/login" element={<Login />} />
+                          <Route path="/add/email" element={<AddEmail />} />
+                          <Route path="/products" element={<AllProduct />} />
+                          <Route path="/forget/password" element={<ForgetPassword />} />
+                          <Route path="/select/role" element={<SelectRole />} />
+                          <Route path="/categories" element={<Categories />} />
+                          <Route path="/about" element={<AboutUs />} />
+                          <Route path="/help" element={<Help />} />
+                          <Route path="/contact" element={<ContactUs />} />
+                          <Route path="/seller" element={<ViewAllSeller />} />
+                          <Route path="/product/tag/:tag" element={<TagProduct />} />
+                          <Route path="/product/:product_slug/:product_id" element={<ProductDetail />} />
+                          <Route path="/category/:category_slug" element={<CategoryProducts />} />
+                          <Route path="/make/payment/:order_id" element={<MakePayment />} />
+                          
+                          {/* Customer Panel */}
+                          <Route path="/dashboard" element={<DashBoard />} />
+                          <Route path="/profile" element={<Profile />} />
+                          <Route path="/change/password" element={<ChangePassword />} />
+                          <Route path="/search" element={<SearchProduct />} />
+                          <Route path="/checkout" element={<Checkout />} />
+                          <Route path="/orders" element={<Orders />} />
+                          <Route path="/order/confirm/" element={<OrderConfirm />} />
+                          <Route path="/order/confirm/:order_id" element={<CustomerFinallyOrder />} />
+                          <Route path="/wishlist" element={<WishList />} />
+                          <Route path="/addresses" element={<Addresses />} />
+                          <Route path="/add/address" element={<AddAddress />} />
+                          <Route path="/order/:date" element={<SortedOrderDate />} />
+                          <Route path="/address/:address_id" element={<UpdateAddress />} />
+                          
+                          {/* Seller Panel */}
+                          <Route path="/seller/dashboard" element={<SellerDashBoard />} />
+                          <Route path="/seller/products" element={<SellerProducts />} />
+                          <Route path="/seller/add/category" element={<AddCategory />} />
+                          <Route path="/seller/add/product" element={<SellerAddProduct />} />
+                          <Route path="/seller/edit/product/:seller_id/:product_id" element={<SellerEditProduct />} />
+                          <Route path="/seller/customer" element={<SellerCustomers />} />
+                          <Route path="/seller/order/:seller_id/:customer_id" element={<SellerShowCustomerOrder/>} />
+                          <Route path="/seller/orders" element={<SellerOrders />} />
+                          <Route path="/seller/profile" element={<SellerProfile />} />
+                          <Route path="/seller/change/password" element={<SellerChangePassword />} />
+                          <Route path="/seller/report" element={<Report />} />
+                          <Route path="/seller/product/:seller_id" element={<ShowAllSellerProduct />} />
 
-                        <Route path="*" element={<NotFound />} />
+                          <Route path="*" element={<NotFound />} />
 
-                      </Routes>
-                      </Elements>
-                    </Layout>
-                  <Footer />
-                </Router>
-              </WishListProvider>
-            </CartProvider>
-          </CurrencyProvider>
-          </ThemeProvider>
+                        </Routes>
+                        </Elements>
+                      </Layout>
+                    <Footer />
+                  </Router>
+                </WishListProvider>
+              </CartProvider>
+            </CurrencyProvider>
+          </RatingProvider>
+        </ThemeProvider>
       </Provider>
     );
   }

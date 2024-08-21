@@ -69,19 +69,26 @@ class CustomerAddress(models.Model):
         return f"{self.address}"
 
 class Order(models.Model):
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE,related_name="customer_orders")
+    PENDING = 'pending'
+    COMPLETED = 'completed'
+
+    ORDER_STATUS_CHOICES = [
+        (PENDING, 'Pending'),
+        (COMPLETED, 'Completed'),
+    ]
+
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE, related_name="customer_orders")
     order_time = models.DateTimeField(auto_now_add=True)
-    order_status = models.BooleanField(default=False)
+    order_status = models.CharField(max_length=10, choices=ORDER_STATUS_CHOICES, default=PENDING)
     
     def __str__(self):
-        return f"{self.id}"
+        return f"Order {self.id} - {self.get_order_status_display()}"
 
 class OrderItems(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name="order_items")
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name="order_products")
     quantity = models.IntegerField(default=1)
     price  = models.DecimalField(max_digits=10,decimal_places=2,default=0)
-
 
     class Meta:
         verbose_name_plural="order items"
