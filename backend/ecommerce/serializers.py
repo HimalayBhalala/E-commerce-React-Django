@@ -264,6 +264,10 @@ class CustomerAddressSerializer(serializers.ModelSerializer):
         model = CustomerAddress
         fields = ["id","customer","address","default_address"]
 
+    def __init__(self,*args, **kwargs):
+        super(CustomerAddressSerializer,self).__init__(*args,**kwargs)
+        self.Meta.depth=1
+
 class CustomerSerializer(serializers.ModelSerializer):
     customer_orders = OrderSerializer(many=True,read_only=True)
     customer_address = CustomerAddressSerializer(many=True,read_only=True)
