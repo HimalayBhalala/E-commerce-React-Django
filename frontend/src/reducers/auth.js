@@ -88,6 +88,7 @@ const authReducer = (state = initialState, action) => {
                 profile_image:localStorage.getItem('profile_image'),
                 username:localStorage.getItem('username'),
                 isAuthenticated: true,
+                customer:payload,
                 user: payload,
                 message: "Customer Authentication success"
             };

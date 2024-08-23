@@ -127,10 +127,6 @@ class CustomerDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerDetailSerializer
 
-class CustomerAddressView(viewsets.ModelViewSet):
-    queryset = CustomerAddress.objects.all()
-    serializer_class = CustomerAddressSerializer
-
 class OrderAPIView(ListCreateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
@@ -196,8 +192,8 @@ def update_order_status(request, order_id):
     except Order.DoesNotExist:
         return Response({'error': 'Order not found'}, status=404)
 
-    payment_status = request.data.get('payment_status')
-
+    payment_status = request.data.get('status')
+    print("----------------------------------------",payment_status)
     if payment_status == 'succeeded':
         order.order_status = Order.COMPLETED
     else:
@@ -475,14 +471,14 @@ def get_seller_customer(request, seller_id):
 
     customer_ids = [item['order__customer'] for item in unique_customers]
     customers = Customer.objects.filter(id__in=customer_ids)
-    
+
     customer_serializer = CustomerDetailInfoSerializer(customers, many=True)
 
     return Response({
         "data": {
             "seller": seller_serializer.data,
             "customers": customer_serializer.data,
-            "products":order_item_serializer.data
+            "products":order_item_serializer.data,
         }
     }, status=status.HTTP_200_OK)
 
@@ -531,7 +527,7 @@ def get_seller_all_orders(request,seller_id):
     except Seller.DoesNotExist:
         return Response({"Message":"Seller is not found"},status=status.HTTP_400_BAD_REQUEST)
     
-    order = Order.objects.filter(customer__in=customer)
+    order = Order.objects.filter(customer__in=customer,order_status="completed")
     order_items = OrderItems.objects.filter(order__in=order,product__seller=seller)
     order_item_serializer = SellerCustomerOrderDetailSerializer(order_items,many=True)
     return Response({"data":order_item_serializer.data},status=status.HTTP_200_OK)
@@ -643,3 +639,55 @@ class RemoveProductFromOrder(APIView):
         
         OrderItems.objects.filter(order=order,product=product).delete()
         return Response({"message":"Product is remove successfully"},status=status.HTTP_204_NO_CONTENT)
+    
+import csv
+import datetime
+from django.http import HttpResponse
+from dateutil.relativedelta import relativedelta
+
+def generate_daily_report(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="daily_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Order ID', 'Product Name', 'Quantity', 'Indian Price',"American Price"])
+
+    today = datetime.date.today()
+    
+    orders = Order.objects.filter(order_time__date=today)
+    for order in orders:
+        for item in order.order_items.all():
+            writer.writerow([order.id, item.product.title, item.quantity, item.product.price,item.product.usd_price])
+    return response
+
+def generate_monthly_report(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="monthly_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Order ID', 'Product Name', 'Quantity', 'Indian Price',"American Price"])
+
+    start_date = datetime.date.today().replace(day=1)
+    end_date = (start_date + relativedelta(months=1)) - datetime.timedelta(days=1)
+
+    orders = Order.objects.filter(order_time__date__range=[start_date, end_date])
+    for order in orders:
+        for item in order.order_items.all(): 
+            writer.writerow([order.id, item.product.title, item.quantity, item.product.price,item.product.usd_price])
+    return response
+
+def generate_yearly_report(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="yearly_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Order ID', 'Product Name', 'Quantity', 'Indian Price',"American Price"])
+
+    start_date = datetime.date.today().replace(month=1, day=1)
+    end_date = datetime.date.today().replace(month=12, day=31)
+    
+    orders = Order.objects.filter(order_time__date__range=[start_date, end_date])
+    for order in orders:
+        for item in order.order_items.all():
+            writer.writerow([order.id, item.product.title, item.quantity, item.product.price,item.product.usd_price])
+    return response

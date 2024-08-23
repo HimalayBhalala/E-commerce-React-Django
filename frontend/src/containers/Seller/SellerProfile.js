@@ -133,7 +133,7 @@ const SellerProfile = ({seller_change_profile,isAuthenticated}) => {
                             />
                             <div>
                                 <label htmlFor="image">
-                                    <Button component="span" color="grey" className="mt-2" variant="contained">
+                                    <Button component="span" style={{backgroundColor:"gray"}} className="mt-2" variant="contained">
                                         Upload New Profile Image
                                     </Button>
                                 </label>

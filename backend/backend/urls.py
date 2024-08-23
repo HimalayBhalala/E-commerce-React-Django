@@ -5,14 +5,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.routers import DefaultRouter
 from ecommerce.views import (
-    CustomerAddressView,
     ProductRatingView
 )
 from django.urls import re_path
 from notification import consumers
 
 route = DefaultRouter()
-route.register("address", CustomerAddressView, basename='address')
 route.register("product-rating", ProductRatingView, basename='rating')
 
 urlpatterns = [

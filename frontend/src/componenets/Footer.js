@@ -1,14 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ThemeContext } from '../context/ThemeContext';
 
 export default function Footer() {
-  const {themeMode} = useContext(ThemeContext);
 
   return (
     <div>
-      <footer className="text-center text-white bg-dark">
-        <div className="container">
+      <footer className="text-center text-white bg-dark bottom-fixed footer">
+        <div className="container" style={{marginTop:"1rem"}}>
           <section>
             <div className="row text-center d-flex justify-content-center pt-5">
               <div className="col-md-2">

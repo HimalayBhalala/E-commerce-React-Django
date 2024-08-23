@@ -7,7 +7,9 @@ import Layout from './hoc/Layout';
 import Footer from './componenets/Footer';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
+// Import your containers and components
 import Home from './containers/Home';
 import Categories from './containers/Categories';
 import CategoryProducts from './containers/CategoryProducts';
@@ -36,6 +38,8 @@ import AddAddress from './containers/Customer/AddAddress';
 import WishList from './containers/Customer/WishList';
 import Checkout from './containers/Customer/Checkout';
 import OrderConfirm from './containers/Customer/OrderConfirm';
+import MakePayment from './containers/Customer/MakePayment';
+import CustomerFinallyOrder from './containers/Customer/CustomerFinallyOrder';
 
 // Seller Panel Imports
 import SellerDashBoard from './containers/Seller/SellerDashBoard';
@@ -50,33 +54,33 @@ import SellerShowCustomerOrder from './containers/Seller/SellerShowCustomerOrder
 import AddCategory from './containers/Seller/AddCategory';
 import Report from './containers/Seller/Reports';
 import TagProduct from './containers/TagProduct';
+import ShowAllSellerProduct from './containers/ShowAllSellerProduct';
+import ViewAllSeller from './containers/ViewAllSeller';
 
 // Context Providers Imports
 import { CartProvider } from './context/CardContext';
 import { CurrencyProvider } from './context/CurrencyContex';
 import { WishListProvider } from './context/WishListContext';
-import { ThemeProvider } from './context/ThemeContext';
 import { RatingProvider } from './context/RatingContext';
-import ShowAllSellerProduct from './containers/ShowAllSellerProduct';
-import ViewAllSeller from './containers/ViewAllSeller';
-import MakePayment from './containers/Customer/MakePayment';
-import CustomerFinallyOrder from './containers/Customer/CustomerFinallyOrder';
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
-
+const initialOptions = {
+  clientId: process.env.REACT_APP_PAYPAL_CLIENT_ID,
+  currency: 'USD',
+};
 
 function App() {
   return (
-      <Provider store={store}>
-        <ThemeProvider>
-          <RatingProvider>
-            <CurrencyProvider>
-              <CartProvider>
-                <WishListProvider>
-                  <Router>
-                    <Layout>
-                    <Elements stripe={stripePromise}>
-                      <Routes>
+    <Provider store={store}>
+        <RatingProvider>
+          <CurrencyProvider>
+            <CartProvider>
+              <WishListProvider>
+                <Router>
+                  <Layout>
+                    <PayPalScriptProvider options={initialOptions}>
+                      <Elements stripe={stripePromise}>
+                        <Routes>
                           <Route path="/" element={<Home />} />
                           <Route path="/register" element={<SignUp />} />
                           <Route path="/login" element={<Login />} />
@@ -116,27 +120,26 @@ function App() {
                           <Route path="/seller/add/product" element={<SellerAddProduct />} />
                           <Route path="/seller/edit/product/:seller_id/:product_id" element={<SellerEditProduct />} />
                           <Route path="/seller/customer" element={<SellerCustomers />} />
-                          <Route path="/seller/order/:seller_id/:customer_id" element={<SellerShowCustomerOrder/>} />
+                          <Route path="/seller/order/:seller_id/:customer_id" element={<SellerShowCustomerOrder />} />
                           <Route path="/seller/orders" element={<SellerOrders />} />
                           <Route path="/seller/profile" element={<SellerProfile />} />
                           <Route path="/seller/change/password" element={<SellerChangePassword />} />
                           <Route path="/seller/report" element={<Report />} />
                           <Route path="/seller/product/:seller_id" element={<ShowAllSellerProduct />} />
-
+                        
                           <Route path="*" element={<NotFound />} />
-
                         </Routes>
-                        </Elements>
-                      </Layout>
-                    <Footer />
-                  </Router>
-                </WishListProvider>
-              </CartProvider>
-            </CurrencyProvider>
-          </RatingProvider>
-        </ThemeProvider>
-      </Provider>
-    );
-  }
+                      </Elements>
+                    </PayPalScriptProvider>
+                  </Layout>
+                  <Footer />
+                </Router>
+              </WishListProvider>
+            </CartProvider>
+          </CurrencyProvider>
+        </RatingProvider>
+    </Provider>
+  );
+}
 
-  export default App;
+export default App;

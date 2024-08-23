@@ -203,7 +203,7 @@ const SellerDashBoard = () => {
                       <h3>Total Orders</h3>
                     </div>
                     <div style={{ fontSize: "25px", color: 'maroon' }}>
-                      {totalCountOrder}
+                      {totalCountOrder - 1}
                     </div>
                   </div>
                 </div>

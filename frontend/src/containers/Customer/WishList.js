@@ -34,18 +34,18 @@ const WishList = () => {
     };
 
     return (
-        <div className="container mt-5" style={{ marginBottom: "12rem" }}>
+        <div className="container mt-5" style={{ marginBottom: "1rem" }}>
             <div className="row">
                 <div className="col-md-3">
                     <SideBar />
                 </div>
                 {
                     wish_list.length <= 0 ? (
-                        <div className="col-md-9">
+                        <div className="col-md-9" style={{marginBottom:"10rem"}}>
                             <h1 className='text-center' style={{marginTop:"7.4rem"}}>No product added in wishlist</h1>
                         </div>
                     ) : (
-                    <div className="col-md-9">
+                    <div className="col-md-9" style={{marginBottom:"10rem"}}>
                         <div className="table-responsive">
                             <table className="table table-bordered">
                                 <thead>

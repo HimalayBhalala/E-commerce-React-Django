@@ -18,6 +18,7 @@ const SellerEditProduct = () => {
         usd_price: '',
         currency: '',
         description: '',
+        tags : '',
         image: null
     });
 
@@ -56,6 +57,7 @@ const SellerEditProduct = () => {
                 title: product.title || '',
                 price: product.price || '',
                 usd_price: product.usd_price || '',
+                tags : product.tags || '',
                 currency: String(getCurrency).toUpperCase(),
                 description: product.description || '',
                 image: product.image || null
@@ -74,6 +76,7 @@ const SellerEditProduct = () => {
         } else {
             data.append('usd_price', formData.usd_price);
         }
+        data.append('tags',formData.tags);
         data.append('currency', formData.currency);
         data.append('description', formData.description);
         data.append('image', formData.image);
@@ -154,6 +157,10 @@ const SellerEditProduct = () => {
                                         <input className='form-control' type="number" name='usd_price' id='usd_price' value={formData.usd_price} onChange={onChange} required />
                                     </div>
                                 )}
+                                 <div className="mt-2">
+                                    <label className='form-label' htmlFor="tags">Tags: </label>
+                                    <input className='form-control' type="text" id='tags' name='tags' value={formData.tags} onChange={onChange}/>
+                                </div>
                                 <div className="mt-2">
                                     <label className='form-label' htmlFor="description">Description: </label>
                                     <textarea className='form-control' rows='4' cols='4' id='description' name='description' value={formData.description} onChange={onChange} required />

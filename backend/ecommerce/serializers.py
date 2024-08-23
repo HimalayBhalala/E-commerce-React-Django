@@ -73,7 +73,7 @@ class ProductInfoSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ["id","category","title","description","image","price","usd_price","product_stemp"]
+        fields = ["id","category","title","description","tags","image","price","usd_price","product_stemp"]
         depth = 1
 
     def get_image(self,obj):
@@ -86,7 +86,7 @@ class ProductInfoSerializer(serializers.ModelSerializer):
 class ProductUpdateInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id","category","title","description","image","price","usd_price","product_stemp"]
+        fields = ["id","category","title","description","tags","image","price","usd_price","product_stemp"]
         depth = 1
 
     def update(self, instance, validated_data):
@@ -95,6 +95,7 @@ class ProductUpdateInfoSerializer(serializers.ModelSerializer):
         instance.image = validated_data.get('image',instance.image)
         instance.price = validated_data.get('price',instance.price)
         instance.usd_price = validated_data.get('usd_price',instance.usd_price)
+        instance.tags = validated_data.get('tags',instance.tags)
         instance.save()
         return instance
 
@@ -304,16 +305,11 @@ class CustomerDetailSerializer(serializers.ModelSerializer):
         return value
     
 class CustomerAddressDetailSerailizer(serializers.ModelSerializer):
+    customer_address = CustomerAddressSerializer(many=True,read_only=True)
+    
     class Meta:
         model = Customer
-        fields = ["id","user","mobile","image"]
-    
-
-class CustomerAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomerAddress
-        fields = ["id","customer","address","default_address"]
-        depth = 1
+        fields = ["id","user","mobile","image","customer_address"]
 
 
     def validate(self,data):
@@ -360,7 +356,7 @@ class SellerAddProductCategorySerializer(serializers.ModelSerializer):
 class SellerAddNewProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id","title","description","image","currency","price","usd_price","product_stemp"]
+        fields = ["id","title","description","image","tags","currency","price","usd_price","product_stemp"]
 
     def create(self, validated_data):
         seller_id = self.context.get('seller_id')
@@ -371,6 +367,7 @@ class SellerAddNewProductSerializer(serializers.ModelSerializer):
         currency = validated_data.get('currency')
         price = validated_data.get('price')
         usd_price = validated_data.get('usd_price')
+        tags = validated_data.get('tags')
         title = validated_data.get('title')
         description = validated_data.get('description')
         image = validated_data.get('image')
@@ -387,7 +384,7 @@ class SellerAddNewProductSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Seller is not Found")
         if not category:
             raise serializers.ValidationError("Catogory is not Found")
-        return Product.objects.create(seller=seller,category=category,price=price,usd_price=usd_price,title=title,description=description,image=image)
+        return Product.objects.create(seller=seller,category=category,price=price,usd_price=usd_price,tags=tags,title=title,description=description,image=image)
     
 
     def to_representation(self, instance):
@@ -453,9 +450,11 @@ class getSingleProductSellerSerializer(serializers.ModelSerializer):
 class CustomerDetailInfoSerializer(serializers.ModelSerializer):
     email = serializers.SerializerMethodField(read_only=True)
     date_joined = serializers.SerializerMethodField(read_only=True)
+    customer_address = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Customer
-        fields = ["id","user","email","mobile","image","date_joined"]
+        fields = ["id","user","email","mobile","image","date_joined","customer_address"]
 
     def get_email(self,obj):
         email = obj.user.email
@@ -464,6 +463,11 @@ class CustomerDetailInfoSerializer(serializers.ModelSerializer):
     def get_date_joined(self,obj):
         date_joined = obj.user.date_joined
         return date_joined
+    
+    def get_customer_address(self, obj):
+        get_addresses = obj.customer_address.filter(default_address=True)
+        serializer = CustomerAddressSerializer(get_addresses, many=True)
+        return serializer.data
     
 class SellerCustomerOrderDetailSerializer(serializers.ModelSerializer):
     product = ProductDetailSerializer(read_only=True)

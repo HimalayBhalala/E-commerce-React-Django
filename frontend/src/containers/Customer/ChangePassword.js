@@ -47,12 +47,12 @@ const ChangePassword = ({change_password}) => {
 
 
   return (
-    <div className="container mt-5" style={{marginBottom:"10.3rem"}}>
+    <div className="container mt-5" style={{marginBottom:"1rem"}}>
         <div className="row">
             <div className="col-md-3">
                 <SideBar />
             </div>
-            <div className="col-md-9">
+            <div className="col-md-9" style={{marginBottom:"24rem"}}>
                 <h1>Welcome, {username}</h1>
                 <hr />
                 <div style={{border:"2px solid black",background:"white"}}>

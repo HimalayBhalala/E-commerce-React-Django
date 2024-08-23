@@ -5,22 +5,32 @@ import { connect } from "react-redux";
 import { CartContext } from "../../context/CardContext";
 import { loadStripe } from "@stripe/stripe-js";
 import { CurrencyContext } from "../../context/CurrencyContex";
+import { Elements } from "@stripe/react-stripe-js";
+import PaymentForm from "./PaymentForm";
+import { PayPalButtons } from "@paypal/react-paypal-js";
 
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLIC_KEY);
 
-const CustomerFinallyOrder = ({ isAuthenticated }) => {
+const CustomerFinallyOrder = ({ isAuthenticated,customer }) => {
   const { setCartData } = useContext(CartContext);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
-  const [orderId, setOrderId] = useState(null);
   const [paymentConfirm, setPaymentConfirm] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('stripe');
   const isInitialMount = useRef(true);
   const { getCurrency } = useContext(CurrencyContext);
-
+  const [getTotalProduct,setTotalProduct] = useState([]);
   const { order_id } = useParams();
 
   useEffect(() => {
+    if(customer){
+      const hasDefaultAddress = customer.some((address) => address.default_address === true);
+      if(!hasDefaultAddress){
+        navigate("/addresses")
+      } 
+    }
+
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
@@ -28,55 +38,89 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
     if (!isAuthenticated) {
       navigate("/login");
     } else if (!orderPlaced) {
-      addOrder(); // Ensure order is added only if payment is confirmed
+      addOrder();
     }
-  }, [isAuthenticated, orderPlaced, navigate]);
+    const GetTotalOrderProduct = () =>{
+        axios.get(`${process.env.REACT_APP_API_URL}/ecommerce/order/${order_id}/`)
+          .then((response) => {
+            setTotalProduct(response.data)
+          })
+          .catch((error) => {
+            console.log("Error Occure during fetching an api",String(error))
+          })
+    }
+
+    GetTotalOrderProduct();
+
+    if (paymentConfirm){
+        try {
+          axios.post(`${process.env.REACT_APP_API_URL}/ecommerce/update-order-status/${order_id}/`, {
+            status: 'succeeded'
+          });
+        } catch (error) {
+          console.error("Error updating order status:", error);
+      };
+    }
+  }, [isAuthenticated, orderPlaced, navigate,order_id,paymentConfirm,customer]);
+
 
   const calculateTotalAmount = () => {
-    const totalPrice = parseFloat(localStorage.getItem('total_price')) || 0;
+    let totalPrice = 0
+    getTotalProduct.map((products) => {
+      if (getCurrency === 'inr'){
+        totalPrice += products.product?.price
+      }else{
+        totalPrice += products.product?.usd_price
+      }
+    })
+    {console.log("Total Price is",totalPrice)}
     if (totalPrice <= 0) {
       console.error("Invalid total amount for payment.");
       return 0;
     }
-    return Math.floor(totalPrice * 100); // Convert to cents
+    return Math.floor(totalPrice * 100);
   };
 
-  const handlePayment = async () => {
+  const handlePayment = async (paymentId) => {
     setIsLoading(true);
     localStorage.setItem('order-currency', getCurrency);
+
     try {
-      const stripe = await stripePromise;
       const totalAmount = calculateTotalAmount();
       
       if (totalAmount <= 0) {
         setIsLoading(false);
         return;
       }
-      
+
       const response = await axios.post(
         `${process.env.REACT_APP_API_URL}/ecommerce/add-payment/`,
         {
           amount: totalAmount,
           currency: getCurrency,
+          paymentMethodId: paymentId,
+          paymentMethod: selectedPaymentMethod,
         }
       );
 
-      const { clientSecret } = response.data;
-      const elements = stripe.elements();
-      const cardElement = elements.getElement("cardElement");
+      if (selectedPaymentMethod === 'stripe') {
+        const { clientSecret } = response.data;
+        const stripe = await stripePromise;
+        const result = await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentId,
+        });
 
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-        },
-      });
-
-      if (result.error) {
-        console.error(result.error.message);
-      } else if (result.paymentIntent.status === "succeeded") {
-        console.log("Payment successful!");
+        if (result.error) {
+          console.error(result.error.message);
+        } else if (result.paymentIntent.status === "succeeded") {
+          console.log("Payment successful!");
+          setPaymentConfirm(true);
+          addOrder(result.paymentIntent.id);
+        }
+      } else if (selectedPaymentMethod === 'paypal') {
+        console.log("PayPal payment successful!");
         setPaymentConfirm(true);
-        addOrder(result.paymentIntent.id); // Pass payment intent ID to addOrder
+        addOrder(paymentId);
       }
     } catch (error) {
       console.error("Error handling payment:", error);
@@ -98,7 +142,6 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
       await addOrderItem(order_item_id);
       await updateOrderStatus(order_item_id, paymentIntentId);
       setOrderPlaced(true);
-      setOrderId(order_item_id);
     } catch (error) {
       console.error("Error adding order:", error);
     } finally {
@@ -144,6 +187,10 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
     }
   };
 
+  const handlePayPalSuccess = (details, data) => {
+    handlePayment(data.orderID, 'paypal');
+  };
+
   return (
     <div>
       {isLoading ? (
@@ -173,7 +220,7 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
                 <p className="text-center">
                   <span className="text-center">
                     <b>Your Order Id : </b>
-                    {orderId}
+                    {order_id}
                   </span>
                 </p>
                 <div className="text-center mt-4">
@@ -217,31 +264,46 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
                 <div className="form-control mt-5 offset-6">
                   <h5 className="mt-2">Select Payment Option</h5>
                   <hr />
-                  <form>
-                    <div className="form-group">
-                      <label>
-                        <input
-                          type="radio"
-                          name="selectPay"
-                          id="stripe"
-                        />
-                        &nbsp;Stripe
-                      </label>
-                    </div>
-
-                    <div className="text-center">
-                      <button
-                        className="btn mt-3 btn-outline-primary"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePayment();
+                  <div className="mb-3">
+                    <input
+                      type="radio"
+                      id="stripe"
+                      name="paymentMethod"
+                      value="stripe"
+                      checked={selectedPaymentMethod === 'stripe'}
+                      onChange={() => setSelectedPaymentMethod('stripe')}
+                    />
+                    <label htmlFor="stripe">Stripe</label>
+                    <Elements stripe={stripePromise}>
+                      {selectedPaymentMethod === 'stripe' && <PaymentForm handlePayment={handlePayment} />}
+                    </Elements>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      id="paypal"
+                      name="paymentMethod"
+                      value="paypal"
+                      checked={selectedPaymentMethod === 'paypal'}
+                      onChange={() => setSelectedPaymentMethod('paypal')}
+                    />
+                    <label htmlFor="paypal">PayPal</label>
+                    {selectedPaymentMethod === 'paypal' && (
+                      <PayPalButtons
+                        createOrder={(data, actions) => {
+                          return actions.order.create({
+                            purchase_units: [{
+                              amount: {
+                                currency_code: getCurrency === 'inr' ? 'INR' : 'USD',
+                                value: calculateTotalAmount() / 100,
+                              },
+                            }],
+                          });
                         }}
-                        style={{ width: "10rem" }}
-                      >
-                        Pay
-                      </button>
-                    </div>
-                  </form>
+                        onApprove={handlePayPalSuccess}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -254,6 +316,7 @@ const CustomerFinallyOrder = ({ isAuthenticated }) => {
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
+  customer : state.auth.customer.data.customer_address
 });
 
 export default connect(mapStateToProps)(CustomerFinallyOrder);

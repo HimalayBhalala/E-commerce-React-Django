@@ -3,6 +3,7 @@ import logo from '../product.jpg';
 import { Link } from 'react-router-dom';
 import SingleProduct from './SingleProduct';
 import { CurrencyContext } from '../context/CurrencyContex';
+import { styled } from '@mui/material';
 
 const Home = () => {
     const baseURL = 'http://127.0.0.1:8000/ecommerce';
@@ -100,6 +101,7 @@ const Home = () => {
                         <div className="row">
                             {popularProductData.map((product) => (
                                 <div className="col-12 col-md-3 mb-4" key={product.id}>
+                                <Link to={`/product/${product.category.title}/${product.id}`} style={{textDecoration:"none" ,color:"black"}}>
                                     <div className="card fixed-size-card">
                                         <img src={product.image} className='card-img-top large-image' alt="image9" />
                                         <div className="card-body">
@@ -121,6 +123,7 @@ const Home = () => {
                                             </button>
                                         </div>
                                     </div>
+                                </Link>
                                 </div>
                             ))}
                         </div>
@@ -133,7 +136,7 @@ const Home = () => {
                         <div className="row">
                                 {
                                     popularSellerData.map((seller) => (
-                                        <div className="col-12 col-md-3 mb-4" key={seller.id}>
+                                        <div className="col-12 col-md-3 mb-5" key={seller.id}>
                                             <Link to={`/seller/product/${seller.id}`} style={{textDecoration:'none'}}>
                                                 <div className="card fixed-size-card text-center">
                                                     <img src={`${process.env.REACT_APP_API_URL}/${seller.image}`} className='card-img-top large-image' alt="image13" />

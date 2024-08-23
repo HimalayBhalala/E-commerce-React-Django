@@ -56,7 +56,7 @@ const Orders = () => {
         </Link>
       </div>
       {orderItem.length === 0 ? (
-        <div className="container mt-5" style={{ marginBottom: "12rem" }}>
+        <div className="container mt-5" style={{ marginBottom: "2rem" }}>
           <div className="row">
             <div className="col-md-3">
               <SideBar />
@@ -74,12 +74,12 @@ const Orders = () => {
           </div>
         </div>
       ) : (
-        <div className="container mt-5" style={{ marginBottom: "12rem" }}>
+        <div className="container mt-5" style={{ marginBottom: "1rem" }}>
           <div className="row">
             <div className="col-md-3">
               <SideBar />
             </div>
-            <div className="col-md-9">
+            <div className="col-md-9" style={{marginBottom:"10rem"}}>
               <div className="table-responsive">
                 <table className="table table-bordered">
                   <thead>

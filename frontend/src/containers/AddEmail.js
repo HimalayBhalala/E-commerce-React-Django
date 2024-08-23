@@ -48,7 +48,7 @@ function AddEmail({user,email_confirmation}) {
                 Confirm Email 
             </h1>
         </header>
-        <form onSubmit={handleSubmit}>
+        <form className='form-control' onSubmit={handleSubmit}>
             <TextField
                 label="Add Email"
                 variant='outlined'

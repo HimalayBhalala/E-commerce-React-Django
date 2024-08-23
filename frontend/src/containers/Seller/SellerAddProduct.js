@@ -13,6 +13,7 @@ const SellerAddProduct = () => {
         title: '',
         price: '',
         usd_price:'',
+        tags : '',
         currency: String(getCurrency).toUpperCase() ,
         description: '',
         image: null
@@ -22,7 +23,7 @@ const SellerAddProduct = () => {
 
     const navigate = useNavigate();
 
-    const { category, title, price,usd_price,currency, description, image } = formData;
+    const { category, title, price,usd_price,tags,currency, description, image } = formData;
 
     useEffect(() => {
         if(getProductStatus){
@@ -52,6 +53,7 @@ const SellerAddProduct = () => {
         }else{
             data.append('usd_price', usd_price);
         }
+        data.append('tags',tags);
         data.append('currency', currency);
         data.append('description', description);
         if (image) {
@@ -140,6 +142,10 @@ const SellerAddProduct = () => {
                                         </div>
                                     )
                                 }
+                                <div className="mt-2">
+                                    <label className='form-label' htmlFor="tags">Tags: </label>
+                                    <input className='form-control' type="text" id='tags' name='tags' value={tags} onChange={onChange}/>
+                                </div>
                                 <div className="mt-2">
                                     <label className='form-label' htmlFor="description">Description: </label>
                                     <textarea className='form-control' rows='4' cols='4' id='description' name='description' value={description} onChange={onChange} required />

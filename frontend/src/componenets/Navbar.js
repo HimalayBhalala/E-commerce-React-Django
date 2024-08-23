@@ -40,9 +40,9 @@ const Navbar = ({ logout, isAuthenticated, profile_image }) => {
           <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div className="navbar-nav ms-auto">
               <form className='text-center'>
-                <div class="form-check form-switch text-center" style={{marginTop:"0.6rem",marginRight:"5rem"}}>
-                  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" name="mode" value={themeMode} checked={themeMode === "dark" ? true : false} onClick={() => changeMode()}/>
-                  <label class="form-check-label" for="flexSwitchCheckChecked" style={{color : themeMode === "dark" ? "black" : "white"}}>{themeMode === "dark" ? "Dark" : "Light"}</label>
+                <div className="form-check form-switch text-center" style={{marginTop:"0.6rem",marginRight:"5rem"}}>
+                  <input className="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked" name="mode" value={themeMode} checked={themeMode === "dark" ? true : false} onClick={() => changeMode()}/>
+                  <label className="form-check-label" for="flexSwitchCheckChecked" style={{color : themeMode === "dark" ? "black" : "white"}}>{themeMode === "dark" ? "Dark" : "Light"}</label>
                 </div>
               </form>
 

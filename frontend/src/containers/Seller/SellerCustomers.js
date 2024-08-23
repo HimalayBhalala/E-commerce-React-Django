@@ -51,6 +51,7 @@ const SellerCustomers = () => {
                                         <th>Sr.No</th>
                                         <th>Email</th>
                                         <th>Mobile</th>
+                                        <th>Address</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -61,7 +62,8 @@ const SellerCustomers = () => {
                                                     <td>{index + 1}</td>
                                                     <td>{customer?.email}</td>
                                                     <td>{customer?.mobile}</td>
-                                                    <td>
+                                                    <td style={{height:"auto",width:"5rem"}}>{customer.customer_address[0].address}</td>
+                                                    <td style={{display:"flex"}}>
                                                         <Link className='btn btn-sm btn-primary' to={`/seller/order/${seller_id}/${customer.id}`} >Order</Link>
                                                         <Link className='btn btn-danger btn-sm ms-1' onClick={() => {customerRemoveFromList(customer.id)}}>Remove From List</Link>
                                                     </td>

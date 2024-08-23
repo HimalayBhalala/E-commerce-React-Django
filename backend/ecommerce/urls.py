@@ -48,5 +48,10 @@ urlpatterns = [
     path('customer/addresses/<int:customer_id>/',views.GetAllCustomerAddress.as_view(),name="get-all-address"),
     path('customer/rating/<int:customer_id>/<int:product_id>/',views.CustomerAddingRating.as_view(),name='customer-rating'),
     path('customer/orders/<int:order_id>/',views.GetAllOrderProduct.as_view(),name='get-order'),
-    path('customer/orders/<int:order_id>/<int:product_id>/',views.RemoveProductFromOrder.as_view(),name='get-order-product')
+    path('customer/orders/<int:order_id>/<int:product_id>/',views.RemoveProductFromOrder.as_view(),name='get-order-product'),
+
+    path('reports/daily/', views.generate_monthly_report, name='generate_daily_report'),
+    path('reports/monthly/', views.generate_monthly_report, name='generate_monthly_report'),
+    path('reports/yearly/', views.generate_monthly_report, name='generat_yearly_report'),
+    
 ]

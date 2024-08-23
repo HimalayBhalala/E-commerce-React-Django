@@ -142,6 +142,11 @@ const ProductDetail = ({ isAuthenticated }) => {
         setIsInWishlist(false);
     };
 
+    const handleBuyNow = () => {
+        addToCart();
+        navigate('/order/confirm');
+    };
+
     const renderTags = () => (
         tagData.map((tag, index) => (
             <Link key={index} to={`/product/tag/${tag}`} className="badge bg-secondary ms-1">
@@ -221,7 +226,7 @@ const ProductDetail = ({ isAuthenticated }) => {
                                 </button>
                             )
                         }
-                        <button className='btn btn-primary btn-sm ms-1' title='Buy Now'>
+                        <button className='btn btn-primary btn-sm ms-1' type='button' onClick={handleBuyNow} title='Buy Now'>
                             <i className='fa-solid fa-bag-shopping'></i> Buy Now
                         </button>
                         <button 

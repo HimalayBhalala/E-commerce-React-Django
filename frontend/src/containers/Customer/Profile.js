@@ -92,10 +92,10 @@ const Profile = ({customer_change_profile,isAuthenticated}) => {
                 <div className="col-md-3">
                     <SideBar />
                 </div>
-                <div className="col-md-9">
+                <div className="col-md-9" style={{marginBottom:"10rem"}}>
                     <h1>Welcome, {customerInfo.user?.first_name}</h1>
                     <hr />
-                    <div style={{ border: '2px solid black', background: 'white' }}>
+                    <div style={{ border: '2px solid black', background: 'white', color:"black" }}>
                         <form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
                             Email:
                             <TextField

@@ -49,7 +49,7 @@ const Login = ({ customer_login,isAuthenticated,seller_login}) => {
     <div className='container mt-5'>
       <div>
       <div className='form-control mt-5 text-center'>
-      <form onSubmit={handleSubmit} >
+      <form onSubmit={handleSubmit}>
         <TextField
           label="Email"
           variant="outlined"

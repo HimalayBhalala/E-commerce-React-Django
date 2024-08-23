@@ -87,12 +87,12 @@ const DashBoard = () => {
 
   return (
     <div>
-      <div className="container mt-5" style={{ marginBottom: "12rem" }}>
+      <div className="container mt-5" style={{ marginBottom: "1rem" }}>
         <div className="row" style={{color : themeMode === "dark" ? "black" : "black"}}>
           <div className="col-md-3">
             <SideBar />
           </div>
-          <div className="col-md-9">
+          <div className="col-md-9" style={{marginBottom:"10rem"}}>
             <div className="row">
               <div className="col-md-4">
                 <div className="card">
